@@ -213,7 +213,11 @@ function safelyCallDestroy(current: Fiber, destroy: () => void) {
     }
   }
 }
-
+/**
+ * 与 Snapshot 标记相关的类型只有 ClassComponent 和 HostRoot.
+ * 对于ClassComponent类型节点, 调用了instance.getSnapshotBeforeUpdate生命周期函数
+ * 对于HostRoot类型节点, 调用clearContainer清空了容器节点(即div#root这个 dom 节点).
+ */
 function commitBeforeMutationLifeCycles(
   current: Fiber | null,
   finishedWork: Fiber,

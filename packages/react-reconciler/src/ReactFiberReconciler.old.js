@@ -256,6 +256,7 @@ export function updateContainer(
   if (__DEV__) {
     onScheduleRoot(container, element);
   }
+  // 获取当前时间戳, 计算本次更新的优先级
   const current = container.current;
   const eventTime = requestEventTime();
   if (__DEV__) {
@@ -265,6 +266,7 @@ export function updateContainer(
       warnIfNotScopedWithMatchingAct(current);
     }
   }
+  /** 根据当前时间, 创建一个update优先级 */
   const lane = requestUpdateLane(current);
 
   if (enableSchedulingProfiler) {
@@ -294,7 +296,7 @@ export function updateContainer(
       );
     }
   }
-
+  // 根据 lane 优先级, 创建update对象, 并加入fiber.updateQueue.pending队列
   const update = createUpdate(eventTime, lane);
   // Caution: React DevTools currently depends on this property
   // being called "element".
@@ -315,6 +317,7 @@ export function updateContainer(
   }
 
   enqueueUpdate(current, update);
+  // 进入 reconciler 运作流程中的`输入`环节
   scheduleUpdateOnFiber(current, lane, eventTime);
 
   return lane;

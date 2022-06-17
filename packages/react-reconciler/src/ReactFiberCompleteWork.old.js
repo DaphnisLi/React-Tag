@@ -642,6 +642,11 @@ function cutOffTailIfNeeded(
   }
 }
 
+/**
+ * 处理Fiber节点, 会调用渲染器(调用react-dom包, 关联Fiber节点和dom对象, 绑定事件等)。
+ *
+ * 一般情况下都会返回 null。但是如果当前 fiber 节点是 SuspenseComponent、SuspenseListComponent 的时候就会派生出新的子节点 fallback  官方文档: https://zh-hans.reactjs.org/docs/react-api.html#reactsuspense
+ */
 function completeWork(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -662,6 +667,7 @@ function completeWork(
     case MemoComponent:
       return null;
     case ClassComponent: {
+      // ? Class类型不做处理
       const Component = workInProgress.type;
       if (isLegacyContextProvider(Component)) {
         popLegacyContext(workInProgress);
@@ -690,6 +696,7 @@ function completeWork(
           // This handles the case of React rendering into a container with previous children.
           // It's also safe to do for updates too, because current.child would only be null
           // if the previous render was null (so the the container would already be empty).
+          // ? 设置fiber.flags标记
           workInProgress.flags |= Snapshot;
         }
       }
@@ -701,6 +708,7 @@ function completeWork(
       const rootContainerInstance = getRootHostContainer();
       const type = workInProgress.type;
       if (current !== null && workInProgress.stateNode != null) {
+        // ? update逻辑, 初次render不会进入
         updateHostComponent(
           current,
           workInProgress,
@@ -744,6 +752,7 @@ function completeWork(
             markUpdate(workInProgress);
           }
         } else {
+          // ? 1. 创建DOM对象
           const instance = createInstance(
             type,
             newProps,
@@ -752,14 +761,17 @@ function completeWork(
             workInProgress,
           );
 
+          // ? 2. 把子树中的DOM对象附加到本节点的DOM对象之后
           appendAllChildren(instance, workInProgress, false, false);
 
+          // ? 设置stateNode属性, 指向DOM对象
           workInProgress.stateNode = instance;
 
           // Certain renderers require commit-time effects for initial mount.
           // (eg DOM renderer supports auto-focus for certain elements).
           // Make sure such renderers get scheduled for later work.
           if (
+            // ? 3. 设置DOM对象的属性, 绑定事件等
             finalizeInitialChildren(
               instance,
               type,
@@ -768,12 +780,14 @@ function completeWork(
               currentHostContext,
             )
           ) {
+            // ? 设置fiber.flags标记(Update)
             markUpdate(workInProgress);
           }
         }
 
         if (workInProgress.ref !== null) {
           // If there is a ref on a host node we need to schedule a callback
+          // ? 设置fiber.flags标记(Ref)
           markRef(workInProgress);
         }
       }

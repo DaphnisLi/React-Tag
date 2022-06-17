@@ -89,6 +89,12 @@ if (__DEV__) {
   };
 }
 
+/**
+ * Dom节点实例
+ *
+ * 如果是document节点，就返回html节点，如果不是就返回第一个子节点实例，否则就返回null
+ * @param {*} container #root
+ */
 function getReactRootElementInContainer(container: any) {
   if (!container) {
     return null;
@@ -100,13 +106,16 @@ function getReactRootElementInContainer(container: any) {
     return container.firstChild;
   }
 }
-
+/**
+ *  判断节点是否含有 data-reactroot 属性
+ * @param {*} container #root
+ */
 function shouldHydrateDueToLegacyHeuristic(container) {
   const rootElement = getReactRootElementInContainer(container);
   return !!(
     rootElement &&
-    rootElement.nodeType === ELEMENT_NODE &&
-    rootElement.hasAttribute(ROOT_ATTRIBUTE_NAME)
+    rootElement.nodeType === ELEMENT_NODE && // 普通的元素节点
+    rootElement.hasAttribute(ROOT_ATTRIBUTE_NAME) // 判断节点是否含有 data-reactroot 属性
   );
 }
 
@@ -173,10 +182,10 @@ function warnOnInvalidCallback(callback: mixed, callerName: string): void {
 }
 
 function legacyRenderSubtreeIntoContainer(
-  parentComponent: ?React$Component<any, any>,
-  children: ReactNodeList,
-  container: Container,
-  forceHydrate: boolean,
+  parentComponent: ?React$Component<any, any>, // null
+  children: ReactNodeList, // <App />
+  container: Container, // #root
+  forceHydrate: boolean, // false
   callback: ?Function,
 ) {
   if (__DEV__) {
@@ -189,7 +198,10 @@ function legacyRenderSubtreeIntoContainer(
   let root: RootType = (container._reactRootContainer: any);
   let fiberRoot;
   if (!root) {
-    // Initial mount
+    // Initial mount  (初始挂载)
+    // 初次调用, root还未初始化, 会进入此分支
+    //1. 创建ReactDOMRoot对象, 初始化react应用环境
+    // 给 root 增加了 _internalRoot 属性
     root = container._reactRootContainer = legacyCreateRootFromDOMContainer(
       container,
       forceHydrate,
@@ -285,14 +297,16 @@ export function hydrate(
 }
 
 export function render(
-  element: React$Element<any>,
-  container: Container,
+  element: React$Element<any>, // <App />
+  container: Container, // #root
   callback: ?Function,
 ) {
+  // 判断 container 是否是有效容器，如果不是就会报错
   invariant(
     isValidContainer(container),
     'Target container is not a DOM element.',
   );
+  // 判断是否是开发环境 https://zh-hans.reactjs.org/docs/codebase-overview.html#development-and-production
   if (__DEV__) {
     const isModernRoot =
       isContainerMarkedAsRoot(container) &&

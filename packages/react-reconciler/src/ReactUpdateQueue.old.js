@@ -106,13 +106,17 @@ import {disableLogs, reenableLogs} from 'shared/ConsolePatchingDev';
 export type Update<State> = {|
   // TODO: Temporary field. Will remove this by storing a map of
   // transition -> event time on the root.
+  /** 发起update事件的时间(17.0.2中作为临时字段, 即将移出) */
   eventTime: number,
+  /** update所属的优先级 */
   lane: Lane,
-
+  /** 表示update的4种类型 */
   tag: 0 | 1 | 2 | 3,
+  /** 载荷, 根据场景可以设置成一个回调函数或者对象 */
   payload: any,
+  /** 回调函数 */
   callback: (() => mixed) | null,
-
+  /** 指向链表中的下一个, 由于UpdateQueue是一个环形链表, 最后一个update.next指向第一个update对象 */
   next: Update<State> | null,
 |};
 
@@ -184,6 +188,7 @@ export function cloneUpdateQueue<State>(
 export function createUpdate(eventTime: number, lane: Lane): Update<*> {
   const update: Update<*> = {
     eventTime,
+    /** 优先级 */
     lane,
 
     tag: UpdateState,

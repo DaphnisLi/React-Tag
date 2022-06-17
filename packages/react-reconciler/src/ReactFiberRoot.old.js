@@ -86,6 +86,7 @@ export function createFiberRoot(
   hydrate: boolean,
   hydrationCallbacks: null | SuspenseHydrationCallbacks,
 ): FiberRoot {
+  // 创建fiberRoot对象, 注意RootTag的传递
   const root: FiberRoot = (new FiberRootNode(containerInfo, tag, hydrate): any);
   if (enableSuspenseCallback) {
     root.hydrationCallbacks = hydrationCallbacks;
@@ -93,10 +94,11 @@ export function createFiberRoot(
 
   // Cyclic construction. This cheats the type system right now because
   // stateNode is any.
+  // 这里创建了`react`应用的首个fiber对象, 称为HostRootFiber
   const uninitializedFiber = createHostRootFiber(tag);
   root.current = uninitializedFiber;
   uninitializedFiber.stateNode = root;
-
+  // 初始化HostRootFiber的updateQueue
   initializeUpdateQueue(uninitializedFiber);
 
   return root;

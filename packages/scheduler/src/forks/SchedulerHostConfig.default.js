@@ -5,20 +5,34 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import {enableIsInputPending} from '../SchedulerFeatureFlags';
+import { enableIsInputPending } from '../SchedulerFeatureFlags';
 
+// TODO 调度相关: 请求或取消调度
+
+/** 请求及时回调 */
 export let requestHostCallback;
+/** 取消及时回调 */
 export let cancelHostCallback;
+/** 请求延时回调 */
 export let requestHostTimeout;
+/** 取消延时回调 */
 export let cancelHostTimeout;
+
+// TODO 时间切片(time slicing)相关: 执行时间分割, 让出主线程(把控制权归还浏览器, 浏览器可以处理用户输入, UI 绘制等紧急任务).
+
+/** 是否让出主线程 */
 export let shouldYieldToHost;
+/** 请求绘制 */
 export let requestPaint;
+/** 获取当前时间 */
 export let getCurrentTime;
+/** 强制设置 yieldInterval (让出主线程的周期) */
 export let forceFrameRate;
 
 const hasPerformanceNow =
   typeof performance === 'object' && typeof performance.now === 'function';
 
+// 如果有 performance 可以使用就用，没有就用Date
 if (hasPerformanceNow) {
   const localPerformance = performance;
   getCurrentTime = () => localPerformance.now();
@@ -39,7 +53,7 @@ if (
   // fallback to a naive implementation.
   let _callback = null;
   let _timeoutID = null;
-  const _flushCallback = function() {
+  const _flushCallback = function () {
     if (_callback !== null) {
       try {
         const currentTime = getCurrentTime();
@@ -52,7 +66,7 @@ if (
       }
     }
   };
-  requestHostCallback = function(cb) {
+  requestHostCallback = function (cb) {
     if (_callback !== null) {
       // Protect against re-entrancy.
       setTimeout(requestHostCallback, 0, cb);
@@ -61,19 +75,19 @@ if (
       setTimeout(_flushCallback, 0);
     }
   };
-  cancelHostCallback = function() {
+  cancelHostCallback = function () {
     _callback = null;
   };
-  requestHostTimeout = function(cb, ms) {
+  requestHostTimeout = function (cb, ms) {
     _timeoutID = setTimeout(cb, ms);
   };
-  cancelHostTimeout = function() {
+  cancelHostTimeout = function () {
     clearTimeout(_timeoutID);
   };
-  shouldYieldToHost = function() {
+  shouldYieldToHost = function () {
     return false;
   };
-  requestPaint = forceFrameRate = function() {};
+  requestPaint = forceFrameRate = function () { };
 } else {
   // Capture local references to native APIs, in case a polyfill overrides them.
   const setTimeout = window.setTimeout;
@@ -90,16 +104,16 @@ if (
       // Using console['error'] to evade Babel and ESLint
       console['error'](
         "This browser doesn't support requestAnimationFrame. " +
-          'Make sure that you load a ' +
-          'polyfill in older browsers. https://reactjs.org/link/react-polyfills',
+        'Make sure that you load a ' +
+        'polyfill in older browsers. https://reactjs.org/link/react-polyfills',
       );
     }
     if (typeof cancelAnimationFrame !== 'function') {
       // Using console['error'] to evade Babel and ESLint
       console['error'](
         "This browser doesn't support cancelAnimationFrame. " +
-          'Make sure that you load a ' +
-          'polyfill in older browsers. https://reactjs.org/link/react-polyfills',
+        'Make sure that you load a ' +
+        'polyfill in older browsers. https://reactjs.org/link/react-polyfills',
       );
     }
   }
@@ -112,7 +126,11 @@ if (
   // thread, like user events. By default, it yields multiple times per frame.
   // It does not attempt to align with frame boundaries, since most tasks don't
   // need to be frame aligned; for those that do, use requestAnimationFrame.
+  /**
+   * 时间切片周期, 默认是5ms(如果一个task运行超过该周期, 下一个task执行之前, 会把控制权归还浏览器)
+   */
   let yieldInterval = 5;
+  /** 任务到期的最后期限，其实就是倒计时5ms */
   let deadline = 0;
 
   // TODO: Make this configurable
@@ -127,7 +145,13 @@ if (
     navigator.scheduling.isInputPending !== undefined
   ) {
     const scheduling = navigator.scheduling;
-    shouldYieldToHost = function() {
+
+    //! 注意shouldYieldToHost的判定条件:
+    // currentTime >= deadline: 只有时间超过deadline之后才会让出主线程(其中deadline = currentTime + yieldInterval).
+    // yieldInterval默认是5ms, 只能通过forceFrameRate函数来修改(事实上在 v17.0.2 源码中, 并没有使用到该函数).
+    // 如果一个task运行时间超过5ms, 下一个task执行之前, 会把控制权归还浏览器.
+    // navigator.scheduling.isInputPending(): 这 facebook 官方贡献给 Chromium 的 api, 现在已经列入 W3C 标准(具体解释), 用于判断是否有输入事件(包括: input 框输入事件, 点击事件等).
+    shouldYieldToHost = function () {
       const currentTime = getCurrentTime();
       if (currentTime >= deadline) {
         // There's no time left. We may want to yield control of the main
@@ -144,6 +168,7 @@ if (
         }
         // There's no pending input. Only yield if we've reached the max
         // yield interval.
+        // 在持续运行的react应用中, currentTime肯定大于300ms, 这个判断只在初始化过程中才有可能返回false
         return currentTime >= maxYieldInterval;
       } else {
         // There's still time left in the frame.
@@ -151,26 +176,26 @@ if (
       }
     };
 
-    requestPaint = function() {
+    requestPaint = function () {
       needsPaint = true;
     };
   } else {
     // `isInputPending` is not available. Since we have no way of knowing if
     // there's pending input, always yield at the end of the frame.
-    shouldYieldToHost = function() {
+    shouldYieldToHost = function () {
       return getCurrentTime() >= deadline;
     };
 
     // Since we yield every frame regardless, `requestPaint` has no effect.
-    requestPaint = function() {};
+    requestPaint = function () { };
   }
 
-  forceFrameRate = function(fps) {
+  forceFrameRate = function (fps) {
     if (fps < 0 || fps > 125) {
       // Using console['error'] to evade Babel and ESLint
       console['error'](
         'forceFrameRate takes a positive int between 0 and 125, ' +
-          'forcing frame rates higher than 125 fps is not supported',
+        'forcing frame rates higher than 125 fps is not supported',
       );
       return;
     }
@@ -181,31 +206,44 @@ if (
       yieldInterval = 5;
     }
   };
-
+  /**
+   * 接收 MessageChannel 消息
+   */
   const performWorkUntilDeadline = () => {
     if (scheduledHostCallback !== null) {
+      //? 1. 获取当前时间
       const currentTime = getCurrentTime();
       // Yield after `yieldInterval` ms, regardless of where we are in the vsync
       // cycle. This means there's always time remaining at the beginning of
-      // the message event.
+      // the message event.'
+
+      //? 2. 更新deadline
       deadline = currentTime + yieldInterval;
       const hasTimeRemaining = true;
       try {
+        //? 3. 执行回调, 返回是否有还有剩余任务
         const hasMoreWork = scheduledHostCallback(
           hasTimeRemaining,
           currentTime,
         );
         if (!hasMoreWork) {
+          //? 没有剩余任务, 退出
           isMessageLoopRunning = false;
           scheduledHostCallback = null;
         } else {
           // If there's more work, schedule the next message event at the end
           // of the preceding one.
+
+          //? 有剩余任务, 发起新的调度
+          // 通过 MessageChannel 发送消息
           port.postMessage(null);
         }
       } catch (error) {
         // If a scheduler task throws, exit the current browser task so the
         // error can be observed.
+
+        //? 如有异常, 重新发起调度
+        // 通过 MessageChannel 发送消息
         port.postMessage(null);
         throw error;
       }
@@ -214,32 +252,37 @@ if (
     }
     // Yielding to the browser will give it a chance to paint, so we can
     // reset this.
+    //? 重置开关
     needsPaint = false;
   };
-
+  /**
+   * 此处需要注意: MessageChannel在浏览器事件循环中属于宏任务, 所以调度中心永远是异步执行回调函数.
+   */
   const channel = new MessageChannel();
   const port = channel.port2;
   channel.port1.onmessage = performWorkUntilDeadline;
 
-  requestHostCallback = function(callback) {
+  requestHostCallback = function (callback) {
+    // 保存callback
     scheduledHostCallback = callback;
     if (!isMessageLoopRunning) {
       isMessageLoopRunning = true;
+      // 通过 MessageChannel 发送消息
       port.postMessage(null);
     }
   };
 
-  cancelHostCallback = function() {
+  cancelHostCallback = function () {
     scheduledHostCallback = null;
   };
 
-  requestHostTimeout = function(callback, ms) {
+  requestHostTimeout = function (callback, ms) {
     taskTimeoutID = setTimeout(() => {
       callback(getCurrentTime());
     }, ms);
   };
 
-  cancelHostTimeout = function() {
+  cancelHostTimeout = function () {
     clearTimeout(taskTimeoutID);
     taskTimeoutID = -1;
   };

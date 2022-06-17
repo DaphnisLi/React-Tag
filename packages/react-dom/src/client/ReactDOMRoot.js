@@ -53,10 +53,11 @@ import {
 } from 'react-reconciler/src/ReactFiberReconciler';
 import invariant from 'shared/invariant';
 import {enableEagerRootListeners} from 'shared/ReactFeatureFlags';
+// React的三种模式，当前，过度，未来
 import {
-  BlockingRoot,
-  ConcurrentRoot,
-  LegacyRoot,
+  LegacyRoot, // 0
+  BlockingRoot, // 1
+  ConcurrentRoot, // 2
 } from 'react-reconciler/src/ReactRootTags';
 
 function ReactDOMRoot(container: Container, options: void | RootOptions) {
@@ -122,6 +123,7 @@ function createRootImpl(
   tag: RootTag,
   options: void | RootOptions,
 ) {
+  // hydrate服务端渲染等, 暂时用不上
   // Tag is either LegacyRoot or Concurrent Root
   const hydrate = options != null && options.hydrate === true;
   const hydrationCallbacks =
@@ -131,7 +133,9 @@ function createRootImpl(
       options.hydrationOptions != null &&
       options.hydrationOptions.mutableSources) ||
     null;
+  // 创建fiberRoot
   const root = createContainer(container, tag, hydrate, hydrationCallbacks);
+  // 标记dom对象, 把dom和fiber对象关联起来
   markContainerAsRoot(root.current, container);
   const containerNodeType = container.nodeType;
 
@@ -200,6 +204,7 @@ export function createLegacyRoot(
 }
 
 export function isValidContainer(node: mixed): boolean {
+  // https://developer.mozilla.org/zh-CN/docs/Web/API/Node/nodeType
   return !!(
     node &&
     (node.nodeType === ELEMENT_NODE ||

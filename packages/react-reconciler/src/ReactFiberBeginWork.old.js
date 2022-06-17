@@ -231,6 +231,7 @@ if (__DEV__) {
   didWarnAboutDefaultPropsOnFunctionComponent = {};
 }
 
+/** 根据ReactElement对象，生成Fiber子节点(只生成次级子节点) */
 export function reconcileChildren(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -698,7 +699,7 @@ function markRef(current: Fiber | null, workInProgress: Fiber) {
     workInProgress.flags |= Ref;
   }
 }
-
+11
 function updateFunctionComponent(
   current,
   workInProgress,
@@ -1050,8 +1051,11 @@ function pushHostRootContext(workInProgress) {
   pushHostContainer(workInProgress, root.containerInfo);
 }
 
+/** fiber 树的跟节点 */
 function updateHostRoot(current, workInProgress, renderLanes) {
   pushHostRootContext(workInProgress);
+
+  // ? 1. 状态计算, 更新整合到 workInProgress.memoizedState中来, memoizedState里面保存了节点的状态(state、hook)
   const updateQueue = workInProgress.updateQueue;
   invariant(
     current !== null && updateQueue !== null,
@@ -1063,10 +1067,14 @@ function updateHostRoot(current, workInProgress, renderLanes) {
   const prevState = workInProgress.memoizedState;
   const prevChildren = prevState !== null ? prevState.element : null;
   cloneUpdateQueue(current, workInProgress);
+
+  // ? 遍历updateQueue.shared.pending, 提取有足够优先级的update对象, 计算出最终的状态 workInProgress.memoizedState
   processUpdateQueue(workInProgress, nextProps, null, renderLanes);
   const nextState = workInProgress.memoizedState;
   // Caution: React DevTools currently depends on this property
   // being called "element".
+
+  // ? 2. 获取下级`ReactElement`对象
   const nextChildren = nextState.element;
   if (nextChildren === prevChildren) {
     resetHydrationState();
@@ -1074,6 +1082,7 @@ function updateHostRoot(current, workInProgress, renderLanes) {
   }
   const root: FiberRoot = workInProgress.stateNode;
   if (root.hydrate && enterHydrationState(workInProgress)) {
+    // ? 服务端渲染相关
     // If we don't have any current children this might be the first pass.
     // We always try to hydrate. If this isn't a hydration pass there won't
     // be any children to hydrate which is effectively the same thing as
@@ -1115,12 +1124,15 @@ function updateHostRoot(current, workInProgress, renderLanes) {
   } else {
     // Otherwise reset hydration state in case we aborted and resumed another
     // root.
+
+    // ? 3. 根据`ReactElement`对象, 调用`reconcileChildren`生成`Fiber`子节点(只生成`次级子节点`)
     reconcileChildren(current, workInProgress, nextChildren, renderLanes);
     resetHydrationState();
   }
   return workInProgress.child;
 }
 
+/** dom节点 */
 function updateHostComponent(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -1131,11 +1143,11 @@ function updateHostComponent(
   if (current === null) {
     tryToClaimNextHydratableInstance(workInProgress);
   }
-
+  // ? 1. 状态计算, 由于HostComponent是无状态组件, 所以只需要收集 nextProps即可, 它没有 memoizedState
   const type = workInProgress.type;
   const nextProps = workInProgress.pendingProps;
   const prevProps = current !== null ? current.memoizedProps : null;
-
+  // ? 2. 获取下级`ReactElement`对象
   let nextChildren = nextProps.children;
   const isDirectTextChild = shouldSetTextContent(type, nextProps);
 
@@ -1144,14 +1156,20 @@ function updateHostComponent(
     // case. We won't handle it as a reified child. We will instead handle
     // this in the host environment that also has access to this prop. That
     // avoids allocating another HostText fiber and traversing it.
+
+    // ? 如果子节点只有一个文本节点, 不用再创建一个HostText类型的fiber
     nextChildren = null;
   } else if (prevProps !== null && shouldSetTextContent(type, prevProps)) {
     // If we're switching from a direct text child to a normal child, or to
     // empty, we need to schedule the text content to be reset.
+
+    // ? 特殊操作需要设置fiber.flags
     workInProgress.flags |= ContentReset;
   }
 
+  // ? 特殊操作需要设置fiber.flags
   markRef(current, workInProgress);
+  // ? 3. 根据`ReactElement`对象, 调用`reconcileChildren`生成`Fiber`子节点(只生成`次级子节点`)
   reconcileChildren(current, workInProgress, nextChildren, renderLanes);
   return workInProgress.child;
 }
@@ -3080,6 +3098,13 @@ function remountFiber(
   }
 }
 
+/**
+ * 深度优先遍历构造 fiber 树，探寻阶段
+ * 功能：构造 fiber 节点
+ * 1、根据 ReactElement对象创建所有的fiber节点, 最终构造出fiber树形结构(设置return和sibling指针)
+ * 2、设置fiber.flags(二进制形式变量, 用来标记 fiber节点 的增,删,改状态, 等待completeWork阶段处理)
+ * 3、设置fiber.stateNode局部状态(如Class类型节点: fiber.stateNode=new Class())
+ */
 function beginWork(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -3106,6 +3131,7 @@ function beginWork(
   }
 
   if (current !== null) {
+    // ? update逻辑, 首次render不会进入
     const oldProps = current.memoizedProps;
     const newProps = workInProgress.pendingProps;
 
@@ -3293,6 +3319,8 @@ function beginWork(
           return updateOffscreenComponent(current, workInProgress, renderLanes);
         }
       }
+
+      // ? 本`fiber`节点的没有更新, 可以复用, 进入bailout逻辑
       return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);
     } else {
       if ((current.flags & ForceUpdateForLegacySuspense) !== NoFlags) {
@@ -3316,8 +3344,11 @@ function beginWork(
   // the update queue. However, there's an exception: SimpleMemoComponent
   // sometimes bails out later in the begin phase. This indicates that we should
   // move this assignment out of the common path and into each branch.
-  workInProgress.lanes = NoLanes;
 
+  // ? 不能复用, 创建新的fiber节点
+  // ? 设置workInProgress优先级为NoLanes(最高优先级)
+  workInProgress.lanes = NoLanes;
+  // ? 根据workInProgress节点的类型, 用不同的方法派生出子节点
   switch (workInProgress.tag) {
     case IndeterminateComponent: {
       return mountIndeterminateComponent(
@@ -3337,6 +3368,10 @@ function beginWork(
         renderLanes,
       );
     }
+
+    // ? 函数组件
+    // 1.执行 function, 获取下级reactElement
+    // 2.根据实际情况, 设置fiber.flags ———— 副作用
     case FunctionComponent: {
       const Component = workInProgress.type;
       const unresolvedProps = workInProgress.pendingProps;
@@ -3352,6 +3387,13 @@ function beginWork(
         renderLanes,
       );
     }
+
+    // ? class组件
+    // 1.构建React.Component实例
+    // 2.把新实例挂载到fiber.stateNode上
+    // 3.执行render之前的生命周期函数
+    // 4.执行render方法, 获取下级reactElement
+    // 5.根据实际情况, 设置fiber.flags ———— 副作用
     case ClassComponent: {
       const Component = workInProgress.type;
       const unresolvedProps = workInProgress.pendingProps;
@@ -3364,11 +3406,18 @@ function beginWork(
         workInProgress,
         Component,
         resolvedProps,
+        // ? 正常情况下渲染优先级会被用于fiber树的构造过程
         renderLanes,
       );
     }
+    // ? HostRootFiber(fiber 树的跟节点)
     case HostRoot:
       return updateHostRoot(current, workInProgress, renderLanes);
+
+    // ? HostComponent(原生dom节点)
+    // 1.pendingProps.children作为下级reactElement
+    // 2.如果下级节点是文本节点,则设置下级节点为 null. 准备进入completeUnitOfWork阶段
+    // 3.根据实际情况, 设置fiber.flags ———— 副作用
     case HostComponent:
       return updateHostComponent(current, workInProgress, renderLanes);
     case HostText:

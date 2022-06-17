@@ -33,6 +33,9 @@ import {getParentSuspenseInstance} from './ReactDOMHostConfig';
 import invariant from 'shared/invariant';
 import {enableScopeAPI} from 'shared/ReactFeatureFlags';
 
+/**
+ * 转换成二进制
+ */
 const randomKey = Math.random()
   .toString(36)
   .slice(2);
@@ -50,6 +53,11 @@ export function precacheFiberNode(
   (node: any)[internalInstanceKey] = hostInst;
 }
 
+/**
+ *  标记dom对象, 把dom和fiber对象关联起来
+ * @param {*} hostRoot fiber节点
+ * @param {*} node dom 节点
+ */
 export function markContainerAsRoot(hostRoot: Fiber, node: Container): void {
   node[internalContainerInstanceKey] = hostRoot;
 }

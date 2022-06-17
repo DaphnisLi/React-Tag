@@ -7,6 +7,7 @@
  * @flow
  */
 
+ // 对应react的三种模式
 export type RootTag = 0 | 1 | 2;
 
 export const LegacyRoot = 0;
