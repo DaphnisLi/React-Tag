@@ -18,7 +18,7 @@ describe('ReactCache', () => {
     }
   });
 
-  // TODO: test something useful.
+  // todo: test something useful.
   // @gate experimental
   it('exports something', () => {
     expect(ReactCache.readCache).not.toBe(undefined);

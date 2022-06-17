@@ -363,7 +363,7 @@ describe('ReactFunctionComponent', () => {
     );
   });
 
-  // TODO: change this test after we deprecate default props support
+  // todo: change this test after we deprecate default props support
   // for function components
   it('should support default props and prop types', () => {
     function Child(props) {

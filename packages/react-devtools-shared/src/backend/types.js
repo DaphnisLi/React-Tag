@@ -53,7 +53,7 @@ export type WorkTagMap = {|
   YieldComponent: WorkTag,
 |};
 
-// TODO: If it's useful for the frontend to know which types of data an Element has
+// todo: If it's useful for the frontend to know which types of data an Element has
 // (e.g. props, state, context, hooks) then we could add a bitmask field for this
 // to keep the number of attributes small.
 export type FiberData = {|

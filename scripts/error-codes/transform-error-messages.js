@@ -95,7 +95,7 @@ module.exports = function(babel) {
             // to proceed, while also allowing a post-build linter to detect it.
             //
             // Outputs:
-            //   /* FIXME (minify-errors-in-prod): Unminified error message in production build! */
+            //   /* fixme (minify-errors-in-prod): Unminified error message in production build! */
             //   if (!condition) {
             //     throw Error(`A ${adj} message that contains ${noun}`);
             //   }
@@ -111,7 +111,7 @@ module.exports = function(babel) {
             );
             parentStatementPath.addComment(
               'leading',
-              'FIXME (minify-errors-in-prod): Unminified error message in production build!'
+              'fixme (minify-errors-in-prod): Unminified error message in production build!'
             );
             return;
           }

@@ -94,7 +94,7 @@ const bundles = [
       NODE_DEV,
       NODE_PROD,
       NODE_PROFILING,
-      // TODO: use on WWW.
+      // todo: use on WWW.
       RN_FB_DEV,
       RN_FB_PROD,
       RN_FB_PROFILING,
@@ -660,7 +660,7 @@ const bundles = [
 
   /******* ESLint Plugin for Hooks *******/
   {
-    // TODO: it's awkward to create a bundle for this but if we don't, the package
+    // todo: it's awkward to create a bundle for this but if we don't, the package
     // won't get copied. We also can't create just DEV bundle because it contains a
     // NODE_ENV check inside. We should probably tweak our build process to allow
     // "raw" packages that don't get bundled.

@@ -580,7 +580,7 @@ export default class Store extends EventEmitter<{|
     return false;
   }
 
-  // TODO Maybe split this into two methods: expand() and collapse()
+  // todo Maybe split this into two methods: expand() and collapse()
   toggleIsCollapsed(id: number, isCollapsed: boolean): void {
     let didMutate = false;
 

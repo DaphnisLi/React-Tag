@@ -319,7 +319,7 @@ export default function(babel, opts = {}) {
     }
     if (customHooksInScope.length > 0) {
       args.push(
-        // TODO: We could use an arrow here to be more compact.
+        // todo: We could use an arrow here to be more compact.
         // However, don't do it until AMA can run them natively.
         t.functionExpression(
           null,
@@ -371,7 +371,7 @@ export default function(babel, opts = {}) {
       const hookCallsForFn = hookCalls.get(fnNode);
       let key = '';
       if (path.parent.type === 'VariableDeclarator') {
-        // TODO: if there is no LHS, consider some other heuristic.
+        // todo: if there is no LHS, consider some other heuristic.
         key = path.parentPath.get('id').getSource();
       }
 

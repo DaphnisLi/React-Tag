@@ -495,7 +495,7 @@ describe('ReactSuspensePlaceholder', () => {
           </>,
         );
 
-        // TODO: This is here only to shift us into the next JND bucket. A
+        // todo: This is here only to shift us into the next JND bucket. A
         // consequence of AsyncText relying on the same timer queue as React's
         // internal Suspense timer. We should decouple our AsyncText helpers
         // from timers.

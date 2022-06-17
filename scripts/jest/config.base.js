@@ -24,6 +24,6 @@ module.exports = {
 
   testSequencer: require.resolve('./jestSequencer'),
 
-  // TODO: Upgrade to Jest 26 which uses jsdom 16 by default.
+  // todo: Upgrade to Jest 26 which uses jsdom 16 by default.
   testEnvironment: require.resolve('jest-environment-jsdom-sixteen'),
 };

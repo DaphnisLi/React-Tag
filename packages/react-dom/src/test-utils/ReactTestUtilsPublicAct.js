@@ -32,11 +32,11 @@ const {IsSomeRendererActing} = ReactSharedInternals;
 // This is the public version of `ReactTestUtils.act`. It is implemented in
 // "userspace" (i.e. not the reconciler), so that it doesn't add to the
 // production bundle size.
-// TODO: Remove this implementation of `act` in favor of the one exported by
+// todo: Remove this implementation of `act` in favor of the one exported by
 // the reconciler. To do this, we must first drop support for `act` in
 // production mode.
 
-// TODO: Remove support for the mock scheduler build, which was only added for
+// todo: Remove support for the mock scheduler build, which was only added for
 // the purposes of internal testing. Internal tests should use
 // `unstable_concurrentAct` instead.
 const isSchedulerMocked =

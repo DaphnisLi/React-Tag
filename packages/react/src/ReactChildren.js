@@ -41,7 +41,7 @@ function escape(key: string): string {
 }
 
 /**
- * TODO: Test that a single child and an array with one item have the same key
+ * todo: Test that a single child and an array with one item have the same key
  * pattern.
  */
 

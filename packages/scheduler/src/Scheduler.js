@@ -23,7 +23,7 @@ import {
 } from './SchedulerHostConfig';
 import {push, pop, peek} from './SchedulerMinHeap';
 
-// TODO: Use symbols?
+// todo: Use symbols?
 import {
   ImmediatePriority,
   UserBlockingPriority,

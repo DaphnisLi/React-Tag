@@ -167,7 +167,7 @@ export function getInternalReactConstants(
   // The section below is copied from files in React repo.
   // Keep it in sync, and add version guards if it changes.
   if (gte(version, '17.0.0-alpha')) {
-    // TODO (Offscreen) Update the version number above to reflect the first Offscreen alpha/beta release.
+    // todo (Offscreen) Update the version number above to reflect the first Offscreen alpha/beta release.
     ReactTypeOfWork = {
       Block: 22,
       ClassComponent: 1,
@@ -504,7 +504,7 @@ export function attach(
       const parentID = parentFiber ? getFiberID(parentFiber) : '';
       // NOTE: calling getFiberID or getPrimaryFiber is unsafe here
       // because it will put them in the map. For now, we'll omit them.
-      // TODO: better debugging story for this.
+      // todo: better debugging story for this.
       console.log(
         `[renderer] %c${name} %c${displayName} (${id}) %c${
           parentFiber ? `${parentDisplayName} (${parentID})` : ''
@@ -618,7 +618,7 @@ export function attach(
 
     switch (tag) {
       case DehydratedSuspenseComponent:
-        // TODO: ideally we would show dehydrated Suspense immediately.
+        // todo: ideally we would show dehydrated Suspense immediately.
         // However, it has some special behavior (like disconnecting
         // an alternate and turning into real Suspense) which breaks DevTools.
         // For now, ignore it, and only show it once it gets hydrated.
@@ -1207,7 +1207,7 @@ export function attach(
       // In that case we can just ignore it, or otherwise
       // there will be errors later on.
       primaryFibers.delete(primaryFiber);
-      // TODO: this is fragile and can obscure actual bugs.
+      // todo: this is fragile and can obscure actual bugs.
       return;
     }
     const id = getFiberID(primaryFiber);
@@ -1804,7 +1804,7 @@ export function attach(
     }
 
     if (alternate) {
-      // TODO: relying on this seems a bit fishy.
+      // todo: relying on this seems a bit fishy.
       const wasMounted =
         alternate.memoizedState != null &&
         alternate.memoizedState.element != null;
@@ -1960,7 +1960,7 @@ export function attach(
       }
     }
     if (node.tag === HostRoot) {
-      // TODO: Check if this was a nested HostRoot when used with
+      // todo: Check if this was a nested HostRoot when used with
       // renderContainerIntoSubtree.
       return MOUNTED;
     }
@@ -2406,7 +2406,7 @@ export function attach(
       type: elementType,
 
       // Inspectable properties.
-      // TODO Review sanitization approach for the below inspectable values.
+      // todo Review sanitization approach for the below inspectable values.
       context,
       hooks,
       props: memoizedProps,

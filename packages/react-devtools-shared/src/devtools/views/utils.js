@@ -41,7 +41,7 @@ export function createRegExp(string: string): RegExp {
       return new RegExp(string, 'i');
     } catch (err) {
       // Bad regex. Make it not match anything.
-      // TODO: maybe warn in console?
+      // todo: maybe warn in console?
       return new RegExp('.^');
     }
   }

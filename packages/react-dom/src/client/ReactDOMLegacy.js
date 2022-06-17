@@ -193,7 +193,7 @@ function legacyRenderSubtreeIntoContainer(
     warnOnInvalidCallback(callback === undefined ? null : callback, 'render');
   }
 
-  // TODO: Without `any` type, Flow says "Property cannot be accessed on any
+  // todo: Without `any` type, Flow says "Property cannot be accessed on any
   // member of intersection type." Whyyyyyy.
   let root: RootType = (container._reactRootContainer: any);
   let fiberRoot;
@@ -286,7 +286,7 @@ export function hydrate(
       );
     }
   }
-  // TODO: throw or warn if we couldn't hydrate?
+  // todo: throw or warn if we couldn't hydrate?
   return legacyRenderSubtreeIntoContainer(
     null,
     element,

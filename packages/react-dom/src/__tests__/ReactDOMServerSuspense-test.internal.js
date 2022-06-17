@@ -138,7 +138,7 @@ describe('ReactDOMServerSuspense', () => {
     expect(divB).toBe(divB2);
   });
 
-  // TODO: Remove this in favor of @gate pragma
+  // todo: Remove this in favor of @gate pragma
   if (__EXPERIMENTAL__) {
     itThrowsWhenRendering(
       'a suspending component outside a Suspense node',

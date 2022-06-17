@@ -28,7 +28,7 @@ const setInnerHTML = createMicrosoftUnsafeLocalFunction(function(
   if (node.namespaceURI === Namespaces.svg) {
     if (__DEV__) {
       if (enableTrustedTypesIntegration) {
-        // TODO: reconsider the text of this warning and when it should show
+        // todo: reconsider the text of this warning and when it should show
         // before enabling the feature flag.
         if (typeof trustedTypes !== 'undefined') {
           console.error(

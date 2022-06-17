@@ -203,7 +203,7 @@ export function schedulerPriorityToLanePriority(
       return InputContinuousLanePriority;
     case NormalSchedulerPriority:
     case LowSchedulerPriority:
-      // TODO: Handle LowSchedulerPriority, somehow. Maybe the same lane as hydration.
+      // todo: Handle LowSchedulerPriority, somehow. Maybe the same lane as hydration.
       return DefaultLanePriority;
     case IdleSchedulerPriority:
       return IdleLanePriority;
@@ -307,7 +307,7 @@ export function getNextLanes(root: FiberRoot, wipLanes: Lanes): Lanes {
 
   if (nextLanes === NoLanes) {
     // This should only be reachable if we're suspended
-    // TODO: Consider warning in this path if a fallback timer is not scheduled.
+    // todo: Consider warning in this path if a fallback timer is not scheduled.
     return NoLanes;
   }
 
@@ -388,7 +388,7 @@ export function getMostRecentEventTime(root: FiberRoot, lanes: Lanes): number {
 }
 
 function computeExpirationTime(lane: Lane, currentTime: number) {
-  // TODO: Expiration heuristic is constant per lane, so could use a map.
+  // todo: Expiration heuristic is constant per lane, so could use a map.
   getHighestPriorityLanes(lane);
   const priority = return_highestLanePriority;
   if (priority >= InputContinuousLanePriority) {
@@ -420,7 +420,7 @@ export function markStarvedLanesAsExpired(
   root: FiberRoot,
   currentTime: number,
 ): void {
-  // TODO: This gets called every time we yield. We can optimize by storing
+  // todo: This gets called every time we yield. We can optimize by storing
   // the earliest expiration time on the root. Then use that to quickly bail out
   // of this function.
 
@@ -665,7 +665,7 @@ export function markRootUpdated(
 ) {
   root.pendingLanes |= updateLane;
 
-  // TODO: Theoretically, any update to any lane can unblock any other lane. But
+  // todo: Theoretically, any update to any lane can unblock any other lane. But
   // it's not practical to try every single possible combination. We need a
   // heuristic to decide which lanes to attempt to render, and in which batches.
   // For now, we use the same heuristic as in the old ExpirationTimes model:

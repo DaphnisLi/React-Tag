@@ -99,7 +99,7 @@ describe('ReactFreshBabelPlugin', () => {
 
   it('uses original function declaration if it get reassigned', () => {
     // This should register the original version.
-    // TODO: in the future, we may *also* register the wrapped one.
+    // todo: in the future, we may *also* register the wrapped one.
     expect(
       transform(`
         function Hello() {
@@ -157,8 +157,8 @@ describe('ReactFreshBabelPlugin', () => {
   });
 
   it('ignores HOC definitions', () => {
-    // TODO: we might want to handle HOCs at usage site, however.
-    // TODO: it would be nice if we could always avoid registering
+    // todo: we might want to handle HOCs at usage site, however.
+    // todo: it would be nice if we could always avoid registering
     // a function that is known to return a function or other non-node.
     expect(
       transform(`

@@ -214,7 +214,7 @@ export function propagateContextChange(
               pickArbitraryLane(renderLanes),
             );
             update.tag = ForceUpdate;
-            // TODO: Because we don't have a work-in-progress, this will add the
+            // todo: Because we don't have a work-in-progress, this will add the
             // update to the current fiber, too, which means it will persist even if
             // this render is thrown away. Since it's a race condition, not sure it's
             // worth fixing.

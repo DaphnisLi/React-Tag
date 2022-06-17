@@ -66,7 +66,7 @@ export function markComponentSuspended(fiber: Fiber, wakeable: Wakeable): void {
     if (supportsUserTiming) {
       const id = getWakeableID(wakeable);
       const componentName = getComponentName(fiber.type) || 'Unknown';
-      // TODO Add component stack id
+      // todo Add component stack id
       performance.mark(`--suspense-suspend-${id}-${componentName}`);
       wakeable.then(
         () => performance.mark(`--suspense-resolved-${id}-${componentName}`),
@@ -144,7 +144,7 @@ export function markForceUpdateScheduled(fiber: Fiber, lane: Lane): void {
   if (enableSchedulingProfiler) {
     if (supportsUserTiming) {
       const componentName = getComponentName(fiber.type) || 'Unknown';
-      // TODO Add component stack id
+      // todo Add component stack id
       performance.mark(
         `--schedule-forced-update-${formatLanes(lane)}-${componentName}`,
       );
@@ -156,7 +156,7 @@ export function markStateUpdateScheduled(fiber: Fiber, lane: Lane): void {
   if (enableSchedulingProfiler) {
     if (supportsUserTiming) {
       const componentName = getComponentName(fiber.type) || 'Unknown';
-      // TODO Add component stack id
+      // todo Add component stack id
       performance.mark(
         `--schedule-state-update-${formatLanes(lane)}-${componentName}`,
       );

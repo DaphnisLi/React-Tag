@@ -412,7 +412,7 @@ describe('ReactElement.jsx', () => {
         });
       }
     }
-    // TODO: an explicit expect for no warning?
+    // todo: an explicit expect for no warning?
     ReactDOM.render(JSXRuntime.jsx(Parent, {}), container);
   });
 

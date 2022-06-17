@@ -52,7 +52,7 @@ function accumulateDirectionalDispatches(inst, phase, event) {
 function getParent(inst) {
   do {
     inst = inst.return;
-    // TODO: If this is a HostRoot we might want to bail out.
+    // todo: If this is a HostRoot we might want to bail out.
     // That is depending on if we want nested subtrees (layers) to bubble
     // events to their parent. We could also go through parentNode on the
     // host node but that wouldn't work for React Native and doesn't let us

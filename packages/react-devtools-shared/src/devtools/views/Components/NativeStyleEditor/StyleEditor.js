@@ -160,7 +160,7 @@ function Row({
   value,
   valuePlaceholder,
 }: RowProps) {
-  // TODO (RN style editor) Use @reach/combobox to auto-complete attributes.
+  // todo (RN style editor) Use @reach/combobox to auto-complete attributes.
   // The list of valid attributes would need to be injected by RN backend,
   // which would need to require them from ReactNativeViewViewConfig "validAttributes.style" keys.
   // This would need to degrade gracefully for react-native-web,

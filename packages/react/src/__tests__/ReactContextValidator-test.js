@@ -32,7 +32,7 @@ describe('ReactContextValidator', () => {
     ReactTestUtils = require('react-dom/test-utils');
   });
 
-  // TODO: This behavior creates a runtime dependency on propTypes. We should
+  // todo: This behavior creates a runtime dependency on propTypes. We should
   // ensure that this is not required for ES6 classes with Flow.
 
   it('should filter out context not in contextTypes', () => {
@@ -274,7 +274,7 @@ describe('ReactContextValidator', () => {
     );
   });
 
-  // TODO (bvaughn) Remove this test and the associated behavior in the future.
+  // todo (bvaughn) Remove this test and the associated behavior in the future.
   // It has only been added in Fiber to match the (unintentional) behavior in Stack.
   it('should warn (but not error) if getChildContext method is missing', () => {
     class ComponentA extends React.Component {
@@ -310,7 +310,7 @@ describe('ReactContextValidator', () => {
     );
   });
 
-  // TODO (bvaughn) Remove this test and the associated behavior in the future.
+  // todo (bvaughn) Remove this test and the associated behavior in the future.
   // It has only been added in Fiber to match the (unintentional) behavior in Stack.
   it('should pass parent context if getChildContext method is missing', () => {
     class ParentContextProvider extends React.Component {

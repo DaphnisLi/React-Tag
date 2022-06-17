@@ -78,7 +78,7 @@ function unwindWork(workInProgress: Fiber, renderLanes: Lanes) {
       return workInProgress;
     }
     case HostComponent: {
-      // TODO: popHydrationState
+      // todo: popHydrationState
       popHostContext(workInProgress);
       return null;
     }

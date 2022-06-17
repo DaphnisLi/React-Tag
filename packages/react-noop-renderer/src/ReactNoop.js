@@ -47,7 +47,7 @@ export const {
   act,
   dumpTree,
   getRoot,
-  // TODO: Remove this after callers migrate to alternatives.
+  // todo: Remove this after callers migrate to alternatives.
   unstable_runWithPriority,
 } = createReactNoop(
   ReactFiberReconciler, // reconciler

@@ -11,7 +11,7 @@ import * as React from 'react';
 import {TabBar, TabLink} from '../client/TabNav';
 
 export default function ProfileNav({userId}) {
-  // TODO: Don't hardcode ID.
+  // todo: Don't hardcode ID.
   return (
     <TabBar>
       <TabLink to={`/profile/${userId}`}>Timeline</TabLink>

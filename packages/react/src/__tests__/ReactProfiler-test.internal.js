@@ -297,7 +297,7 @@ describe('Profiler', () => {
           </div>,
         );
 
-        // TODO: unstable_now is called by more places than just the profiler.
+        // todo: unstable_now is called by more places than just the profiler.
         // Rewrite this test so it's less fragile.
         expect(Scheduler).toHaveYielded([
           'read current time',
@@ -1014,7 +1014,7 @@ describe('Profiler', () => {
           // And does not include the original (interrupted) 10ms.
           // The tree contains 42ms of base render time at this point,
           // Reflecting the most recent (longer) render durations.
-          // TODO: This actual time should decrease by 10ms once the scheduler supports resuming.
+          // todo: This actual time should decrease by 10ms once the scheduler supports resuming.
           expect(Scheduler).toFlushAndYield(['FirstComponent:10', 'Yield:4']);
           expect(callback).toHaveBeenCalledTimes(1);
           call = callback.mock.calls[0];
@@ -1952,7 +1952,7 @@ describe('Profiler', () => {
         expect(call).toHaveLength(enableSchedulerTracing ? 5 : 4);
         expect(call[0]).toBe('unmount-test');
         expect(call[1]).toBe('update');
-        // TODO (bvaughn) The duration reported below should be 10100, but is 0
+        // todo (bvaughn) The duration reported below should be 10100, but is 0
         // by the time the passive effect is flushed its parent Fiber pointer is gone.
         // If we refactor to preserve the unmounted Fiber tree we could fix this.
         // The current implementation would require too much extra overhead to track this.

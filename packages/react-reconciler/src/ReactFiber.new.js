@@ -106,7 +106,7 @@ if (__DEV__) {
     new Set([nonExtensibleObject]);
     /* eslint-enable no-new */
   } catch (e) {
-    // TODO: Consider warning about bad polyfills
+    // todo: Consider warning about bad polyfills
     hasBadMapPolyfill = true;
   }
 }
@@ -653,7 +653,7 @@ function createFiberFromProfiler(
   }
 
   const fiber = createFiber(Profiler, pendingProps, key, mode | ProfileMode);
-  // TODO: The Profiler fiber shouldn't have a type. It has a tag.
+  // todo: The Profiler fiber shouldn't have a type. It has a tag.
   fiber.elementType = REACT_PROFILER_TYPE;
   fiber.type = REACT_PROFILER_TYPE;
   fiber.lanes = lanes;
@@ -676,7 +676,7 @@ export function createFiberFromSuspense(
 ) {
   const fiber = createFiber(SuspenseComponent, pendingProps, key, mode);
 
-  // TODO: The SuspenseComponent fiber shouldn't have a type. It has a tag.
+  // todo: The SuspenseComponent fiber shouldn't have a type. It has a tag.
   // This needs to be fixed in getComponentName so that it relies on the tag
   // instead.
   fiber.type = REACT_SUSPENSE_TYPE;
@@ -694,7 +694,7 @@ export function createFiberFromSuspenseList(
 ) {
   const fiber = createFiber(SuspenseListComponent, pendingProps, key, mode);
   if (__DEV__) {
-    // TODO: The SuspenseListComponent fiber shouldn't have a type. It has a tag.
+    // todo: The SuspenseListComponent fiber shouldn't have a type. It has a tag.
     // This needs to be fixed in getComponentName so that it relies on the tag
     // instead.
     fiber.type = REACT_SUSPENSE_LIST_TYPE;
@@ -711,7 +711,7 @@ export function createFiberFromOffscreen(
   key: null | string,
 ) {
   const fiber = createFiber(OffscreenComponent, pendingProps, key, mode);
-  // TODO: The OffscreenComponent fiber shouldn't have a type. It has a tag.
+  // todo: The OffscreenComponent fiber shouldn't have a type. It has a tag.
   // This needs to be fixed in getComponentName so that it relies on the tag
   // instead.
   if (__DEV__) {
@@ -729,7 +729,7 @@ export function createFiberFromLegacyHidden(
   key: null | string,
 ) {
   const fiber = createFiber(LegacyHiddenComponent, pendingProps, key, mode);
-  // TODO: The LegacyHidden fiber shouldn't have a type. It has a tag.
+  // todo: The LegacyHidden fiber shouldn't have a type. It has a tag.
   // This needs to be fixed in getComponentName so that it relies on the tag
   // instead.
   if (__DEV__) {
@@ -752,7 +752,7 @@ export function createFiberFromText(
 
 export function createFiberFromHostInstanceForDeletion(): Fiber {
   const fiber = createFiber(HostComponent, null, null, NoMode);
-  // TODO: These should not need a type.
+  // todo: These should not need a type.
   fiber.elementType = 'DELETED';
   fiber.type = 'DELETED';
   return fiber;

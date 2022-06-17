@@ -321,7 +321,7 @@ describe('ReactHooksInspectionIntegration', () => {
     }
     const Foo = React.memo(InnerFoo);
     const renderer = ReactTestRenderer.create(<Foo />);
-    // TODO: Test renderer findByType is broken for memo. Have to search for the inner.
+    // todo: Test renderer findByType is broken for memo. Have to search for the inner.
     const childFiber = renderer.root.findByType(InnerFoo)._currentFiber();
     const tree = ReactDebugTools.inspectHooksOfFiber(childFiber);
     expect(tree).toEqual([

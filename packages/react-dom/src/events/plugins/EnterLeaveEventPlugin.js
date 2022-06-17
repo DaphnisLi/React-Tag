@@ -79,12 +79,12 @@ function extractEvents(
   }
 
   let win;
-  // TODO: why is this nullable in the types but we read from it?
+  // todo: why is this nullable in the types but we read from it?
   if ((nativeEventTarget: any).window === nativeEventTarget) {
     // `nativeEventTarget` is probably a window object.
     win = nativeEventTarget;
   } else {
-    // TODO: Figure out why `ownerDocument` is sometimes undefined in IE8.
+    // todo: Figure out why `ownerDocument` is sometimes undefined in IE8.
     const doc = (nativeEventTarget: any).ownerDocument;
     if (doc) {
       win = doc.defaultView || doc.parentWindow;

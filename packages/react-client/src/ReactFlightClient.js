@@ -254,7 +254,7 @@ function initializeBlock<Props, Data>(
   const moduleReference: ModuleReference<
     BlockRenderFunction<Props, Data>,
   > = resolveModuleReference(moduleMetaData);
-  // TODO: Do this earlier, as the chunk is resolved.
+  // todo: Do this earlier, as the chunk is resolved.
   preloadModule(moduleReference);
 
   const moduleExport = requireModule(moduleReference);
@@ -330,11 +330,11 @@ export function parseModelTuple(
 ): any {
   const tuple: [mixed, mixed, mixed, mixed] = (value: any);
   if (tuple[0] === REACT_ELEMENT_TYPE) {
-    // TODO: Consider having React just directly accept these arrays as elements.
+    // todo: Consider having React just directly accept these arrays as elements.
     // Or even change the ReactElement type to be an array.
     return createElement(tuple[1], tuple[2], tuple[3]);
   } else if (tuple[0] === REACT_BLOCK_TYPE) {
-    // TODO: Consider having React just directly accept these arrays as blocks.
+    // todo: Consider having React just directly accept these arrays as blocks.
     return createLazyBlock((tuple: any));
   }
   return value;

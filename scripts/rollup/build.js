@@ -118,18 +118,18 @@ const babelPlugins = [
   ['@babel/plugin-proposal-class-properties', {loose: true}],
   'syntax-trailing-function-commas',
   // These use loose mode which avoids embedding a runtime.
-  // TODO: Remove object spread from the source. Prefer Object.assign instead.
+  // todo: Remove object spread from the source. Prefer Object.assign instead.
   [
     '@babel/plugin-proposal-object-rest-spread',
     {loose: true, useBuiltIns: true},
   ],
   ['@babel/plugin-transform-template-literals', {loose: true}],
-  // TODO: Remove for...of from the source. It requires a runtime to be embedded.
+  // todo: Remove for...of from the source. It requires a runtime to be embedded.
   '@babel/plugin-transform-for-of',
-  // TODO: Remove array spread from the source. Prefer .apply instead.
+  // todo: Remove array spread from the source. Prefer .apply instead.
   ['@babel/plugin-transform-spread', {loose: true, useBuiltIns: true}],
   '@babel/plugin-transform-parameters',
-  // TODO: Remove array destructuring from the source. Requires runtime.
+  // todo: Remove array destructuring from the source. Requires runtime.
   ['@babel/plugin-transform-destructuring', {loose: true, useBuiltIns: true}],
 ];
 
@@ -419,7 +419,7 @@ function getPlugins(
           renaming: !shouldStayReadable,
         })
       ),
-    // HACK to work around the fact that Rollup isn't removing unused, pure-module imports.
+    // hack to work around the fact that Rollup isn't removing unused, pure-module imports.
     // Note that this plugin must be called after closure applies DCE.
     isProduction && stripUnusedImports(pureExternalModules),
     // Add the whitespace back if necessary.

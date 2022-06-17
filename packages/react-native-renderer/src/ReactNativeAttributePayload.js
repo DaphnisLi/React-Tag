@@ -441,7 +441,7 @@ function addProperties(
   props: Object,
   validAttributes: AttributeConfiguration<>,
 ): null | Object {
-  // TODO: Fast path
+  // todo: Fast path
   return diffProperties(updatePayload, emptyObject, props, validAttributes);
 }
 
@@ -454,7 +454,7 @@ function clearProperties(
   prevProps: Object,
   validAttributes: AttributeConfiguration<>,
 ): null | Object {
-  // TODO: Fast path
+  // todo: Fast path
   return diffProperties(updatePayload, prevProps, emptyObject, validAttributes);
 }
 

@@ -35,7 +35,7 @@ function printWarning(level, format, args) {
         args.push(stack);
       }
     }
-    // TODO: don't ignore level and pass it down somewhere too.
+    // todo: don't ignore level and pass it down somewhere too.
     args.unshift(format);
     args.unshift(false);
     warningWWW.apply(null, args);

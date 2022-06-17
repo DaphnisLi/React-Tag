@@ -12,10 +12,10 @@ import {matchRoute} from './ServerRouter';
 import ProfileTimeline from './ProfileTimeline';
 import ProfileBio from './ProfileBio';
 
-// TODO: Replace with asset reference.
+// todo: Replace with asset reference.
 import ProfileNav from '../client/ProfileNav';
 
-// TODO: Router component?
+// todo: Router component?
 const ProfileRoutes = {
   '/': props => <ProfileTimeline {...props} key="timeline" />,
   '/bio': props => <ProfileBio {...props} key="bio" />,

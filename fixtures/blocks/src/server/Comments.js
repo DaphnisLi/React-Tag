@@ -9,7 +9,7 @@
 import * as React from 'react';
 import {fetch} from 'react-fetch';
 
-// TODO: Replace with asset reference.
+// todo: Replace with asset reference.
 import Link from '../client/Link';
 
 export default function Comments({postId}) {

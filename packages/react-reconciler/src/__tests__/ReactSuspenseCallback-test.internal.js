@@ -221,7 +221,7 @@ describe('ReactSuspense', () => {
     expect(Scheduler).toFlushWithoutYielding();
 
     // Force fallback to commit.
-    // TODO: Should be able to use `act` here.
+    // todo: Should be able to use `act` here.
     jest.runAllTimers();
 
     expect(ReactNoop.getChildren()).toEqual([

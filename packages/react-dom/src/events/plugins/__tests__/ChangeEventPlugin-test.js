@@ -36,7 +36,7 @@ describe('ChangeEventPlugin', () => {
   beforeEach(() => {
     jest.resetModules();
     ReactFeatureFlags = require('shared/ReactFeatureFlags');
-    // TODO pull this into helper method, reduce repetition.
+    // todo pull this into helper method, reduce repetition.
     // mock the browser APIs which are used in schedule:
     // - calling 'window.postMessage' should actually fire postmessage handlers
     const originalAddEventListener = global.addEventListener;
@@ -90,7 +90,7 @@ describe('ChangeEventPlugin', () => {
     node.dispatchEvent(new Event('change', {bubbles: true, cancelable: true}));
 
     if (ReactFeatureFlags.disableInputAttributeSyncing) {
-      // TODO: figure out why. This might be a bug.
+      // todo: figure out why. This might be a bug.
       expect(called).toBe(1);
     } else {
       // There should be no React change events because the value stayed the same.
@@ -114,7 +114,7 @@ describe('ChangeEventPlugin', () => {
     node.dispatchEvent(new Event('change', {bubbles: true, cancelable: true}));
 
     if (ReactFeatureFlags.disableInputAttributeSyncing) {
-      // TODO: figure out why. This might be a bug.
+      // todo: figure out why. This might be a bug.
       expect(called).toBe(1);
     } else {
       // There should be no React change events because the value stayed the same.

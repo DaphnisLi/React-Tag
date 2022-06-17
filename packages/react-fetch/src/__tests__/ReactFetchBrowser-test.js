@@ -18,7 +18,7 @@ describe('ReactFetchBrowser', () => {
     }
   });
 
-  // TODO: test something useful.
+  // todo: test something useful.
   // @gate experimental
   it('exports something', () => {
     expect(ReactFetchBrowser.fetch).not.toBe(undefined);

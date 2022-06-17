@@ -363,9 +363,9 @@ function processTimelineEvent(
       timestamp: startTime,
     });
   } else if (ph === 'b') {
-    // TODO: Begin user timing measure
+    // todo: Begin user timing measure
   } else if (ph === 'e') {
-    // TODO: End user timing measure
+    // todo: End user timing measure
   } // eslint-disable-line brace-style
 
   // Unrecognized event
@@ -389,7 +389,7 @@ function preprocessFlamechart(rawData: TimelineEvent[]): Flamechart {
     throw errorToRethrow;
   }
 
-  const profile = parsedData.profiles[0]; // TODO: Choose the main CPU thread only
+  const profile = parsedData.profiles[0]; // todo: Choose the main CPU thread only
 
   const speedscopeFlamechart = new SpeedscopeFlamechart({
     getTotalWeight: profile.getTotalWeight.bind(profile),
@@ -446,7 +446,7 @@ export default function preprocessData(
   }
 
   // Use Profile event's `startTime` as the start time to align with flame chart.
-  // TODO: Remove assumption that there'll only be 1 'Profile' event. If this
+  // todo: Remove assumption that there'll only be 1 'Profile' event. If this
   // assumption does not hold, the chart may start at the wrong time.
   profilerData.startTime = timeline[indexOfProfileEvent].args.data.startTime;
   profilerData.duration =

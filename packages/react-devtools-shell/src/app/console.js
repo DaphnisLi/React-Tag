@@ -11,7 +11,7 @@ function ignoreStrings(
   methodName: string,
   stringsToIgnore: Array<string>,
 ): void {
-  // HACKY In the test harness, DevTools overrides the parent window's console.
+  // hack Y In the test harness, DevTools overrides the parent window's console.
   // Our test app code uses the iframe's console though.
   // To simulate a more accurate end-to-end environment,
   // the shell's console patching should pass through to the parent override methods.

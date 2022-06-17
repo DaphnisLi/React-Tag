@@ -104,7 +104,7 @@ import invariant from 'shared/invariant';
 import {disableLogs, reenableLogs} from 'shared/ConsolePatchingDev';
 
 export type Update<State> = {|
-  // TODO: Temporary field. Will remove this by storing a map of
+  // todo: Temporary field. Will remove this by storing a map of
   // transition -> event time on the root.
   eventTime: number,
   lane: Lane,
@@ -431,7 +431,7 @@ export function processUpdateQueue<State>(
     // we need to transfer the updates to that queue, too. Because the base
     // queue is a singly-linked list with no cycles, we can append to both
     // lists and take advantage of structural sharing.
-    // TODO: Pass `current` as argument
+    // todo: Pass `current` as argument
     const current = workInProgress.alternate;
     if (current !== null) {
       // This is always non-null on a ClassComponent or HostRoot
@@ -452,7 +452,7 @@ export function processUpdateQueue<State>(
   if (firstBaseUpdate !== null) {
     // Iterate through the list of updates to compute the result.
     let newState = queue.baseState;
-    // TODO: Don't need to accumulate this. Instead, we can remove renderLanes
+    // todo: Don't need to accumulate this. Instead, we can remove renderLanes
     // from the original lanes.
     let newLanes = NoLanes;
 

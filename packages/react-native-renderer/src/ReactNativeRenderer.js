@@ -24,7 +24,7 @@ import {
   injectIntoDevTools,
   getPublicRootInstance,
 } from 'react-reconciler/src/ReactFiberReconciler';
-// TODO: direct imports like some-package/src/* are bad. Fix me.
+// todo: direct imports like some-package/src/* are bad. Fix me.
 import {getStackByFiberInDevAndProd} from 'react-reconciler/src/ReactFiberComponentStack';
 import {createPortal as createPortalImpl} from 'react-reconciler/src/ReactPortal';
 import {
@@ -176,7 +176,7 @@ function render(
   let root = roots.get(containerTag);
 
   if (!root) {
-    // TODO (bvaughn): If we decide to keep the wrapper component,
+    // todo (bvaughn): If we decide to keep the wrapper component,
     // We could create a wrapper for containerTag as well to reduce special casing.
     root = createContainer(containerTag, LegacyRoot, false, null);
     roots.set(containerTag, root);
@@ -189,7 +189,7 @@ function render(
 function unmountComponentAtNode(containerTag: number) {
   const root = roots.get(containerTag);
   if (root) {
-    // TODO: Is it safe to reset this now or should I wait since this unmount could be deferred?
+    // todo: Is it safe to reset this now or should I wait since this unmount could be deferred?
     updateContainer(null, root, null, () => {
       roots.delete(containerTag);
     });

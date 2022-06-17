@@ -14,7 +14,7 @@ global.ReadableStream = require('@mattiasbuelens/web-streams-polyfill/ponyfill/e
 global.TextDecoder = require('util').TextDecoder;
 
 // Don't wait before processing work on the server.
-// TODO: we can replace this with FlightServer.act().
+// todo: we can replace this with FlightServer.act().
 global.setImmediate = cb => cb();
 
 let webpackModuleIdx = 0;
@@ -451,7 +451,7 @@ describe('ReactFlightDOM', () => {
       '<div>:name::avatar:</div>' +
         '<p>(loading sidebar)</p>' +
         '<p>(loading posts)</p>' +
-        '<p>Game over</p>', // TODO: should not have message in prod.
+        '<p>Game over</p>', // todo: should not have message in prod.
     );
 
     // We can now show the sidebar.
@@ -462,7 +462,7 @@ describe('ReactFlightDOM', () => {
       '<div>:name::avatar:</div>' +
         '<div>:photos::friends:</div>' +
         '<p>(loading posts)</p>' +
-        '<p>Game over</p>', // TODO: should not have message in prod.
+        '<p>Game over</p>', // todo: should not have message in prod.
     );
 
     // Show everything.
@@ -473,7 +473,7 @@ describe('ReactFlightDOM', () => {
       '<div>:name::avatar:</div>' +
         '<div>:photos::friends:</div>' +
         '<div>:posts:</div>' +
-        '<p>Game over</p>', // TODO: should not have message in prod.
+        '<p>Game over</p>', // todo: should not have message in prod.
     );
   });
 });

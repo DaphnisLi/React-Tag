@@ -59,7 +59,7 @@ import ReactSharedInternals from './ReactSharedInternals';
 import {createFundamental} from './ReactFundamental';
 import {startTransition} from './ReactStartTransition';
 
-// TODO: Move this branching into the other module instead and just re-export.
+// todo: Move this branching into the other module instead and just re-export.
 const createElement = __DEV__ ? createElementWithValidation : createElementProd;
 const cloneElement = __DEV__ ? cloneElementWithValidation : cloneElementProd;
 const createFactory = __DEV__ ? createFactoryWithValidation : createFactoryProd;

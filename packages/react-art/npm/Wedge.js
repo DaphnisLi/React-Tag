@@ -130,7 +130,7 @@ var Wedge = createReactClass({
     // we will need to let the drawing method know.
     var large = ca > Math.PI;
 
-    // TODO (sema) Please improve theses comments to make the math
+    // todo (sema) Please improve theses comments to make the math
     // more understandable.
     //
     // Formula for a point on a circle at a specific angle with a center

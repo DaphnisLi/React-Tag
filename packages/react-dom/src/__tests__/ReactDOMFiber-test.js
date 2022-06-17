@@ -246,7 +246,7 @@ describe('ReactDOMFiber', () => {
     expect(container.innerHTML).toBe('');
   });
 
-  // TODO: remove in React 18
+  // todo: remove in React 18
   if (!__EXPERIMENTAL__) {
     it('should support unstable_createPortal alias', () => {
       const portalContainer = document.createElement('div');
@@ -1183,7 +1183,7 @@ describe('ReactDOMFiber', () => {
     expect(ops).toEqual(['A']);
 
     if (__DEV__) {
-      // TODO: this warning shouldn't be firing in the first place if user didn't call it.
+      // todo: this warning shouldn't be firing in the first place if user didn't call it.
       const errorCalls = console.error.calls.count();
       for (let i = 0; i < errorCalls; i++) {
         expect(console.error.calls.argsFor(i)[0]).toMatch(

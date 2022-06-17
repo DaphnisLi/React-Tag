@@ -65,7 +65,7 @@ const {
   unstable_runWithPriority: runWithPriority,
 } = Scheduler;
 
-// TODO: can we stop exporting these?
+// todo: can we stop exporting these?
 export let _enabled = true;
 
 // This is exported in FB builds for use by legacy FB layer infra.
@@ -150,7 +150,7 @@ function dispatchUserBlockingUpdate(
   if (decoupleUpdatePriorityFromScheduler) {
     const previousPriority = getCurrentUpdateLanePriority();
     try {
-      // TODO: Double wrapping is necessary while we decouple Scheduler priority.
+      // todo: Double wrapping is necessary while we decouple Scheduler priority.
       setCurrentUpdateLanePriority(InputContinuousLanePriority);
       runWithPriority(
         UserBlockingPriority,
@@ -190,7 +190,7 @@ export function dispatchEvent(
   }
   let allowReplay = true;
   if (enableEagerRootListeners) {
-    // TODO: replaying capture phase events is currently broken
+    // todo: replaying capture phase events is currently broken
     // because we used to do it during top-level native bubble handlers
     // but now we use different bubble and capture handlers.
     // In eager mode, we attach capture listeners early, so we need
@@ -277,7 +277,7 @@ export function attemptToDispatchEvent(
   targetContainer: EventTarget,
   nativeEvent: AnyNativeEvent,
 ): null | Container | SuspenseInstance {
-  // TODO: Warn if _enabled is false.
+  // todo: Warn if _enabled is false.
 
   const nativeEventTarget = getEventTarget(nativeEvent);
   let targetInst = getClosestInstanceFromNode(nativeEventTarget);
@@ -294,13 +294,13 @@ export function attemptToDispatchEvent(
         if (instance !== null) {
           // Queue the event to be replayed later. Abort dispatching since we
           // don't want this event dispatched twice through the event system.
-          // TODO: If this is the first discrete event in the queue. Schedule an increased
+          // todo: If this is the first discrete event in the queue. Schedule an increased
           // priority for this boundary.
           return instance;
         }
         // This shouldn't happen, something went wrong but to avoid blocking
         // the whole system, dispatch the event without a target.
-        // TODO: Warn.
+        // todo: Warn.
         targetInst = null;
       } else if (tag === HostRoot) {
         const root: FiberRoot = nearestMounted.stateNode;

@@ -84,7 +84,7 @@ export type ServerOptions = {
   identifierPrefix?: string,
 };
 
-// Based on reading the React.Children implementation. TODO: type this somewhere?
+// Based on reading the React.Children implementation. todo: type this somewhere?
 type ReactNode = string | number | ReactElement;
 type FlatReactChildren = Array<null | ReactNode>;
 type toArrayType = (children: mixed) => FlatReactChildren;
@@ -719,7 +719,7 @@ class ReactDOMServerRenderer {
   threadID: ThreadID;
   stack: Array<Frame>;
   exhausted: boolean;
-  // TODO: type this more strictly:
+  // todo: type this more strictly:
   currentSelectValue: any;
   previousWasTextNode: boolean;
   makeStaticMarkup: boolean;
@@ -925,7 +925,7 @@ class ReactDOMServerRenderer {
             if (enableSuspenseServerRenderer) {
               invariant(
                 this.suspenseDepth > 0,
-                // TODO: include component name. This is a bit tricky with current factoring.
+                // todo: include component name. This is a bit tricky with current factoring.
                 'A React component suspended while rendering, but no fallback UI was specified.\n' +
                   '\n' +
                   'Add a <Suspense fallback=...> component higher in the tree to ' +
@@ -1020,7 +1020,7 @@ class ReactDOMServerRenderer {
       }
 
       switch (elementType) {
-        // TODO: LegacyHidden acts the same as a fragment. This only works
+        // todo: LegacyHidden acts the same as a fragment. This only works
         // because we currently assume that every instance of LegacyHidden is
         // accompanied by a host component wrapper. In the hidden mode, the host
         // component is given a `hidden` attribute, which ensures that the
@@ -1457,7 +1457,7 @@ class ReactDOMServerRenderer {
       let initialValue = props.value;
       if (initialValue == null) {
         let defaultValue = props.defaultValue;
-        // TODO (yungsters): Remove support for children content in <textarea>.
+        // todo (yungsters): Remove support for children content in <textarea>.
         let textareaChildren = props.children;
         if (textareaChildren != null) {
           if (__DEV__) {

@@ -95,7 +95,7 @@ export type HostComponent<T> = AbstractComponent<T, $ReadOnly<NativeMethods>>;
 
 type SecretInternalsType = {
   computeComponentStackForErrorReporting(tag: number): string,
-  // TODO (bvaughn) Decide which additional types to expose here?
+  // todo (bvaughn) Decide which additional types to expose here?
   // And how much information to fill in for the above types.
   ...
 };
@@ -157,7 +157,7 @@ export type ReactNativeType = {
   ): any,
   unmountComponentAtNode(containerTag: number): any,
   unmountComponentAtNodeAndRemoveContainer(containerTag: number): any,
-  // TODO (bvaughn) Add types
+  // todo (bvaughn) Add types
   unstable_batchedUpdates: any,
   __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: SecretInternalsType,
   ...

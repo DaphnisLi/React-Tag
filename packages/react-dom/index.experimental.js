@@ -29,6 +29,6 @@ export {
   unstable_renderSubtreeIntoContainer,
   // Disabled behind disableUnstableCreatePortal
   // Temporary alias since we already shipped React 16 RC with it.
-  // TODO: remove in React 18.
+  // todo: remove in React 18.
   unstable_createPortal,
 } from './src/client/ReactDOM';

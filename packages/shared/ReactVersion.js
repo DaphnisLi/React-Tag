@@ -5,5 +5,5 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-// TODO: this is special because it gets imported during build.
+// todo: this is special because it gets imported during build.
 export default '17.0.0';

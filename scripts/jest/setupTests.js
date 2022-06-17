@@ -13,7 +13,7 @@ if (process.env.REACT_CLASS_EQUIVALENCE_TEST) {
   const env = jasmine.getEnv();
   const errorMap = require('../error-codes/codes.json');
 
-  // TODO: Stop using spyOn in all the test since that seem deprecated.
+  // todo: Stop using spyOn in all the test since that seem deprecated.
   // This is a legacy upgrade path strategy from:
   // https://github.com/facebook/jest/blob/v20.0.4/packages/jest-matchers/src/spyMatchers.js#L160
   const isSpy = spy => spy.calls && typeof spy.calls.count === 'function';
@@ -67,7 +67,7 @@ if (process.env.REACT_CLASS_EQUIVALENCE_TEST) {
     }
   });
 
-  // TODO: Consider consolidating this with `yieldValue`. In both cases, tests
+  // todo: Consider consolidating this with `yieldValue`. In both cases, tests
   // should not be allowed to exit without asserting on the entire log.
   const patchConsoleMethod = (methodName, unexpectedConsoleCallStacks) => {
     const newMethod = function(format, ...args) {

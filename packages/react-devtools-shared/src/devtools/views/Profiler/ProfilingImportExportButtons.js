@@ -98,7 +98,7 @@ export default function ProfilingImportExportButtons() {
           });
         }
       });
-      // TODO (profiling) Handle fileReader errors.
+      // todo (profiling) Handle fileReader errors.
       fileReader.readAsText(input.files[0]);
     }
   }, [modalDialogDispatch, profilerStore]);

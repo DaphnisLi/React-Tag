@@ -208,7 +208,7 @@ function toTree(node: ?Fiber) {
         nodeType: 'host',
         type: node.type,
         props: {...node.memoizedProps},
-        instance: null, // TODO: use createNodeMock here somehow?
+        instance: null, // todo: use createNodeMock here somehow?
         rendered: flatten(nodeAndSiblingsArray(node.child).map(toTree)),
       };
     }
@@ -595,7 +595,7 @@ let actingUpdatesScopeDepth = 0;
 // version, too, since our constraints in our test suite are not the same as
 // those of developers using React — we're testing React itself, as opposed to
 // building an app with React.
-// TODO: Migrate our tests to use ReactNoop. Although we would need to figure
+// todo: Migrate our tests to use ReactNoop. Although we would need to figure
 // out a solution for Relay, which has some Concurrent Mode tests.
 function unstable_concurrentAct(scope: () => Thenable<mixed> | void) {
   if (Scheduler.unstable_flushAllWithoutAsserting === undefined) {
@@ -633,7 +633,7 @@ function unstable_concurrentAct(scope: () => Thenable<mixed> | void) {
     }
   };
 
-  // TODO: This would be way simpler if 1) we required a promise to be
+  // todo: This would be way simpler if 1) we required a promise to be
   // returned and 2) we could use async/await. Since it's only our used in
   // our test suite, we should be able to.
   try {
@@ -667,7 +667,7 @@ function unstable_concurrentAct(scope: () => Thenable<mixed> | void) {
       };
     } else {
       try {
-        // TODO: Let's not support non-async scopes at all in our tests. Need to
+        // todo: Let's not support non-async scopes at all in our tests. Need to
         // migrate existing tests.
         let didFlushWork;
         do {

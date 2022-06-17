@@ -108,7 +108,7 @@ export default function InspectedElementWrapper(_: Props) {
   const canToggleSuspense =
     inspectedElement != null && inspectedElement.canToggleSuspense;
 
-  // TODO (suspense toggle) Would be nice to eventually use a two setState pattern here as well.
+  // todo (suspense toggle) Would be nice to eventually use a two setState pattern here as well.
   const toggleSuspended = useCallback(() => {
     let nearestSuspenseElement = null;
     let currentElement = element;

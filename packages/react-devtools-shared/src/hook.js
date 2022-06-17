@@ -119,7 +119,7 @@ export function installHook(target: any): DevToolsHook | null {
       // Weird environments may exist.
       // This code needs a higher fault tolerance
       // because it runs even with closed DevTools.
-      // TODO: should we catch errors in all injected code, and not just this part?
+      // todo: should we catch errors in all injected code, and not just this part?
     }
     return 'production';
   }
@@ -276,7 +276,7 @@ export function installHook(target: any): DevToolsHook | null {
     }
   }
 
-  // TODO: More meaningful names for "rendererInterfaces" and "renderers".
+  // todo: More meaningful names for "rendererInterfaces" and "renderers".
   const fiberRoots = {};
   const rendererInterfaces = new Map();
   const listeners = {};

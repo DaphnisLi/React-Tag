@@ -85,7 +85,7 @@ type DispatchEntry = {|
 
 export type DispatchQueue = Array<DispatchEntry>;
 
-// TODO: remove top-level side effect.
+// todo: remove top-level side effect.
 SimpleEventPlugin.registerEvents();
 EnterLeaveEventPlugin.registerEvents();
 ChangeEventPlugin.registerEvents();
@@ -101,7 +101,7 @@ function extractEvents(
   eventSystemFlags: EventSystemFlags,
   targetContainer: EventTarget,
 ) {
-  // TODO: we should remove the concept of a "SimpleEventPlugin".
+  // todo: we should remove the concept of a "SimpleEventPlugin".
   // This is the basic functionality of the event system. All
   // the other plugins are essentially polyfills. So the plugin
   // should probably be inlined somewhere and have its logic
@@ -324,7 +324,7 @@ export function listenToAllSupportedEvents(rootContainerElement: EventTarget) {
     if ((rootContainerElement: any)[listeningMarker]) {
       // Performance optimization: don't iterate through events
       // for the same portal container or root node more than once.
-      // TODO: once we remove the flag, we may be able to also
+      // todo: once we remove the flag, we may be able to also
       // remove some of the bookkeeping maps used for laziness.
       return;
     }
@@ -381,7 +381,7 @@ export function listenToNativeEvent(
     // listener has already been added previously. However, we
     // special case the scroll event because the reality is that any
     // element can scroll.
-    // TODO: ideally, we'd eventually apply the same logic to all
+    // todo: ideally, we'd eventually apply the same logic to all
     // events from the nonDelegatedEvents list. Then we can remove
     // this special case and use the same logic for all events.
     if (domEventName !== 'scroll') {
@@ -525,7 +525,7 @@ function addTrappedEventListener(
       return originalListener.apply(this, p);
     };
   }
-  // TODO: There are too many combinations here. Consolidate them.
+  // todo: There are too many combinations here. Consolidate them.
   if (isCapturePhaseListener) {
     if (isPassiveListener !== undefined) {
       unsubscribeListener = addEventCaptureListenerWithPassiveFlag(
@@ -847,7 +847,7 @@ function getParent(inst: Fiber | null): Fiber | null {
   }
   do {
     inst = inst.return;
-    // TODO: If this is a HostRoot we might want to bail out.
+    // todo: If this is a HostRoot we might want to bail out.
     // That is depending on if we want nested subtrees (layers) to bubble
     // events to their parent. We could also go through parentNode on the
     // host node but that wouldn't work for React Native and doesn't let us

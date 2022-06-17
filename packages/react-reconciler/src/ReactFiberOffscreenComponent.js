@@ -11,7 +11,7 @@ import type {ReactNodeList} from 'shared/ReactTypes';
 import type {Lanes} from './ReactFiberLane';
 
 export type OffscreenProps = {|
-  // TODO: Pick an API before exposing the Offscreen type. I've chosen an enum
+  // todo: Pick an API before exposing the Offscreen type. I've chosen an enum
   // for now, since we might have multiple variants. For example, hiding the
   // content without changing the layout.
   //
@@ -24,7 +24,7 @@ export type OffscreenProps = {|
 // We use the existence of the state object as an indicator that the component
 // is hidden.
 export type OffscreenState = {|
-  // TODO: This doesn't do anything, yet. It's always NoLanes. But eventually it
+  // todo: This doesn't do anything, yet. It's always NoLanes. But eventually it
   // will represent the pending work that must be included in the render in
   // order to unhide the component.
   baseLanes: Lanes,

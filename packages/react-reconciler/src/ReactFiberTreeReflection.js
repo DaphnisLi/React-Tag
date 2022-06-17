@@ -53,7 +53,7 @@ export function getNearestMountedFiber(fiber: Fiber): null | Fiber {
     }
   }
   if (node.tag === HostRoot) {
-    // TODO: Check if this was a nested HostRoot when used with
+    // todo: Check if this was a nested HostRoot when used with
     // renderContainerIntoSubtree.
     return nearestMounted;
   }

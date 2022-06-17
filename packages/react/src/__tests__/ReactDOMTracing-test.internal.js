@@ -155,7 +155,7 @@ describe('ReactDOMTracing', () => {
         if (gate(flags => flags.new)) {
           expect(onRender).toHaveBeenCalledTimes(3);
         } else {
-          // TODO: This is 4 instead of 3 because this update was scheduled at
+          // todo: This is 4 instead of 3 because this update was scheduled at
           // idle priority, and idle updates are slightly higher priority than
           // offscreen work. So it takes two render passes to finish it. Profiler
           // calls `onRender` for the first render even though everything
@@ -245,7 +245,7 @@ describe('ReactDOMTracing', () => {
               Scheduler.unstable_yieldValue('Child:update');
             } else {
               Scheduler.unstable_yieldValue('Child:mount');
-              // TODO: Double wrapping is temporary while we remove Scheduler runWithPriority.
+              // todo: Double wrapping is temporary while we remove Scheduler runWithPriority.
               ReactDOM.unstable_runWithPriority(IdleLanePriority, () =>
                 Scheduler.unstable_runWithPriority(
                   Scheduler.unstable_IdlePriority,
@@ -313,7 +313,7 @@ describe('ReactDOMTracing', () => {
         if (gate(flags => flags.new)) {
           expect(onRender).toHaveBeenCalledTimes(3);
         } else {
-          // TODO: This is 4 instead of 3 because this update was scheduled at
+          // todo: This is 4 instead of 3 because this update was scheduled at
           // idle priority, and idle updates are slightly higher priority than
           // offscreen work. So it takes two render passes to finish it. Profiler
           // calls `onRender` for the first render even though everything

@@ -177,7 +177,7 @@ let workInProgressHook: Hook | null = null;
 let didScheduleRenderPhaseUpdate: boolean = false;
 // Where an update was scheduled only during the current render pass. This
 // gets reset after each attempt.
-// TODO: Maybe there's some way to consolidate this with
+// todo: Maybe there's some way to consolidate this with
 // `didScheduleRenderPhaseUpdate`. Or with `numberOfReRenders`.
 let didScheduleRenderPhaseUpdateDuringThisPass: boolean = false;
 
@@ -375,7 +375,7 @@ export function renderWithHooks<Props, SecondArg>(
 
   // didScheduleRenderPhaseUpdate = false;
 
-  // TODO Warn if no hooks are used at all during mount, then some are used during update.
+  // todo Warn if no hooks are used at all during mount, then some are used during update.
   // Currently we will identify the update render as a mount because memoizedState === null.
   // This is tricky because it's valid for certain types of components (e.g. React.lazy)
 
@@ -735,7 +735,7 @@ function updateReducer<S, I, A>(
           newBaseQueueLast = newBaseQueueLast.next = clone;
         }
         // Update the remaining priority in the queue.
-        // TODO: Don't need to accumulate this. Instead, we can remove
+        // todo: Don't need to accumulate this. Instead, we can remove
         // renderLanes from the original lanes.
         currentlyRenderingFiber.lanes = mergeLanes(
           currentlyRenderingFiber.lanes,
@@ -838,7 +838,7 @@ function rerenderReducer<S, I, A>(
     hook.memoizedState = newState;
     // Don't persist the state accumulated from the render phase updates to
     // the base state unless the queue is empty.
-    // TODO: Not sure if this is the desired semantics, but it's what we
+    // todo: Not sure if this is the desired semantics, but it's what we
     // do for gDSFP. I can't remember why.
     if (hook.baseQueue === null) {
       hook.baseState = newState;
@@ -1351,7 +1351,7 @@ function mountImperativeHandle<T>(
     }
   }
 
-  // TODO: If deps are provided, should we skip comparing the ref itself?
+  // todo: If deps are provided, should we skip comparing the ref itself?
   const effectDeps =
     deps !== null && deps !== undefined ? deps.concat([ref]) : null;
 
@@ -1387,7 +1387,7 @@ function updateImperativeHandle<T>(
     }
   }
 
-  // TODO: If deps are provided, should we skip comparing the ref itself?
+  // todo: If deps are provided, should we skip comparing the ref itself?
   const effectDeps =
     deps !== null && deps !== undefined ? deps.concat([ref]) : null;
 
@@ -1521,7 +1521,7 @@ function startTransition(setPending, callback) {
       },
     );
 
-    // TODO: Can remove this. Was only necessary because we used to give
+    // todo: Can remove this. Was only necessary because we used to give
     // different behavior to transitions without a config object. Now they are
     // all treated the same.
     setCurrentUpdateLanePriority(DefaultLanePriority);
@@ -1600,7 +1600,7 @@ export function getIsUpdatingOpaqueValueInRenderPhaseInDEV(): boolean | void {
 
 function warnOnOpaqueIdentifierAccessInDEV(fiber) {
   if (__DEV__) {
-    // TODO: Should warn in effects and callbacks, too
+    // todo: Should warn in effects and callbacks, too
     const name = getComponentName(fiber.type) || 'Unknown';
     if (getIsRendering() && !didWarnAboutUseOpaqueIdentifier[name]) {
       console.error(

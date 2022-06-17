@@ -821,7 +821,7 @@ describe('ReactHooksWithNoopRenderer', () => {
       expect(root).toMatchRenderedOutput(<span prop="Down" />);
     });
 
-    // TODO: This should probably warn
+    // todo: This should probably warn
     // @gate experimental
     it('calling startTransition inside render phase', async () => {
       let startTransition;

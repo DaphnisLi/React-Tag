@@ -3,7 +3,7 @@
 exports[`error transform should correctly transform invariants that are not in the error codes map 1`] = `
 "import invariant from 'shared/invariant';
 
-/*FIXME (minify-errors-in-prod): Unminified error message in production build!*/
+/*fixme (minify-errors-in-prod): Unminified error message in production build!*/
 if (!condition) {
   throw Error(\\"This is not a real error message.\\");
 }"
@@ -12,7 +12,7 @@ if (!condition) {
 exports[`error transform should handle escaped characters 1`] = `
 "import invariant from 'shared/invariant';
 
-/*FIXME (minify-errors-in-prod): Unminified error message in production build!*/
+/*fixme (minify-errors-in-prod): Unminified error message in production build!*/
 if (!condition) {
   throw Error(\\"What's up?\\");
 }"

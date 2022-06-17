@@ -373,7 +373,7 @@ let nestedPassiveUpdateCount: number = 0;
 // during the commit phase. This enables them to be traced across components
 // that spawn new work during render. E.g. hidden boundaries, suspended SSR
 // hydration or SuspenseList.
-// TODO: Can use a bitmask instead of an array
+// todo: Can use a bitmask instead of an array
 let spawnedWorkDuringRender: null | Array<Lane | Lanes> = null;
 
 // If two updates are scheduled within the same event, we should treat their
@@ -474,7 +474,7 @@ export function requestUpdateLane(fiber: Fiber): Lane {
     return findTransitionLane(currentEventWipLanes, currentEventPendingLanes);
   }
 
-  // TODO: Remove this dependency on the Scheduler priority.
+  // todo: Remove this dependency on the Scheduler priority.
   // To do that, we're replacing it with an update lane priority.
   // 正常情况, 获取调度优先级
   const schedulerPriority = getCurrentPriorityLevel();
@@ -487,7 +487,7 @@ export function requestUpdateLane(fiber: Fiber): Lane {
   // which is probably not what we want.
   let lane;
   if (
-    // TODO: Temporary. We're removing the concept of discrete updates.
+    // todo: Temporary. We're removing the concept of discrete updates.
     (executionContext & DiscreteEventContext) !== NoContext &&
     schedulerPriority === UserBlockingSchedulerPriority
   ) {
@@ -585,13 +585,13 @@ export function scheduleUpdateOnFiber(
       // definitely won't finish. Since we have a new update, let's mark it as
       // suspended now, right before marking the incoming update. This has the
       // effect of interrupting the current render and switching to the update.
-      // TODO: Make sure this doesn't override pings that happen while we've
+      // todo: Make sure this doesn't override pings that happen while we've
       // already started rendering.
       markRootSuspended(root, workInProgressRootRenderLanes);
     }
   }
 
-  // TODO: requestUpdateLanePriority also reads the priority. Pass the
+  // todo: requestUpdateLanePriority also reads the priority. Pass the
   // priority as an argument to that function and this one.
   const priorityLevel = getCurrentPriorityLevel();
   if (lane === SyncLane) {
@@ -936,7 +936,7 @@ function finishConcurrentRender(root, exitStatus, lanes) {
             // We should prefer to render the fallback of at the last
             // suspended level. Ping the last suspended level to try
             // rendering it again.
-            // FIXME: What if the suspended lanes are Idle? Should not restart.
+            // fixme: What if the suspended lanes are Idle? Should not restart.
             const eventTime = requestEventTime();
             markRootPinged(root, suspendedLanes, eventTime);
             break;
@@ -970,7 +970,7 @@ function finishConcurrentRender(root, exitStatus, lanes) {
         // This is not a transition, but we did trigger an avoided state.
         // Schedule a placeholder to display after a short delay, using the Just
         // Noticeable Difference.
-        // TODO: Is the JND optimization worth the added complexity? If this is
+        // todo: Is the JND optimization worth the added complexity? If this is
         // the only reason we track the event time, then probably not.
         // Consider removing.
 
@@ -1009,7 +1009,7 @@ function finishConcurrentRender(root, exitStatus, lanes) {
 function markRootSuspended(root, suspendedLanes) {
   // When suspending, we should always exclude lanes that were pinged or (more
   // rarely, since we try to avoid it) updated during the render phase.
-  // TODO: Lol maybe there's a better way to factor this besides this
+  // todo: Lol maybe there's a better way to factor this besides this
   // obnoxiously named function :)
   suspendedLanes = removeLanes(suspendedLanes, workInProgressRootPingedLanes);
   suspendedLanes = removeLanes(suspendedLanes, workInProgressRootUpdatedLanes);
@@ -1125,7 +1125,7 @@ export function getExecutionContext(): ExecutionContext {
 }
 
 export function flushDiscreteUpdates() {
-  // TODO: Should be able to flush inside batchedUpdates, but not inside `act`.
+  // todo: Should be able to flush inside batchedUpdates, but not inside `act`.
   // However, `act` uses `batchedUpdates`, so there's no way to distinguish
   // those two cases. Need to fix this before exposing flushDiscreteUpdates
   // as a public API.
@@ -1417,7 +1417,7 @@ function handleError(root, thrownValue): void {
       resetContextDependencies();
       resetHooksAfterThrow();
       resetCurrentDebugFiberInDEV();
-      // TODO: I found and added this missing line while investigating a
+      // todo: I found and added this missing line while investigating a
       // separate issue. Write a regression test using string refs.
       ReactCurrentOwner.current = null;
 
@@ -1433,7 +1433,7 @@ function handleError(root, thrownValue): void {
         // has no siblings nor a parent, we set it to null. Usually this is
         // handled by `completeUnitOfWork` or `unwindWork`, but since we're
         // intentionally not calling those, we need set it here.
-        // TODO: Consider calling `unwindWork` to pop the contexts.
+        // todo: Consider calling `unwindWork` to pop the contexts.
         workInProgress = null;
         return;
       }
@@ -1538,7 +1538,7 @@ export function renderDidSuspendDelayIfPossible(): void {
     // Mark the current render as suspended so that we switch to working on
     // the updates that were skipped. Usually we only suspend at the end of
     // the render phase.
-    // TODO: We should probably always mark the root as suspended immediately
+    // todo: We should probably always mark the root as suspended immediately
     // (inside this function), since by suspending at the end of the render
     // phase introduces a potential mistake where we suspend lanes that were
     // pinged or updated while we were rendering.
@@ -1920,7 +1920,7 @@ function completeUnitOfWork(unitOfWork: Fiber): void {
 
 function resetChildLanes(completedWork: Fiber) {
   if (
-    // TODO: Move this check out of the hot path by moving `resetChildLanes`
+    // todo: Move this check out of the hot path by moving `resetChildLanes`
     // to switch statement in `completeWork`.
     (completedWork.tag === LegacyHiddenComponent ||
       completedWork.tag === OffscreenComponent) &&
@@ -2016,7 +2016,7 @@ function commitRootImpl(root, renderPriorityLevel) {
     // means `flushPassiveEffects` will sometimes result in additional
     // passive effects. So we need to keep flushing in a loop until there are
     // no more pending effects.
-    // TODO: Might be better if `flushPassiveEffects` did not automatically
+    // todo: Might be better if `flushPassiveEffects` did not automatically
     // flush synchronous work at the end, to avoid factoring hazards like this.
     flushPassiveEffects();
   } while (rootWithPendingPassiveEffects !== null);
@@ -2265,7 +2265,7 @@ function commitRootImpl(root, renderPriorityLevel) {
     root.current = finishedWork;
     // Measure these anyway so the flamegraph explicitly shows that there were
     // no effects.
-    // TODO: Maybe there's a better way to report this.
+    // todo: Maybe there's a better way to report this.
     if (enableProfilerTimer) {
       recordCommitTime();
     }
@@ -2425,7 +2425,7 @@ function commitBeforeMutationEffects() {
           beforeActiveInstanceBlur();
         }
       } else {
-        // TODO: Move this out of the hot path using a dedicated effect tag.
+        // todo: Move this out of the hot path using a dedicated effect tag.
         if (
           nextEffect.tag === SuspenseComponent &&
           isSuspenseBoundaryBeingHidden(current, nextEffect) &&
@@ -2477,7 +2477,7 @@ function commitMutationEffects(
   root: FiberRoot,
   renderPriorityLevel: ReactPriorityLevel,
 ) {
-  // TODO: Should probably move the bulk of this function to commitWork.
+  // todo: Should probably move the bulk of this function to commitWork.
   // ? 处理DOM突变
   while (nextEffect !== null) {
     setCurrentDebugFiberInDEV(nextEffect);
@@ -2495,7 +2495,7 @@ function commitMutationEffects(
         commitDetachRef(current);
       }
       if (enableScopeAPI) {
-        // TODO: This is a temporary solution that allowed us to transition away
+        // todo: This is a temporary solution that allowed us to transition away
         // from React Flare on www.
         if (nextEffect.tag === ScopeComponent) {
           commitAttachRef(nextEffect);
@@ -2514,7 +2514,7 @@ function commitMutationEffects(
         commitPlacement(nextEffect);
         // Clear the "placement" from effect tag so that we know that this is
         // inserted, before any life-cycles like componentDidMount gets called.
-        // TODO: findDOMNode doesn't rely on this any more but isMounted does
+        // todo: findDOMNode doesn't rely on this any more but isMounted does
         // and isMounted is deprecated anyway so we should be able to kill this.
         // ? 注意Placement标记会被清除
         nextEffect.flags &= ~Placement;
@@ -2582,7 +2582,7 @@ function commitLayoutEffects(root: FiberRoot, committedLanes: Lanes) {
     markLayoutEffectsStarted(committedLanes);
   }
 
-  // TODO: Should probably move the bulk of this function to commitWork.
+  // todo: Should probably move the bulk of this function to commitWork.
   while (nextEffect !== null) {
     setCurrentDebugFiberInDEV(nextEffect);
 
@@ -2594,7 +2594,7 @@ function commitLayoutEffects(root: FiberRoot, committedLanes: Lanes) {
     }
 
     if (enableScopeAPI) {
-      // TODO: This is a temporary solution that allowed us to transition away
+      // todo: This is a temporary solution that allowed us to transition away
       // from React Flare on www.
       if (flags & Ref && nextEffect.tag !== ScopeComponent) {
         commitAttachRef(nextEffect);
@@ -2982,7 +2982,7 @@ export function captureCommitPhaseError(sourceFiber: Fiber, error: mixed) {
           // We can't schedule any follow up work for the root because the fiber is already unmounted,
           // but we can still call the log-only boundary so the error isn't swallowed.
           //
-          // TODO This is only a temporary bandaid for the old reconciler fork.
+          // todo This is only a temporary bandaid for the old reconciler fork.
           // We can delete this special case once the new fork is merged.
           if (
             typeof instance.componentDidCatch === 'function' &&
@@ -2991,7 +2991,7 @@ export function captureCommitPhaseError(sourceFiber: Fiber, error: mixed) {
             try {
               instance.componentDidCatch(error, errorInfo);
             } catch (errorToIgnore) {
-              // TODO Ignore this error? Rethrow it?
+              // todo Ignore this error? Rethrow it?
               // This is kind of an edge case.
             }
           }
@@ -3026,7 +3026,7 @@ export function pingSuspendedRoot(
     // rendering. We might want to restart this render. This should mirror
     // the logic of whether or not a root suspends once it completes.
 
-    // TODO: If we're rendering sync either due to Sync, Batched or expired,
+    // todo: If we're rendering sync either due to Sync, Batched or expired,
     // we should probably never restart.
 
     // If we're suspended with delay, or if it's a retry, we'll always suspend
@@ -3061,7 +3061,7 @@ function retryTimedOutBoundary(boundaryFiber: Fiber, retryLane: Lane) {
   if (retryLane === NoLane) {
     retryLane = requestRetryLane(boundaryFiber);
   }
-  // TODO: Special case idle priority?
+  // todo: Special case idle priority?
   const eventTime = requestEventTime();
   const root = markUpdateLaneFromFiberToRoot(boundaryFiber, retryLane);
   if (root !== null) {
@@ -3533,7 +3533,7 @@ export const warnIfNotCurrentlyActingUpdatesInDev = warnIfNotCurrentlyActingUpda
 
 // In tests, we want to enforce a mocked scheduler.
 let didWarnAboutUnmockedScheduler = false;
-// TODO Before we release concurrent mode, revisit this and decide whether a mocked
+// todo Before we release concurrent mode, revisit this and decide whether a mocked
 // scheduler is the actual recommendation. The alternative could be a testing build,
 // a new lib, or whatever; we dunno just yet. This message is for early adopters
 // to get their tests right.
@@ -3692,7 +3692,7 @@ function finishPendingInteractions(root, committedLanes) {
   try {
     subscriber = __subscriberRef.current;
     if (subscriber !== null && root.memoizedInteractions.size > 0) {
-      // FIXME: More than one lane can finish in a single commit.
+      // fixme: More than one lane can finish in a single commit.
       const threadID = computeThreadID(root, committedLanes);
       subscriber.onWorkStopped(root.memoizedInteractions, threadID);
     }
@@ -3734,7 +3734,7 @@ function finishPendingInteractions(root, committedLanes) {
 
 // `act` testing API
 //
-// TODO: This is mostly a copy-paste from the legacy `act`, which does not have
+// todo: This is mostly a copy-paste from the legacy `act`, which does not have
 // access to the same internals that we do here. Some trade offs in the
 // implementation no longer make sense.
 

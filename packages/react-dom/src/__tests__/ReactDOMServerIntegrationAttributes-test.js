@@ -430,9 +430,9 @@ describe('ReactDOMServerIntegration', () => {
           <div
             style={{
               lineClamp: 10,
-              // TODO: requires https://github.com/jsdom/cssstyle/pull/112
+              // todo: requires https://github.com/jsdom/cssstyle/pull/112
               // WebkitLineClamp: 10,
-              // TODO: revisit once cssstyle or jsdom figures out
+              // todo: revisit once cssstyle or jsdom figures out
               // if they want to support other vendors or not
               // MozFlexGrow: 10,
               // msFlexGrow: 10,

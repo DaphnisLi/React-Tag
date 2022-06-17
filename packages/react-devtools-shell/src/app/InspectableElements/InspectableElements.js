@@ -19,7 +19,7 @@ import NestedProps from './NestedProps';
 import SimpleValues from './SimpleValues';
 import SymbolKeys from './SymbolKeys';
 
-// TODO Add Immutable JS example
+// todo Add Immutable JS example
 
 export default function InspectableElements() {
   return (

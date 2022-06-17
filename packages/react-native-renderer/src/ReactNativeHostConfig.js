@@ -249,7 +249,7 @@ export const cancelTimeout = clearTimeout;
 export const noTimeout = -1;
 
 export function shouldSetTextContent(type: string, props: Props): boolean {
-  // TODO (bvaughn) Revisit this decision.
+  // todo (bvaughn) Revisit this decision.
   // Always returning false simplifies the createInstance() implementation,
   // But creates an additional child Fiber for raw text children.
   // No additional native views are created though.
@@ -400,7 +400,7 @@ export function insertInContainerBefore(
   child: Instance | TextInstance,
   beforeChild: Instance | TextInstance,
 ): void {
-  // TODO (bvaughn): Remove this check when...
+  // todo (bvaughn): Remove this check when...
   // We create a wrapper object for the container in ReactNative render()
   // Or we refactor to remove wrapper objects entirely.
   // For more info on pros/cons see PR #8560 description.
@@ -481,7 +481,7 @@ export function unhideInstance(instance: Instance, props: Props): void {
 }
 
 export function clearContainer(container: Container): void {
-  // TODO Implement this for React Native
+  // todo Implement this for React Native
   // UIManager does not expose a "remove all" type method.
 }
 

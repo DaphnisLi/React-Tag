@@ -51,7 +51,7 @@ export function initBackend(
     hook.sub('operations', agent.onHookOperations),
     hook.sub('traceUpdates', agent.onTraceUpdates),
 
-    // TODO Add additional subscriptions required for profiling mode
+    // todo Add additional subscriptions required for profiling mode
   ];
 
   const attachRenderer = (id: number, renderer: ReactRenderer) => {

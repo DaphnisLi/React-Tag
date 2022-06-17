@@ -198,7 +198,7 @@ function renameStyle(
 
   let customStyle;
 
-  // TODO It would be nice if the renderer interface abstracted this away somehow.
+  // todo It would be nice if the renderer interface abstracted this away somehow.
   if (instance !== null && typeof instance.setNativeProps === 'function') {
     // In the case of a host component, we need to use setNativeProps().
     // Remember to "correct" resolved styles when we read them next time.
@@ -208,7 +208,7 @@ function renameStyle(
     } else {
       Object.assign(styleOverrides, newStyle);
     }
-    // TODO Fabric does not support setNativeProps; chat with Sebastian or Eli
+    // todo Fabric does not support setNativeProps; chat with Sebastian or Eli
     instance.setNativeProps({style: newStyle});
   } else if (Array.isArray(style)) {
     const lastIndex = style.length - 1;
@@ -284,7 +284,7 @@ function setStyle(
   const {instance, style} = data;
   const newStyle = {[name]: value};
 
-  // TODO It would be nice if the renderer interface abstracted this away somehow.
+  // todo It would be nice if the renderer interface abstracted this away somehow.
   if (instance !== null && typeof instance.setNativeProps === 'function') {
     // In the case of a host component, we need to use setNativeProps().
     // Remember to "correct" resolved styles when we read them next time.
@@ -294,7 +294,7 @@ function setStyle(
     } else {
       Object.assign(styleOverrides, newStyle);
     }
-    // TODO Fabric does not support setNativeProps; chat with Sebastian or Eli
+    // todo Fabric does not support setNativeProps; chat with Sebastian or Eli
     instance.setNativeProps({style: newStyle});
   } else if (Array.isArray(style)) {
     const lastLength = style.length - 1;

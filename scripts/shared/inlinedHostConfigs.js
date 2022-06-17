@@ -61,7 +61,7 @@ module.exports = [
     shortName: 'art',
     entryPoints: ['react-art'],
     paths: ['react-art'],
-    isFlowTyped: false, // TODO: type it.
+    isFlowTyped: false, // todo: type it.
     isServerSupported: false,
   },
   {

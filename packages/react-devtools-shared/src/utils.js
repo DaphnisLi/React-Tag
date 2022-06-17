@@ -495,7 +495,7 @@ export function getDataType(data: Object): DataType {
           ? 'typed_array'
           : 'data_view';
       } else if (data.constructor && data.constructor.name === 'ArrayBuffer') {
-        // HACK This ArrayBuffer check is gross; is there a better way?
+        // hack This ArrayBuffer check is gross; is there a better way?
         // We could try to create a new DataView with the value.
         // If it doesn't error, we know it's an ArrayBuffer,
         // but this seems kind of awkward and expensive.

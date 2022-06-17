@@ -25,7 +25,7 @@ export default function WhatChanged({fiberID}: Props) {
   // TRICKY
   // Handle edge case where no commit is selected because of a min-duration filter update.
   // If the commit index is null, suspending for data below would throw an error.
-  // TODO (ProfilerContext) This check should not be necessary.
+  // todo (ProfilerContext) This check should not be necessary.
   if (selectedCommitIndex === null) {
     return null;
   }

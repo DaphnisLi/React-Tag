@@ -7,7 +7,7 @@
 
 import { enableIsInputPending } from '../SchedulerFeatureFlags';
 
-// TODO 调度相关: 请求或取消调度
+// todo 调度相关: 请求或取消调度
 
 /** 请求及时回调 */
 export let requestHostCallback;
@@ -18,7 +18,7 @@ export let requestHostTimeout;
 /** 取消延时回调 */
 export let cancelHostTimeout;
 
-// TODO 时间切片(time slicing)相关: 执行时间分割, 让出主线程(把控制权归还浏览器, 浏览器可以处理用户输入, UI 绘制等紧急任务).
+// todo 时间切片(time slicing)相关: 执行时间分割, 让出主线程(把控制权归还浏览器, 浏览器可以处理用户输入, UI 绘制等紧急任务).
 
 /** 是否让出主线程 */
 export let shouldYieldToHost;
@@ -94,7 +94,7 @@ if (
   const clearTimeout = window.clearTimeout;
 
   if (typeof console !== 'undefined') {
-    // TODO: Scheduler no longer requires these methods to be polyfilled. But
+    // todo: Scheduler no longer requires these methods to be polyfilled. But
     // maybe we want to continue warning if they don't exist, to preserve the
     // option to rely on it in the future?
     const requestAnimationFrame = window.requestAnimationFrame;
@@ -133,8 +133,8 @@ if (
   /** 任务到期的最后期限，其实就是倒计时5ms */
   let deadline = 0;
 
-  // TODO: Make this configurable
-  // TODO: Adjust this based on priority?
+  // todo: Make this configurable
+  // todo: Adjust this based on priority?
   const maxYieldInterval = 300;
   let needsPaint = false;
 

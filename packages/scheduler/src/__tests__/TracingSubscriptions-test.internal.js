@@ -616,6 +616,6 @@ describe('TracingSubscriptions', () => {
   describe('disabled', () => {
     beforeEach(() => loadModules({enableSchedulerTracing: false}));
 
-    // TODO
+    // todo
   });
 });

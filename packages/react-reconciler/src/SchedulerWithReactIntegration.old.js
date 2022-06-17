@@ -86,7 +86,7 @@ const initialTimeMs: number = Scheduler_now();
 // timestamp. In that case, subtract the module initialization time to simulate
 // the behavior of performance.now and keep our times small enough to fit
 // within 32 bits.
-// TODO: Consider lifting this into Scheduler.
+// todo: Consider lifting this into Scheduler.
 export const now =
   initialTimeMs < 10000 ? Scheduler_now : () => Scheduler_now() - initialTimeMs;
 

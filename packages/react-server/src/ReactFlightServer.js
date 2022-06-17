@@ -133,7 +133,7 @@ function attemptResolveElement(element: React$Element<any>): ReactModel {
     type === REACT_DEBUG_TRACING_MODE_TYPE ||
     type === REACT_LEGACY_HIDDEN_TYPE ||
     type === REACT_OFFSCREEN_TYPE ||
-    // TODO: These are temporary shims
+    // todo: These are temporary shims
     // and we'll want a different behavior.
     type === REACT_SUSPENSE_TYPE ||
     type === REACT_SUSPENSE_LIST_TYPE
@@ -273,7 +273,7 @@ export function resolveModelToJSON(
     value !== null &&
     value.$$typeof === REACT_ELEMENT_TYPE
   ) {
-    // TODO: Concatenate keys of parents onto children.
+    // todo: Concatenate keys of parents onto children.
     const element: React$Element<any> = (value: any);
     try {
       // Attempt to render the server component.
@@ -297,7 +297,7 @@ export function resolveModelToJSON(
 }
 
 function emitErrorChunk(request: Request, id: number, error: mixed): void {
-  // TODO: We should not leak error messages to the client in prod.
+  // todo: We should not leak error messages to the client in prod.
   // Give this an error code instead and log on the server.
   // We can serialize the error in DEV as a convenience.
   let message;
@@ -327,7 +327,7 @@ function retrySegment(request: Request, segment: Segment): void {
       value !== null &&
       value.$$typeof === REACT_ELEMENT_TYPE
     ) {
-      // TODO: Concatenate keys of parents onto children.
+      // todo: Concatenate keys of parents onto children.
       const element: React$Element<any> = (value: any);
       // Attempt to render the server component.
       // Doing this here lets us reuse this same segment if the next component

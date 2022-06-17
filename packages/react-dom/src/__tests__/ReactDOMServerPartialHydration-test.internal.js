@@ -2876,7 +2876,7 @@ describe('ReactDOMServerPartialHydration', () => {
   // always a parent Suspense boundary. But it's still a bug. Leaving for a
   // follow up.
   //
-  // @gate FIXME
+  // @gate fixme
   // @gate experimental
   it('hydrates a hidden subtree outside of a Suspense boundary', async () => {
     const ref = React.createRef();

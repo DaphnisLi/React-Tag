@@ -116,7 +116,7 @@ function createPortal(
     isValidContainer(container),
     'Target container is not a DOM element.',
   );
-  // TODO: pass ReactDOM portal implementation as third argument
+  // todo: pass ReactDOM portal implementation as third argument
   // $FlowFixMe The Flow type is opaque but there's no way to actually create it.
   return createPortalImpl(children, container, null, key);
 }
@@ -183,7 +183,7 @@ const Internals = {
     enqueueStateRestore,
     restoreStateIfNeeded,
     flushPassiveEffects,
-    // TODO: This is related to `act`, not events. Move to separate key?
+    // todo: This is related to `act`, not events. Move to separate key?
     IsThisRendererActing,
   ],
 };
@@ -208,11 +208,11 @@ export {
   renderSubtreeIntoContainer as unstable_renderSubtreeIntoContainer,
   // Disabled behind disableUnstableCreatePortal
   // Temporary alias since we already shipped React 16 RC with it.
-  // TODO: remove in React 18.
+  // todo: remove in React 18.
   unstable_createPortal,
   // enableCreateEventHandleAPI
   createEventHandle as unstable_createEventHandle,
-  // TODO: Remove this once callers migrate to alternatives.
+  // todo: Remove this once callers migrate to alternatives.
   // This should only be used by React internals.
   runWithPriority as unstable_runWithPriority,
 };

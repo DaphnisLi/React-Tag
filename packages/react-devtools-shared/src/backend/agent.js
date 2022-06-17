@@ -317,7 +317,7 @@ export default class Agent extends EventEmitter<{|
         this._throttledPersistSelection(rendererID, id);
       }
 
-      // TODO: If there was a way to change the selected DOM element
+      // todo: If there was a way to change the selected DOM element
       // in native Elements tab without forcing a switch to it, we'd do it here.
       // For now, it doesn't seem like there is a way to do that:
       // https://github.com/bvaughn/react-devtools-experimental/issues/102
@@ -622,7 +622,7 @@ export default class Agent extends EventEmitter<{|
       debug('onHookOperations', operations);
     }
 
-    // TODO:
+    // todo:
     // The chrome.runtime does not currently support transferables; it forces JSON serialization.
     // See bug https://bugs.chromium.org/p/chromium/issues/detail?id=927134
     //

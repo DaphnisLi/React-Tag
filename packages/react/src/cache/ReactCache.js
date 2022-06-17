@@ -15,12 +15,12 @@ type Cache = {|
   resources: Map<any, any>,
 |};
 
-// TODO: should there be a default cache?
+// todo: should there be a default cache?
 const CacheContext: ReactContext<null | Cache> = createContext(null);
 
 function CacheImpl() {
   this.resources = new Map();
-  // TODO: cancellation token.
+  // todo: cancellation token.
 }
 
 function createCache(): Cache {
@@ -29,7 +29,7 @@ function createCache(): Cache {
 }
 
 function readCache(): Cache {
-  // TODO: this doesn't subscribe.
+  // todo: this doesn't subscribe.
   // But we really want load context anyway.
   const value = CacheContext._currentValue;
   if (value instanceof CacheImpl) {

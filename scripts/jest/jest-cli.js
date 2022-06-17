@@ -10,7 +10,7 @@ const ossConfig = './scripts/jest/config.source.js';
 const wwwConfig = './scripts/jest/config.source-www.js';
 const devToolsConfig = './scripts/jest/config.build-devtools.js';
 
-// TODO: These configs are separate but should be rolled into the configs above
+// todo: These configs are separate but should be rolled into the configs above
 // so that the CLI can provide them as options for any of the configs.
 const persistentConfig = './scripts/jest/config.source-persistent.js';
 const buildConfig = './scripts/jest/config.build.js';
@@ -206,7 +206,7 @@ function validateOptions() {
   }
 
   if (argv.build) {
-    // TODO: We could build this if it hasn't been built yet.
+    // todo: We could build this if it hasn't been built yet.
     const buildDir = path.resolve('./build');
     if (!fs.existsSync(buildDir)) {
       logError(

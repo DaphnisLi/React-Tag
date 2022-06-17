@@ -27,7 +27,7 @@ describe('StoreStressConcurrent', () => {
     print = require('./storeSerializer').print;
   });
 
-  // TODO: Remove this in favor of @gate pragma
+  // todo: Remove this in favor of @gate pragma
   if (!__EXPERIMENTAL__) {
     it("empty test so Jest doesn't complain", () => {});
     return;

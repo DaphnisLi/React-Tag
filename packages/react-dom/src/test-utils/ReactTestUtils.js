@@ -34,7 +34,7 @@ const getFiberCurrentPropsFromNode = EventInternals[2];
 const enqueueStateRestore = EventInternals[3];
 const restoreStateIfNeeded = EventInternals[4];
 // const flushPassiveEffects = EventInternals[5];
-// TODO: This is related to `act`, not events. Move to separate key?
+// todo: This is related to `act`, not events. Move to separate key?
 // const IsThisRendererActing = EventInternals[6];
 
 function Event(suffix) {}
@@ -408,7 +408,7 @@ function isInteractive(tag) {
 function getParent(inst) {
   do {
     inst = inst.return;
-    // TODO: If this is a HostRoot we might want to bail out.
+    // todo: If this is a HostRoot we might want to bail out.
     // That is depending on if we want nested subtrees (layers) to bubble
     // events to their parent. We could also go through parentNode on the
     // host node but that wouldn't work for React Native and doesn't let us
@@ -463,7 +463,7 @@ function shouldPreventMouseEvent(name, type, props) {
  * @return {?function} The stored callback.
  */
 function getListener(inst: Fiber, registrationName: string) {
-  // TODO: shouldPreventMouseEvent is DOM-specific and definitely should not
+  // todo: shouldPreventMouseEvent is DOM-specific and definitely should not
   // live here; needs to be moved to a better place soon
   const stateNode = inst.stateNode;
   if (!stateNode) {

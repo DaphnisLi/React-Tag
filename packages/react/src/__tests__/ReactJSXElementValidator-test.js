@@ -9,7 +9,7 @@
 
 'use strict';
 
-// TODO: All these warnings should become static errors using Flow instead
+// todo: All these warnings should become static errors using Flow instead
 // of dynamic errors when using JSX with Flow.
 let React;
 let ReactDOM;

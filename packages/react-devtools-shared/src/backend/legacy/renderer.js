@@ -378,7 +378,7 @@ export function attach(
     }
 
     if (isRoot) {
-      // TODO Is this right? For all versions?
+      // todo Is this right? For all versions?
       const hasOwnerMetadata =
         internalInstance._currentElement != null &&
         internalInstance._currentElement._owner != null;

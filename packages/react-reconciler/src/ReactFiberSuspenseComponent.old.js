@@ -22,7 +22,7 @@ export type SuspenseProps = {|
   children?: ReactNodeList,
   fallback?: ReactNodeList,
 
-  // TODO: Add "unstable_" prefix?
+  // todo: Add "unstable_" prefix?
   suspenseCallback?: (Set<Wakeable> | null) => mixed,
 
   unstable_expectedLoadTime?: number,

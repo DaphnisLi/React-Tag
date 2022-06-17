@@ -8,7 +8,7 @@
 import * as React from 'react';
 import {TabBar, TabLink} from './TabNav';
 
-// TODO: Error Boundaries.
+// todo: Error Boundaries.
 
 function MainTabNav() {
   return (

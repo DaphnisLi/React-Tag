@@ -237,7 +237,7 @@ function commitBeforeMutationLifeCycles(
           const instance = finishedWork.stateNode;
           // We could update instance props and state here,
           // but instead we rely on them being set during last render.
-          // TODO: revisit this when we implement resuming.
+          // todo: revisit this when we implement resuming.
           if (__DEV__) {
             if (
               finishedWork.type === finishedWork.elementType &&
@@ -494,7 +494,7 @@ function commitLifeCycles(
         if (current === null) {
           // We could update instance props and state here,
           // but instead we rely on them being set during last render.
-          // TODO: revisit this when we implement resuming.
+          // todo: revisit this when we implement resuming.
           if (__DEV__) {
             if (
               finishedWork.type === finishedWork.elementType &&
@@ -544,7 +544,7 @@ function commitLifeCycles(
           const prevState = current.memoizedState;
           // We could update instance props and state here,
           // but instead we rely on them being set during last render.
-          // TODO: revisit this when we implement resuming.
+          // todo: revisit this when we implement resuming.
           if (__DEV__) {
             if (
               finishedWork.type === finishedWork.elementType &&
@@ -597,7 +597,7 @@ function commitLifeCycles(
         }
       }
 
-      // TODO: I think this is now always non-null by the time it reaches the
+      // todo: I think this is now always non-null by the time it reaches the
       // commit phase. Consider removing the type check.
       const updateQueue: UpdateQueue<
         *,
@@ -632,13 +632,13 @@ function commitLifeCycles(
         }
         // We could update instance props and state here,
         // but instead we rely on them being set during last render.
-        // TODO: revisit this when we implement resuming.
+        // todo: revisit this when we implement resuming.
         commitUpdateQueue(finishedWork, updateQueue, instance);
       }
       return;
     }
     case HostRoot: {
-      // TODO: I think this is now always non-null by the time it reaches the
+      // todo: I think this is now always non-null by the time it reaches the
       // commit phase. Consider removing the type check.
       const updateQueue: UpdateQueue<
         *,
@@ -925,7 +925,7 @@ function commitUnmount(
       return;
     }
     case HostPortal: {
-      // TODO: this is recursive.
+      // todo: this is recursive.
       // We are also not using this parent because
       // the portal will get pushed immediately.
       if (supportsMutation) {
@@ -1107,7 +1107,7 @@ function getHostSibling(fiber: Fiber): ?Instance {
   // We're going to search forward into the tree until we find a sibling host
   // node. Unfortunately, if multiple insertions are done in a row we have to
   // search past them. This leads to exponential search for the next sibling.
-  // TODO: Find a more efficient way to do this.
+  // todo: Find a more efficient way to do this.
   let node: Fiber = fiber;
   siblings: while (true) {
     // If we didn't find anything, let's try the next sibling.
@@ -1539,7 +1539,7 @@ function commitWork(current: Fiber | null, finishedWork: Fiber): void {
         // this case.
         const oldProps = current !== null ? current.memoizedProps : newProps;
         const type = finishedWork.type;
-        // TODO: Type the updateQueue to be specific to host components.
+        // todo: Type the updateQueue to be specific to host components.
         const updatePayload: null | UpdatePayload = (finishedWork.updateQueue: any);
         finishedWork.updateQueue = null;
         if (updatePayload !== null) {
@@ -1635,7 +1635,7 @@ function commitSuspenseComponent(finishedWork: Fiber) {
     markCommitTimeOfFallback();
 
     if (supportsMutation) {
-      // Hide the Offscreen component that contains the primary children. TODO:
+      // Hide the Offscreen component that contains the primary children. todo:
       // Ideally, this effect would have been scheduled on the Offscreen fiber
       // itself. That's how unhiding works: the Offscreen component schedules an
       // effect on itself. However, in this case, the component didn't complete,
@@ -1724,7 +1724,7 @@ function attachSuspenseRetryListeners(finishedWork: Fiber) {
 
 // This function detects when a Suspense boundary goes from visible to hidden.
 // It returns false if the boundary is already hidden.
-// TODO: Use an effect tag.
+// todo: Use an effect tag.
 export function isSuspenseBoundaryBeingHidden(
   current: Fiber | null,
   finishedWork: Fiber,

@@ -12,7 +12,7 @@
 
 import {BatchedBridge} from 'react-native/Libraries/ReactPrivate/ReactNativePrivateInterface';
 
-// TODO @sema: Adjust types
+// todo @sema: Adjust types
 import type {ReactNativeType} from './ReactNativeTypes';
 
 let ReactFabric;

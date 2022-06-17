@@ -26,7 +26,7 @@ function initializeModules(hasPointerEvents) {
   ReactDOM = require('react-dom');
   Scheduler = require('scheduler');
 
-  // TODO: This import throws outside of experimental mode. Figure out better
+  // todo: This import throws outside of experimental mode. Figure out better
   // strategy for gated imports.
   if (__EXPERIMENTAL__) {
     useFocus = require('react-interactions/events/focus').useFocus;

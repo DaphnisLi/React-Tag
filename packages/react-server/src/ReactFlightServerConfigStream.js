@@ -62,7 +62,7 @@ ByteSize
 - (unsigned 32-bit integer)
 */
 
-// TODO: Implement HTMLData, BlobData and URLData.
+// todo: Implement HTMLData, BlobData and URLData.
 
 import type {Request, ReactModel} from 'react-server/src/ReactFlightServer';
 

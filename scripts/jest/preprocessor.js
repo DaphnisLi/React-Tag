@@ -41,7 +41,7 @@ const babelOptions = {
     // Keep stacks detailed in tests.
     // Don't put this in .babelrc so that we don't embed filenames
     // into ReactART builds that include JSX.
-    // TODO: I have not verified that this actually works.
+    // todo: I have not verified that this actually works.
     require.resolve('@babel/plugin-transform-react-jsx-source'),
 
     pathToTransformInfiniteLoops,

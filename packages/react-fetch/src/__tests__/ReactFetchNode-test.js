@@ -22,7 +22,7 @@ describe('ReactFetchNode', () => {
     jest.resetModules();
     if (__EXPERIMENTAL__) {
       ReactCache = require('react/unstable-cache');
-      // TODO: A way to pass load context.
+      // todo: A way to pass load context.
       ReactCache.CacheProvider._context._currentValue = ReactCache.createCache();
       ReactFetchNode = require('react-fetch');
       fetch = ReactFetchNode.fetch;

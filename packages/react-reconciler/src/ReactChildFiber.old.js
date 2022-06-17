@@ -116,7 +116,7 @@ function coerceRef(
     typeof mixedRef !== 'object'
   ) {
     if (__DEV__) {
-      // TODO: Clean this up once we turn on the string ref warning for
+      // todo: Clean this up once we turn on the string ref warning for
       // everyone, because the strict mode case will no longer be relevant
       if (
         (returnFiber.mode & StrictMode || warnAboutStringRefs) &&
@@ -302,7 +302,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       return null;
     }
 
-    // TODO: For the shouldClone case, this could be micro-optimized a bit by
+    // todo: For the shouldClone case, this could be micro-optimized a bit by
     // assuming that after the first child we've already added everything.
     let childToDelete = currentFirstChild;
     while (childToDelete !== null) {
@@ -823,7 +823,7 @@ function ChildReconciler(shouldTrackSideEffects) {
         lanes,
       );
       if (newFiber === null) {
-        // TODO: This breaks on empty slots like null children. That's
+        // todo: This breaks on empty slots like null children. That's
         // unfortunate because it triggers the slow path all the time. We need
         // a better way to communicate whether this was a miss or null,
         // boolean, undefined, etc.
@@ -841,10 +841,10 @@ function ChildReconciler(shouldTrackSideEffects) {
       }
       lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
       if (previousNewFiber === null) {
-        // TODO: Move out of the loop. This only happens for the first run.
+        // todo: Move out of the loop. This only happens for the first run.
         resultingFirstChild = newFiber;
       } else {
-        // TODO: Defer siblings if we're not at the right index for this slot.
+        // todo: Defer siblings if we're not at the right index for this slot.
         // I.e. if we had null values before, then we want to defer this
         // for each null value. However, we also don't want to call updateSlot
         // with the previous one.
@@ -870,7 +870,7 @@ function ChildReconciler(shouldTrackSideEffects) {
         }
         lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
         if (previousNewFiber === null) {
-          // TODO: Move out of the loop. This only happens for the first run.
+          // todo: Move out of the loop. This only happens for the first run.
           resultingFirstChild = newFiber;
         } else {
           previousNewFiber.sibling = newFiber;
@@ -1008,7 +1008,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       }
       const newFiber = updateSlot(returnFiber, oldFiber, step.value, lanes);
       if (newFiber === null) {
-        // TODO: This breaks on empty slots like null children. That's
+        // todo: This breaks on empty slots like null children. That's
         // unfortunate because it triggers the slow path all the time. We need
         // a better way to communicate whether this was a miss or null,
         // boolean, undefined, etc.
@@ -1026,10 +1026,10 @@ function ChildReconciler(shouldTrackSideEffects) {
       }
       lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
       if (previousNewFiber === null) {
-        // TODO: Move out of the loop. This only happens for the first run.
+        // todo: Move out of the loop. This only happens for the first run.
         resultingFirstChild = newFiber;
       } else {
-        // TODO: Defer siblings if we're not at the right index for this slot.
+        // todo: Defer siblings if we're not at the right index for this slot.
         // I.e. if we had null values before, then we want to defer this
         // for each null value. However, we also don't want to call updateSlot
         // with the previous one.
@@ -1055,7 +1055,7 @@ function ChildReconciler(shouldTrackSideEffects) {
         }
         lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
         if (previousNewFiber === null) {
-          // TODO: Move out of the loop. This only happens for the first run.
+          // todo: Move out of the loop. This only happens for the first run.
           resultingFirstChild = newFiber;
         } else {
           previousNewFiber.sibling = newFiber;
@@ -1141,7 +1141,7 @@ function ChildReconciler(shouldTrackSideEffects) {
     const key = element.key;
     let child = currentFirstChild;
     while (child !== null) {
-      // TODO: If key === null and child.key === null, then this only applies to
+      // todo: If key === null and child.key === null, then this only applies to
       // the first item in the list.
       if (child.key === key) {
         switch (child.tag) {
@@ -1241,7 +1241,7 @@ function ChildReconciler(shouldTrackSideEffects) {
     const key = portal.key;
     let child = currentFirstChild;
     while (child !== null) {
-      // TODO: If key === null and child.key === null, then this only applies to
+      // todo: If key === null and child.key === null, then this only applies to
       // the first item in the list.
       if (child.key === key) {
         if (
@@ -1321,7 +1321,7 @@ function ChildReconciler(shouldTrackSideEffects) {
           if (enableLazyElements) {
             const payload = newChild._payload;
             const init = newChild._init;
-            // TODO: This function is supposed to be non-recursive.
+            // todo: This function is supposed to be non-recursive.
             return reconcileChildFibers(
               returnFiber,
               currentFirstChild,

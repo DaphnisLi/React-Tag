@@ -214,7 +214,7 @@ export function performReactRefresh(): RefreshUpdate | null {
       }
     });
 
-    // TODO: rename these fields to something more meaningful.
+    // todo: rename these fields to something more meaningful.
     const update: RefreshUpdate = {
       updatedFamilies, // Families that will re-render preserving state
       staleFamilies, // Families that will be remounted
@@ -564,7 +564,7 @@ export function injectIntoGlobalHook(globalObject: any): void {
 }
 
 export function hasUnrecoverableErrors() {
-  // TODO: delete this after removing dependency in RN.
+  // todo: delete this after removing dependency in RN.
   return false;
 }
 

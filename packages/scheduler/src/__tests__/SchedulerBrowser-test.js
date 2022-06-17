@@ -76,7 +76,7 @@ describe('SchedulerBrowser', () => {
     const window = {};
     global.window = window;
 
-    // TODO: Scheduler no longer requires these methods to be polyfilled. But
+    // todo: Scheduler no longer requires these methods to be polyfilled. But
     // maybe we want to continue warning if they don't exist, to preserve the
     // option to rely on it in the future?
     window.requestAnimationFrame = window.cancelAnimationFrame = () => {};
@@ -84,11 +84,11 @@ describe('SchedulerBrowser', () => {
     window.setTimeout = (cb, delay) => {
       const id = timerIDCounter++;
       log(`Set Timer`);
-      // TODO
+      // todo
       return id;
     };
     window.clearTimeout = id => {
-      // TODO
+      // todo
     };
 
     const port1 = {};

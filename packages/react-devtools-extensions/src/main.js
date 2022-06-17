@@ -320,7 +320,7 @@ function createPanelIfReactLoaded() {
             }
           });
           extensionPanel.onHidden.addListener(panel => {
-            // TODO: Stop highlighting and stuff.
+            // todo: Stop highlighting and stuff.
           });
         },
       );

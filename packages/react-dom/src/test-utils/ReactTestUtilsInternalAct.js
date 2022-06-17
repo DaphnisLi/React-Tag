@@ -75,7 +75,7 @@ export function unstable_concurrentAct(scope: () => Thenable<mixed> | void) {
     }
   };
 
-  // TODO: This would be way simpler if 1) we required a promise to be
+  // todo: This would be way simpler if 1) we required a promise to be
   // returned and 2) we could use async/await. Since it's only our used in
   // our test suite, we should be able to.
   try {
@@ -109,7 +109,7 @@ export function unstable_concurrentAct(scope: () => Thenable<mixed> | void) {
       };
     } else {
       try {
-        // TODO: Let's not support non-async scopes at all in our tests. Need to
+        // todo: Let's not support non-async scopes at all in our tests. Need to
         // migrate existing tests.
         let didFlushWork;
         do {

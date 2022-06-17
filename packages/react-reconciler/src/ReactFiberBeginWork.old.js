@@ -304,7 +304,7 @@ function updateForwardRef(
   nextProps: any,
   renderLanes: Lanes,
 ) {
-  // TODO: current can be non-null here even if the component
+  // todo: current can be non-null here even if the component
   // hasn't yet mounted. This happens after the first render suspends.
   // We'll need to figure out if this is fine or can cause issues.
 
@@ -488,7 +488,7 @@ function updateSimpleMemoComponent(
   updateLanes: Lanes,
   renderLanes: Lanes,
 ): null | Fiber {
-  // TODO: current can be non-null here even if the component
+  // todo: current can be non-null here even if the component
   // hasn't yet mounted. This happens when the inner render suspends.
   // We'll need to figure out if this is fine or can cause issues.
 
@@ -543,7 +543,7 @@ function updateSimpleMemoComponent(
         // because a MemoComponent fiber does not have hooks or an update queue;
         // rather, it wraps around an inner component, which may or may not
         // contains hooks.
-        // TODO: Move the reset at in beginWork out of the common path so that
+        // todo: Move the reset at in beginWork out of the common path so that
         // this is no longer necessary.
         workInProgress.lanes = current.lanes;
         return bailoutOnAlreadyFinishedWork(
@@ -584,7 +584,7 @@ function updateOffscreenComponent(
   ) {
     if ((workInProgress.mode & ConcurrentMode) === NoMode) {
       // In legacy sync mode, don't defer the subtree. Render it now.
-      // TODO: Figure out what we should do in Blocking mode.
+      // todo: Figure out what we should do in Blocking mode.
       const nextState: OffscreenState = {
         baseLanes: NoLanes,
       };
@@ -790,7 +790,7 @@ function updateBlock<Props, Data>(
   nextProps: any,
   renderLanes: Lanes,
 ) {
-  // TODO: current can be non-null here even if the component
+  // todo: current can be non-null here even if the component
   // hasn't yet mounted. This happens after the first render suspends.
   // We'll need to figure out if this is fine or can cause issues.
 
@@ -980,7 +980,7 @@ function finishClassComponent(
     // unmount all the children. componentDidCatch will schedule an update to
     // re-render a fallback. This is temporary until we migrate everyone to
     // the new API.
-    // TODO: Warn in a future release.
+    // todo: Warn in a future release.
     nextChildren = null;
 
     if (enableProfilerTimer) {
@@ -1025,7 +1025,7 @@ function finishClassComponent(
   }
 
   // Memoize state using the values we just used to render.
-  // TODO: Restructure so we never read values from the instance.
+  // todo: Restructure so we never read values from the instance.
   workInProgress.memoizedState = instance.state;
 
   // The context might have changed so we need to recalculate it.
@@ -1284,7 +1284,7 @@ function mountLazyComponent(
     }
     case Block: {
       if (enableBlocksAPI) {
-        // TODO: Resolve for Hot Reloading.
+        // todo: Resolve for Hot Reloading.
         child = updateBlock(
           null,
           workInProgress,
@@ -1676,7 +1676,7 @@ function updateSuspenseOffscreenState(
   };
 }
 
-// TODO: Probably should inline this back
+// todo: Probably should inline this back
 function shouldRemainOnFallback(
   suspenseContext: SuspenseContext,
   current: null | Fiber,
@@ -1705,7 +1705,7 @@ function shouldRemainOnFallback(
 }
 
 function getRemainingWorkInPrimaryTree(current: Fiber, renderLanes) {
-  // TODO: Should not remove render lanes that were pinged during this render
+  // todo: Should not remove render lanes that were pinged during this render
   return removeLanes(current.childLanes, renderLanes);
 }
 
@@ -2177,7 +2177,7 @@ function updateSuspenseFallbackChildren(
       workInProgress.lastEffect = progressedLastEffect;
       progressedLastEffect.nextEffect = null;
     } else {
-      // TODO: Reset this somewhere else? Lol legacy mode is so weird.
+      // todo: Reset this somewhere else? Lol legacy mode is so weird.
       workInProgress.firstEffect = workInProgress.lastEffect = null;
     }
   } else {
@@ -2299,7 +2299,7 @@ function mountDehydratedSuspenseComponent(
     // wrong priority associated with it and will prevent hydration of parent path.
     // Instead, we'll leave work left on it to render it in a separate commit.
 
-    // TODO This time should be the time at which the server rendered response that is
+    // todo This time should be the time at which the server rendered response that is
     // a parent to this boundary was displayed. However, since we currently don't have
     // a protocol to transfer that time, we'll just estimate it by using the current
     // time. This will mean that Suspense timeouts are slightly shifted to later than
@@ -2377,7 +2377,7 @@ function updateDehydratedSuspenseComponent(
         // is one of the very rare times where we mutate the current tree
         // during the render phase.
         suspenseState.retryLane = attemptHydrationAtLane;
-        // TODO: Ideally this would inherit the event time of the current render
+        // todo: Ideally this would inherit the event time of the current render
         const eventTime = NoTimestamp;
         scheduleUpdateOnFiber(current, attemptHydrationAtLane, eventTime);
       } else {
@@ -2758,7 +2758,7 @@ function updateSuspenseListComponent(
         let tail;
         if (lastContentRow === null) {
           // The whole list is part of the tail.
-          // TODO: We could fast path by just rendering the tail now.
+          // todo: We could fast path by just rendering the tail now.
           tail = workInProgress.child;
           workInProgress.child = null;
         } else {
@@ -2798,7 +2798,7 @@ function updateSuspenseListComponent(
           tail = row;
           row = nextRow;
         }
-        // TODO: If workInProgress.child is null, we can continue on the tail immediately.
+        // todo: If workInProgress.child is null, we can continue on the tail immediately.
         initSuspenseListRenderState(
           workInProgress,
           true, // isBackwards
@@ -2842,7 +2842,7 @@ function updatePortalComponent(
     // but at commit. Therefore we need to track insertions which the normal
     // flow doesn't do during mount. This doesn't happen at the root because
     // the root always starts with a "current" with a null child.
-    // TODO: Consider unifying this with how the root works.
+    // todo: Consider unifying this with how the root works.
     workInProgress.child = reconcileChildFibers(
       workInProgress,
       null,
@@ -3024,7 +3024,7 @@ function bailoutOnAlreadyFinishedWork(
   // Check if the children have any pending work.
   if (!includesSomeLane(renderLanes, workInProgress.childLanes)) {
     // The children don't have any work either. We can skip them.
-    // TODO: Once we add back resuming, we should check if the children are
+    // todo: Once we add back resuming, we should check if the children are
     // a work-in-progress set. If so, we need to transfer their effects.
     return null;
   } else {
@@ -3312,7 +3312,7 @@ function beginWork(
           // so we'll just enter that. The only difference is we'll bail out
           // at the next level instead of this one, because the child props
           // have not changed. Which is fine.
-          // TODO: Probably should refactor `beginWork` to split the bailout
+          // todo: Probably should refactor `beginWork` to split the bailout
           // path from the normal path. I'm tempted to do a labeled break here
           // but I won't :)
           workInProgress.lanes = NoLanes;
@@ -3340,7 +3340,7 @@ function beginWork(
   }
 
   // Before entering the begin phase, clear pending update priority.
-  // TODO: This assumes that we're about to evaluate the component and process
+  // todo: This assumes that we're about to evaluate the component and process
   // the update queue. However, there's an exception: SimpleMemoComponent
   // sometimes bails out later in the begin phase. This indicates that we should
   // move this assignment out of the common path and into each branch.

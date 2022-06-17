@@ -305,7 +305,7 @@ export function trapClickOnNonInteractiveElement(node: HTMLElement) {
   // Just set it using the onclick property so that we don't have to manage any
   // bookkeeping for it. Not sure if we need to clear it when the listener is
   // removed.
-  // TODO: Only do this for the relevant Safaris maybe?
+  // todo: Only do this for the relevant Safaris maybe?
   node.onclick = noop;
 }
 
@@ -382,7 +382,7 @@ function updateDOMProperties(
   wasCustomComponentTag: boolean,
   isCustomComponentTag: boolean,
 ): void {
-  // TODO: Handle wasCustomComponentTag
+  // todo: Handle wasCustomComponentTag
   for (let i = 0; i < updatePayload.length; i += 2) {
     const propKey = updatePayload[i];
     const propValue = updatePayload[i + 1];
@@ -525,7 +525,7 @@ export function setInitialProperties(
     validatePropertiesInDevelopment(tag, rawProps);
   }
 
-  // TODO: Make sure that we check isMounted before firing any of these events.
+  // todo: Make sure that we check isMounted before firing any of these events.
   let props: Object;
   switch (tag) {
     case 'dialog':
@@ -627,13 +627,13 @@ export function setInitialProperties(
 
   switch (tag) {
     case 'input':
-      // TODO: Make sure we check if this is still unmounted or do any clean
+      // todo: Make sure we check if this is still unmounted or do any clean
       // up necessary since we never stop tracking anymore.
       track((domElement: any));
       ReactDOMInputPostMountWrapper(domElement, rawProps, false);
       break;
     case 'textarea':
-      // TODO: Make sure we check if this is still unmounted or do any clean
+      // todo: Make sure we check if this is still unmounted or do any clean
       // up necessary since we never stop tracking anymore.
       track((domElement: any));
       ReactDOMTextareaPostMountWrapper(domElement, rawProps);
@@ -646,7 +646,7 @@ export function setInitialProperties(
       break;
     default:
       if (typeof props.onClick === 'function') {
-        // TODO: This cast may not be sound for SVG, MathML or custom elements.
+        // todo: This cast may not be sound for SVG, MathML or custom elements.
         trapClickOnNonInteractiveElement(((domElement: any): HTMLElement));
       }
       break;
@@ -697,7 +697,7 @@ export function diffProperties(
         typeof lastProps.onClick !== 'function' &&
         typeof nextProps.onClick === 'function'
       ) {
-        // TODO: This cast may not be sound for SVG, MathML or custom elements.
+        // todo: This cast may not be sound for SVG, MathML or custom elements.
         trapClickOnNonInteractiveElement(((domElement: any): HTMLElement));
       }
       break;
@@ -809,7 +809,7 @@ export function diffProperties(
           (updatePayload = updatePayload || []).push(propKey, nextHtml);
         }
       } else {
-        // TODO: It might be too late to clear this if we have children
+        // todo: It might be too late to clear this if we have children
         // inserted already.
       }
     } else if (propKey === CHILDREN) {
@@ -892,7 +892,7 @@ export function updateProperties(
     isCustomComponentTag,
   );
 
-  // TODO: Ensure that an update gets scheduled if any of the special props
+  // todo: Ensure that an update gets scheduled if any of the special props
   // changed.
   switch (tag) {
     case 'input':
@@ -939,7 +939,7 @@ export function diffHydratedProperties(
     validatePropertiesInDevelopment(tag, rawProps);
   }
 
-  // TODO: Make sure that we check isMounted before firing any of these events.
+  // todo: Make sure that we check isMounted before firing any of these events.
   switch (tag) {
     case 'dialog':
       listenToNonDelegatedEvent('cancel', domElement);
@@ -1028,7 +1028,7 @@ export function diffHydratedProperties(
         case 'data-reactroot':
           break;
         // Controlled attributes are not validated
-        // TODO: Only ignore them on controlled tags.
+        // todo: Only ignore them on controlled tags.
         case 'value':
           break;
         case 'checked':
@@ -1057,8 +1057,8 @@ export function diffHydratedProperties(
       // HTML and attributes. Ideally we should preserve structure but it's
       // ok not to if the visible content is still enough to indicate what
       // even listeners these nodes might be wired up to.
-      // TODO: Warn if there is more than a single textNode as a child.
-      // TODO: Should we use domElement.firstChild.nodeValue to compare?
+      // todo: Warn if there is more than a single textNode as a child.
+      // todo: Should we use domElement.firstChild.nodeValue to compare?
       if (typeof nextProp === 'string') {
         if (domElement.textContent !== nextProp) {
           if (__DEV__ && !suppressHydrationWarning) {
@@ -1099,7 +1099,7 @@ export function diffHydratedProperties(
         propKey === SUPPRESS_CONTENT_EDITABLE_WARNING ||
         propKey === SUPPRESS_HYDRATION_WARNING ||
         // Controlled attributes are not validated
-        // TODO: Only ignore them on controlled tags.
+        // todo: Only ignore them on controlled tags.
         propKey === 'value' ||
         propKey === 'checked' ||
         propKey === 'selected'
@@ -1195,13 +1195,13 @@ export function diffHydratedProperties(
 
   switch (tag) {
     case 'input':
-      // TODO: Make sure we check if this is still unmounted or do any clean
+      // todo: Make sure we check if this is still unmounted or do any clean
       // up necessary since we never stop tracking anymore.
       track((domElement: any));
       ReactDOMInputPostMountWrapper(domElement, rawProps, true);
       break;
     case 'textarea':
-      // TODO: Make sure we check if this is still unmounted or do any clean
+      // todo: Make sure we check if this is still unmounted or do any clean
       // up necessary since we never stop tracking anymore.
       track((domElement: any));
       ReactDOMTextareaPostMountWrapper(domElement, rawProps);
@@ -1212,11 +1212,11 @@ export function diffHydratedProperties(
       // post mount to force it to diverge from attributes. However, for
       // option and select we don't quite do the same thing and select
       // is not resilient to the DOM state changing so we don't do that here.
-      // TODO: Consider not doing this for input and textarea.
+      // todo: Consider not doing this for input and textarea.
       break;
     default:
       if (typeof rawProps.onClick === 'function') {
-        // TODO: This cast may not be sound for SVG, MathML or custom elements.
+        // todo: This cast may not be sound for SVG, MathML or custom elements.
         trapClickOnNonInteractiveElement(((domElement: any): HTMLElement));
       }
       break;
@@ -1296,7 +1296,7 @@ export function warnForInsertedHydratedText(
     if (text === '') {
       // We expect to insert empty text nodes since they're not represented in
       // the HTML.
-      // TODO: Remove this special case if we can just avoid inserting empty
+      // todo: Remove this special case if we can just avoid inserting empty
       // text nodes.
       return;
     }

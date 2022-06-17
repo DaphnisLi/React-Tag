@@ -32,7 +32,7 @@ type RejectedResult = {|
 
 type Result = PendingResult | ResolvedResult | RejectedResult;
 
-// TODO: this is a browser-only version. Add a separate Node entry point.
+// todo: this is a browser-only version. Add a separate Node entry point.
 const nativeFetch = window.fetch;
 const fetchKey = {};
 
@@ -125,8 +125,8 @@ function preloadResult(url: string, options: mixed): Result {
   if (!entry) {
     if (options) {
       if (options.method || options.body || options.signal) {
-        // TODO: wire up our own cancellation mechanism.
-        // TODO: figure out what to do with POST.
+        // todo: wire up our own cancellation mechanism.
+        // todo: figure out what to do with POST.
         throw Error('Unsupported option');
       }
     }

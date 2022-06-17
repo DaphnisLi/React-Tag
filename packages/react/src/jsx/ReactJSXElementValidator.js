@@ -353,7 +353,7 @@ export function jsxWithValidation(
     const element = jsxDEV(type, props, key, source, self);
 
     // The result can be nullish if a mock or a custom function is used.
-    // TODO: Drop this when these are no longer allowed as the type argument.
+    // todo: Drop this when these are no longer allowed as the type argument.
     if (element == null) {
       return element;
     }

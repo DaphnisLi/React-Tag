@@ -2095,7 +2095,7 @@ describe('ReactFresh', () => {
   it('can remount on signature change within a suspense node', () => {
     if (__DEV__) {
       testRemountingWithWrapper(Hello => {
-        // TODO: we'll probably want to test fallback trees too.
+        // todo: we'll probably want to test fallback trees too.
         const child = (
           <React.Suspense>
             <Hello />

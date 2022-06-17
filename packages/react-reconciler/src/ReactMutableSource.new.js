@@ -98,7 +98,7 @@ export function registerMutableSourceForHydration(
   const getVersion = mutableSource._getVersion;
   const version = getVersion(mutableSource._source);
 
-  // TODO Clear this data once all pending hydration work is finished.
+  // todo Clear this data once all pending hydration work is finished.
   // Retaining it forever may interfere with GC.
   if (root.mutableSourceEagerHydrationData == null) {
     root.mutableSourceEagerHydrationData = [mutableSource, version];

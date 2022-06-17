@@ -58,13 +58,13 @@ export default function resolveBoxStyle(
 
     const styleForEnd = style[prefix + 'End'];
     if (styleForEnd != null) {
-      // TODO RTL support
+      // todo RTL support
       result.right = styleForEnd;
       hasParts = true;
     }
     const styleForStart = style[prefix + 'Start'];
     if (styleForStart != null) {
-      // TODO RTL support
+      // todo RTL support
       result.left = styleForStart;
       hasParts = true;
     }

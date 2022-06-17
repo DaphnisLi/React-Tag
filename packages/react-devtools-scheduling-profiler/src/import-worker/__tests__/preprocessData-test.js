@@ -348,5 +348,5 @@ describe(preprocessData, () => {
     `);
   });
 
-  // TODO: Add test for flamechart parsing
+  // todo: Add test for flamechart parsing
 });

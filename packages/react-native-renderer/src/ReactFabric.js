@@ -137,7 +137,7 @@ function findNodeHandle(componentOrHandle: any): ?number {
   if (hostInstance == null) {
     return hostInstance;
   }
-  // TODO: the code is right but the types here are wrong.
+  // todo: the code is right but the types here are wrong.
   // https://github.com/facebook/react/pull/12863
   if ((hostInstance: any).canonical) {
     // Fabric
@@ -177,7 +177,7 @@ function render(
   let root = roots.get(containerTag);
 
   if (!root) {
-    // TODO (bvaughn): If we decide to keep the wrapper component,
+    // todo (bvaughn): If we decide to keep the wrapper component,
     // We could create a wrapper for containerTag as well to reduce special casing.
     root = createContainer(containerTag, LegacyRoot, false, null);
     roots.set(containerTag, root);
@@ -194,7 +194,7 @@ function unmountComponentAtNode(containerTag: number) {
 function stopSurface(containerTag: number) {
   const root = roots.get(containerTag);
   if (root) {
-    // TODO: Is it safe to reset this now or should I wait since this unmount could be deferred?
+    // todo: Is it safe to reset this now or should I wait since this unmount could be deferred?
     updateContainer(null, root, null, () => {
       roots.delete(containerTag);
     });
@@ -226,7 +226,7 @@ export {
   dispatchCommand,
   render,
   // Deprecated - this function is being renamed to stopSurface, use that instead.
-  // TODO (T47576999): Delete this once it's no longer called from native code.
+  // todo (T47576999): Delete this once it's no longer called from native code.
   unmountComponentAtNode,
   stopSurface,
   createPortal,

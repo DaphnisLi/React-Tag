@@ -257,11 +257,11 @@ if (supportsMutation) {
 
     // If we get updated because one of our children updated, we don't
     // have newProps so we'll have to reuse them.
-    // TODO: Split the update API as separate for the props vs. children.
+    // todo: Split the update API as separate for the props vs. children.
     // Even better would be if children weren't special cased at all tho.
     const instance: Instance = workInProgress.stateNode;
     const currentHostContext = getHostContext();
-    // TODO: Experiencing an error where oldProps is null. Suggests a host
+    // todo: Experiencing an error where oldProps is null. Suggests a host
     // component is hitting the resume path. Figure out why. Possibly
     // related to `hidden`.
     const updatePayload = prepareUpdate(
@@ -272,7 +272,7 @@ if (supportsMutation) {
       rootContainerInstance,
       currentHostContext,
     );
-    // TODO: Type this specific to this type of component.
+    // todo: Type this specific to this type of component.
     workInProgress.updateQueue = (updatePayload: any);
     // If the update payload indicates that there is a change or if there
     // is a new ref we mark this as an update. All the work is done in commitWork.
@@ -882,13 +882,13 @@ function completeWork(
         }
 
         const currentHostContext = getHostContext();
-        // TODO: Move createInstance to beginWork and keep it on a context
+        // todo: Move createInstance to beginWork and keep it on a context
         // "stack" as the parent. Then append children as we go in beginWork
         // or completeWork depending on whether we want to add them top->down or
         // bottom->up. Top->down is faster in IE11.
         const wasHydrated = popHydrationState(workInProgress);
         if (wasHydrated) {
-          // TODO: Move this and createInstance step into the beginPhase
+          // todo: Move this and createInstance step into the beginPhase
           // to consolidate.
           if (
             prepareToHydrateHostInstance(
@@ -977,7 +977,7 @@ function completeWork(
       const didBailout = bubbleProperties(workInProgress);
       if (!didBailout) {
         // Use subtreeFlags to determine which commit callbacks should fire.
-        // TODO: Move this logic to the commit phase, since we already check if
+        // todo: Move this logic to the commit phase, since we already check if
         // a fiber's subtree contains effects. Refactor the commit phase's
         // depth-first traversal so that we can put work tag-specific logic
         // before or after committing a subtree's effects.
@@ -999,7 +999,7 @@ function completeWork(
         // Call onCommit only if the subtree contains layout work, or if it
         // contains deletions, since those might result in unmount work, which
         // we include in the same measure.
-        // TODO: Can optimize by using a static flag to track whether a tree
+        // todo: Can optimize by using a static flag to track whether a tree
         // contains layout effects, like we do for passive effects.
         if (
           (flags & (LayoutMask | Deletion)) !== NoFlags ||
@@ -1118,11 +1118,11 @@ function completeWork(
       if (nextDidTimeout && !prevDidTimeout) {
         // If this subtreee is running in blocking mode we can suspend,
         // otherwise we won't suspend.
-        // TODO: This will still suspend a synchronous tree if anything
+        // todo: This will still suspend a synchronous tree if anything
         // in the concurrent tree already suspended during this render.
         // This is a known bug.
         if ((workInProgress.mode & BlockingMode) !== NoMode) {
-          // TODO: Move this back to throwException because this is too late
+          // todo: Move this back to throwException because this is too late
           // if this is a large tree which is common for initial loads. We
           // don't know if we should restart a render or not until we get
           // this marker, and this is too late.
@@ -1151,7 +1151,7 @@ function completeWork(
       }
 
       if (supportsPersistence) {
-        // TODO: Only schedule updates if not prevDidTimeout.
+        // todo: Only schedule updates if not prevDidTimeout.
         if (nextDidTimeout) {
           // If this boundary just timed out, schedule an effect to attach a
           // retry listener to the promise. This flag is also used to hide the
@@ -1160,7 +1160,7 @@ function completeWork(
         }
       }
       if (supportsMutation) {
-        // TODO: Only schedule updates if these values are non equal, i.e. it changed.
+        // todo: Only schedule updates if these values are non equal, i.e. it changed.
         if (nextDidTimeout || prevDidTimeout) {
           // If this boundary just timed out, schedule an effect to attach a
           // retry listener to the promise. This flag is also used to hide the
@@ -1408,7 +1408,7 @@ function completeWork(
         next.sibling = null;
 
         // Restore the context.
-        // TODO: We can probably just avoid popping it instead and only
+        // todo: We can probably just avoid popping it instead and only
         // setting it the first time we go from not suspended to suspended.
         let suspenseContext = suspenseStackCursor.current;
         if (didSuspendAlready) {

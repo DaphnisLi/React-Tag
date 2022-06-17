@@ -184,7 +184,7 @@ describe('ReactSuspense', () => {
     // switches back to the normal view. The second Suspense should still
     // show the placeholder
     jest.advanceTimersByTime(5000);
-    // TODO: Should we throw if you forget to call toHaveYielded?
+    // todo: Should we throw if you forget to call toHaveYielded?
     expect(Scheduler).toHaveYielded(['Promise resolved [A]']);
     expect(Scheduler).toFlushAndYield(['A']);
     expect(root).toMatchRenderedOutput('ALoading B...');
@@ -383,7 +383,7 @@ describe('ReactSuspense', () => {
 
       // After suspending, should abort the first update and switch to the
       // second update. So, C1 should not appear in the log.
-      // TODO: This should work even if React does not yield to the main
+      // todo: This should work even if React does not yield to the main
       // thread. Should use same mechanism as selective hydration to interrupt
       // the render before the end of the current slice of work.
       expect(Scheduler).toFlushAndYield(['A2', 'B2', 'C2']);
@@ -534,7 +534,7 @@ describe('ReactSuspense', () => {
 
       // After suspending, should abort the first update and switch to the
       // second update. So, C1 should not appear in the log.
-      // TODO: This should work even if React does not yield to the main
+      // todo: This should work even if React does not yield to the main
       // thread. Should use same mechanism as selective hydration to interrupt
       // the render before the end of the current slice of work.
       expect(Scheduler).toFlushAndYield(['A2', 'B2', 'C2']);

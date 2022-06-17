@@ -82,7 +82,7 @@ function Profiler(_: {||}) {
         // In that case, the selected commit index would be null.
         // We could still show a sidebar for the previously selected fiber,
         // but it would be an odd user experience.
-        // TODO (ProfilerContext) This check should not be necessary.
+        // todo (ProfilerContext) This check should not be necessary.
         if (selectedCommitIndex !== null) {
           if (selectedFiberID !== null) {
             sidebar = <SidebarSelectedFiberInfo />;

@@ -451,7 +451,7 @@ export function useCallback<T>(
   return useMemo(() => callback, deps);
 }
 
-// TODO Decide on how to implement this hook for server rendering.
+// todo Decide on how to implement this hook for server rendering.
 // If a mutation occurs during render, consider triggering a Suspense boundary
 // and falling back to client rendering.
 function useMutableSource<Source, Snapshot>(

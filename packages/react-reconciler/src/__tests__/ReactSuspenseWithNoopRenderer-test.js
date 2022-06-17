@@ -349,7 +349,7 @@ describe('ReactSuspenseWithNoopRenderer', () => {
   });
 
   // Second condition is redundant but guarantees that the test runs in prod.
-  // TODO: Delete this feature flag.
+  // todo: Delete this feature flag.
   // @gate !replayFailedUnitOfWorkWithInvokeGuardedCallback || !__DEV__
   it('retries on error', async () => {
     class ErrorBoundary extends React.Component {
@@ -408,7 +408,7 @@ describe('ReactSuspenseWithNoopRenderer', () => {
   });
 
   // Second condition is redundant but guarantees that the test runs in prod.
-  // TODO: Delete this feature flag.
+  // todo: Delete this feature flag.
   // @gate !replayFailedUnitOfWorkWithInvokeGuardedCallback || !__DEV__
   it('retries on error after falling back to a placeholder', async () => {
     class ErrorBoundary extends React.Component {
@@ -1948,7 +1948,7 @@ describe('ReactSuspenseWithNoopRenderer', () => {
     expect(ReactNoop.getChildren()).toEqual([span('Loading...')]);
   });
 
-  // TODO: flip to "warns" when this is implemented again.
+  // todo: flip to "warns" when this is implemented again.
   it('does not warn when a low priority update suspends inside a high priority update for functional components', async () => {
     let _setShow;
     function App() {
@@ -1965,7 +1965,7 @@ describe('ReactSuspenseWithNoopRenderer', () => {
       ReactNoop.render(<App />);
     });
 
-    // TODO: assert toErrorDev() when the warning is implemented again.
+    // todo: assert toErrorDev() when the warning is implemented again.
     ReactNoop.act(() => {
       Scheduler.unstable_runWithPriority(
         Scheduler.unstable_UserBlockingPriority,
@@ -1974,7 +1974,7 @@ describe('ReactSuspenseWithNoopRenderer', () => {
     });
   });
 
-  // TODO: flip to "warns" when this is implemented again.
+  // todo: flip to "warns" when this is implemented again.
   it('does not warn when a low priority update suspends inside a high priority update for class components', async () => {
     let show;
     class App extends React.Component {
@@ -1994,7 +1994,7 @@ describe('ReactSuspenseWithNoopRenderer', () => {
       ReactNoop.render(<App />);
     });
 
-    // TODO: assert toErrorDev() when the warning is implemented again.
+    // todo: assert toErrorDev() when the warning is implemented again.
     ReactNoop.act(() => {
       Scheduler.unstable_runWithPriority(
         Scheduler.unstable_UserBlockingPriority,
@@ -2036,7 +2036,7 @@ describe('ReactSuspenseWithNoopRenderer', () => {
     expect(Scheduler).toHaveYielded(['Suspend! [A]', 'Suspend! [B]']);
   });
 
-  // TODO: flip to "warns" when this is implemented again.
+  // todo: flip to "warns" when this is implemented again.
   it(
     'does not warn when component that triggered user-blocking update is between Suspense boundary ' +
       'and component that suspended',
@@ -2058,7 +2058,7 @@ describe('ReactSuspenseWithNoopRenderer', () => {
         ReactNoop.render(<App />);
       });
 
-      // TODO: assert toErrorDev() when the warning is implemented again.
+      // todo: assert toErrorDev() when the warning is implemented again.
       ReactNoop.act(() => {
         Scheduler.unstable_runWithPriority(
           Scheduler.unstable_UserBlockingPriority,
@@ -2752,7 +2752,7 @@ describe('ReactSuspenseWithNoopRenderer', () => {
     );
   });
 
-  // TODO: This test is specifically about avoided commits that suspend for a
+  // todo: This test is specifically about avoided commits that suspend for a
   // JND. We may remove this behavior.
   it("suspended commit remains suspended even if there's another update at same expiration", async () => {
     // Regression test
@@ -3148,7 +3148,7 @@ describe('ReactSuspenseWithNoopRenderer', () => {
           // that might unblock the tree. We do know that there's a lower
           // priority update *somehwere* in the entire root, though (the update
           // to the fallback). So we try rendering one more time, just in case.
-          // TODO: We shouldn't need to do this with lanes, because we always
+          // todo: We shouldn't need to do this with lanes, because we always
           // know exactly which lanes have pending work in each tree.
           'Suspend! [C]',
 
@@ -3360,7 +3360,7 @@ describe('ReactSuspenseWithNoopRenderer', () => {
             Scheduler.unstable_yieldValue('Commit Child');
           } else {
             Scheduler.unstable_yieldValue(
-              'FIXME: Texts are inconsistent (tearing)',
+              'fixme: Texts are inconsistent (tearing)',
             );
           }
         }, [text, outerText]);
@@ -3500,7 +3500,7 @@ describe('ReactSuspenseWithNoopRenderer', () => {
           Scheduler.unstable_yieldValue('Commit Child');
         } else {
           Scheduler.unstable_yieldValue(
-            'FIXME: Texts are inconsistent (tearing)',
+            'fixme: Texts are inconsistent (tearing)',
           );
         }
       }, [text, outerText]);

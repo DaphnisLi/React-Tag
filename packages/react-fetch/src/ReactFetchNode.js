@@ -41,11 +41,11 @@ function nodeFetch(
     hostname,
     port,
     path: pathname + search,
-    // TODO: cherry-pick supported user-passed options.
+    // todo: cherry-pick supported user-passed options.
   };
   const nodeImpl = protocol === 'https:' ? https : http;
   const request = nodeImpl.request(nodeOptions, response => {
-    // TODO: support redirects.
+    // todo: support redirects.
     onResolve(new Response(response));
   });
   request.on('error', error => {
@@ -98,7 +98,7 @@ function readResult<T>(result: Result<T>): T {
 function Response(nativeResponse) {
   this.headers = nativeResponse.headers;
   this.ok = nativeResponse.statusCode >= 200 && nativeResponse.statusCode < 300;
-  this.redirected = false; // TODO
+  this.redirected = false; // todo
   this.status = nativeResponse.statusCode;
   this.statusText = nativeResponse.statusMessage;
   this.type = 'basic';
@@ -152,7 +152,7 @@ Response.prototype = {
     return buffer;
   },
   blob() {
-    // TODO: Is this needed?
+    // todo: Is this needed?
     throw new Error('Not implemented.');
   },
   json() {
@@ -171,8 +171,8 @@ function preloadResult(url: string, options: mixed): Result<FetchResponse> {
   if (!entry) {
     if (options) {
       if (options.method || options.body || options.signal) {
-        // TODO: wire up our own cancellation mechanism.
-        // TODO: figure out what to do with POST.
+        // todo: wire up our own cancellation mechanism.
+        // todo: figure out what to do with POST.
         throw Error('Unsupported option');
       }
     }

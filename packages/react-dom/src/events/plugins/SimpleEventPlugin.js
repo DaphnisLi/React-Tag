@@ -101,7 +101,7 @@ function extractEvents(
     case 'mousedown':
     case 'mousemove':
     case 'mouseup':
-    // TODO: Disabled elements should not respond to mouse events
+    // todo: Disabled elements should not respond to mouse events
     /* falls through */
     case 'mouseout':
     case 'mouseover':
@@ -164,7 +164,7 @@ function extractEvents(
     eventSystemFlags & IS_EVENT_HANDLE_NON_MANAGED_NODE
   ) {
     const listeners = accumulateEventHandleNonManagedNodeListeners(
-      // TODO: this cast may not make sense for events like
+      // todo: this cast may not make sense for events like
       // "focus" where React listens to e.g. "focusin".
       ((reactEventType: any): DOMEventName),
       targetContainer,
@@ -188,7 +188,7 @@ function extractEvents(
     // them in React either. We'll start by not bubbling onScroll, and then expand.
     const accumulateTargetOnly =
       !inCapturePhase &&
-      // TODO: ideally, we'd eventually add all events from
+      // todo: ideally, we'd eventually add all events from
       // nonDelegatedEvents list in DOMPluginEventSystem.
       // Then we can remove this special list.
       // This is a breaking change that can wait until React 18.

@@ -183,7 +183,7 @@ function processChildContext(
     const instance = fiber.stateNode;
     const childContextTypes = type.childContextTypes;
 
-    // TODO (bvaughn) Replace this behavior with an invariant() in the future.
+    // todo (bvaughn) Replace this behavior with an invariant() in the future.
     // It has only been added in Fiber to match the (unintentional) behavior in Stack.
     if (typeof instance.getChildContext !== 'function') {
       if (__DEV__) {

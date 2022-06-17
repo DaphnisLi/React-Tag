@@ -31,7 +31,7 @@ function initializeModules(hasPointerEvents) {
   Scheduler = require('scheduler');
   act = ReactTestRenderer.unstable_concurrentAct;
 
-  // TODO: This import throws outside of experimental mode. Figure out better
+  // todo: This import throws outside of experimental mode. Figure out better
   // strategy for gated imports.
   if (__EXPERIMENTAL__) {
     useFocusWithin = require('react-interactions/events/focus').useFocusWithin;

@@ -2167,7 +2167,7 @@ const tests = {
             // Don't assume user meant `foo` because it's not used in the effect.
             "The 'foo' literal is not a valid dependency because it never changes. " +
             'You can safely remove it.',
-          // TODO: provide suggestion.
+          // todo: provide suggestion.
           suggestions: undefined,
         },
       ],
@@ -2288,7 +2288,7 @@ const tests = {
             'React Hook useEffect was passed a dependency list that is not an ' +
             "array literal. This means we can't statically verify whether you've " +
             'passed the correct dependencies.',
-          // TODO: should this autofix or bail out?
+          // todo: should this autofix or bail out?
           suggestions: undefined,
         },
         {
@@ -2347,7 +2347,7 @@ const tests = {
             'React Hook useEffect has a spread element in its dependency array. ' +
             "This means we can't statically verify whether you've passed the " +
             'correct dependencies.',
-          // TODO: should this autofix or bail out?
+          // todo: should this autofix or bail out?
           suggestions: undefined,
         },
       ],
@@ -2385,7 +2385,7 @@ const tests = {
           message:
             "React Hook useEffect has a missing dependency: 'local'. " +
             'Either include it or remove the dependency array.',
-          // TODO: I'm not sure this is a good idea.
+          // todo: I'm not sure this is a good idea.
           // Maybe bail out?
           suggestions: [
             {
@@ -2456,7 +2456,7 @@ const tests = {
           message:
             'React Hook useEffect has a complex expression in the dependency array. ' +
             'Extract it to a separate variable so it can be statically checked.',
-          // TODO: ideally suggestion would remove the bad expression?
+          // todo: ideally suggestion would remove the bad expression?
           suggestions: undefined,
         },
       ],
@@ -2508,7 +2508,7 @@ const tests = {
           message:
             'React Hook useEffect has a complex expression in the dependency array. ' +
             'Extract it to a separate variable so it can be statically checked.',
-          // TODO: ideally suggeston would remove the bad expression?
+          // todo: ideally suggeston would remove the bad expression?
           suggestions: undefined,
         },
       ],
@@ -2746,7 +2746,7 @@ const tests = {
       // However, it *is* allowed to specify broader deps then strictly necessary.
       // So in this case we ask you to remove 'props.foo.bar.baz' because 'props.foo'
       // already covers it, and having both is unnecessary.
-      // TODO: maybe consider suggesting a narrower one by default in these cases.
+      // todo: maybe consider suggesting a narrower one by default in these cases.
       code: normalizeIndent`
         function MyComponent(props) {
           const fn = useCallback(() => {
@@ -3533,7 +3533,7 @@ const tests = {
           message:
             "React Hook useEffect has a missing dependency: 'local'. " +
             'Either include it or remove the dependency array.',
-          // TODO: should we bail out instead?
+          // todo: should we bail out instead?
           suggestions: [
             {
               desc: 'Update the dependencies array to be: [local]',
@@ -3570,7 +3570,7 @@ const tests = {
           message:
             "React Hook useEffect has a missing dependency: 'local'. " +
             'Either include it or remove the dependency array.',
-          // TODO: should we bail out instead?
+          // todo: should we bail out instead?
           suggestions: [
             {
               desc: 'Update the dependencies array to be: [local]',
@@ -5729,7 +5729,7 @@ const tests = {
       // effect. But it's used by more than one. So we
       // suggest useCallback() and use it for the autofix
       // where possible (variable but not declaration).
-      // TODO: we could coalesce messages for the same function if it affects multiple Hooks.
+      // todo: we could coalesce messages for the same function if it affects multiple Hooks.
       errors: [
         {
           message:
@@ -5831,7 +5831,7 @@ const tests = {
             "'handleNext' in its own useCallback() Hook.",
           // Normally we'd suggest moving handleNext inside an
           // effect. But it's used more than once.
-          // TODO: our autofix here isn't quite sufficient because
+          // todo: our autofix here isn't quite sufficient because
           // it only wraps the first definition. But seems ok.
           suggestions: [
             {
@@ -6214,7 +6214,7 @@ const tests = {
           return <h1>{count}</h1>;
         }
       `,
-      // TODO: ideally this should suggest useState updater form
+      // todo: ideally this should suggest useState updater form
       // since this code doesn't actually work. The autofix could
       // at least avoid suggesting 'tick' since it's obviously
       // always different, and thus useless.
@@ -6266,7 +6266,7 @@ const tests = {
             `Either include it or remove the dependency array.`,
           // Note: this autofix is shady because
           // the variable is used before declaration.
-          // TODO: Maybe we can catch those fixes and not autofix.
+          // todo: Maybe we can catch those fixes and not autofix.
           suggestions: [
             {
               desc: 'Update the dependencies array to be: [podcasts]',
@@ -7943,7 +7943,7 @@ const testsTypescript = {
 const testsTypescriptEslintParserV4 = {
   valid: [],
   invalid: [
-    // TODO: Should also be invalid as part of the JS test suite i.e. be invalid with babel eslint parsers.
+    // todo: Should also be invalid as part of the JS test suite i.e. be invalid with babel eslint parsers.
     // It doesn't use any explicit types but any JS is still valid TS.
     {
       code: normalizeIndent`

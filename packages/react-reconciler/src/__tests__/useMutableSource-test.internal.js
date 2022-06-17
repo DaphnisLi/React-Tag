@@ -1797,7 +1797,7 @@ describe('useMutableSource', () => {
               'same mutable source. This is currently unsupported.',
           );
 
-          // TODO (useMutableSource) Act will automatically flush remaining work from render 1,
+          // todo (useMutableSource) Act will automatically flush remaining work from render 1,
           // but at this point something in the hooks dispatcher has been broken by jest.resetModules()
           // Figure out what this is and remove this catch.
           expect(() =>
@@ -1860,7 +1860,7 @@ describe('useMutableSource', () => {
               'same mutable source. This is currently unsupported.',
           );
 
-          // TODO (useMutableSource) Act will automatically flush remaining work from render 1,
+          // todo (useMutableSource) Act will automatically flush remaining work from render 1,
           // but at this point something in the hooks dispatcher has been broken by jest.resetModules()
           // Figure out what this is and remove this catch.
           expect(() =>

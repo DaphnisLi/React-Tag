@@ -163,7 +163,7 @@ export function connectToDevTools(options: ?ConnectOptions) {
       bridge.send('overrideComponentFilters', savedComponentFilters);
     }
 
-    // TODO (npm-packages) Warn if "isBackendStorageAPISupported"
+    // todo (npm-packages) Warn if "isBackendStorageAPISupported"
     const agent = new Agent(bridge);
     agent.addListener('shutdown', () => {
       // If we received 'shutdown' from `agent`, we assume the `bridge` is already shutting down,

@@ -552,7 +552,7 @@ export default {
             }
             const isDirectlyInsideEffect = fnScope.block === node;
             if (isDirectlyInsideEffect) {
-              // TODO: we could potentially ignore early returns.
+              // todo: we could potentially ignore early returns.
               setStateInsideEffectWithoutDeps = key;
             }
           });
@@ -763,9 +763,9 @@ export default {
                         ? [`useMemo(() => { return `, '; })']
                         : ['useCallback(', ')'];
                     return [
-                      // TODO: also add an import?
+                      // todo: also add an import?
                       fixer.insertTextBefore(construction.node.init, before),
-                      // TODO: ideally we'd gather deps here but it would require
+                      // todo: ideally we'd gather deps here but it would require
                       // restructuring the rule code. This will cause a new lint
                       // error to appear immediately for useCallback. Note we're
                       // not adding [] because would that changes semantics.
@@ -775,10 +775,10 @@ export default {
                 },
               ];
             }
-            // TODO: What if the function needs to change on every render anyway?
+            // todo: What if the function needs to change on every render anyway?
             // Should we suggest removing effect deps as an appropriate fix too?
             reportProblem({
-              // TODO: Why not report this at the dependency site?
+              // todo: Why not report this at the dependency site?
               node: construction.node,
               message,
               suggest,
@@ -1096,7 +1096,7 @@ export default {
               .map(formatDependency)
               .join(', ')}]`,
             fix(fixer) {
-              // TODO: consider preserving the comments or formatting?
+              // todo: consider preserving the comments or formatting?
               return fixer.replaceText(
                 declaredDependenciesNode,
                 `[${suggestedDeps.map(formatDependency).join(', ')}]`,
@@ -1128,7 +1128,7 @@ export default {
           reactiveHookName === 'useMemo' ||
           reactiveHookName === 'useCallback'
         ) {
-          // TODO: Can this have a suggestion?
+          // todo: Can this have a suggestion?
           reportProblem({
             node: reactiveHook,
             message:

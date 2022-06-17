@@ -90,7 +90,7 @@ export type RendererInspectionConfig = $ReadOnly<{|
   ) => void,
 |}>;
 
-// TODO: Remove this conditional once all changes have propagated.
+// todo: Remove this conditional once all changes have propagated.
 if (registerEventHandler) {
   /**
    * Register the event emitter with the native bridge
@@ -318,7 +318,7 @@ export function prepareUpdate(
 ): null | Object {
   const viewConfig = instance.canonical.viewConfig;
   const updatePayload = diff(oldProps, newProps, viewConfig.validAttributes);
-  // TODO: If the event handlers have changed, we need to update the current props
+  // todo: If the event handlers have changed, we need to update the current props
   // in the commit phase but there is no host config hook to do it yet.
   // So instead we hack it by updating it in the render phase.
   instance.canonical.currentProps = newProps;
@@ -330,7 +330,7 @@ export function resetAfterCommit(containerInfo: Container): void {
 }
 
 export function shouldSetTextContent(type: string, props: Props): boolean {
-  // TODO (bvaughn) Revisit this decision.
+  // todo (bvaughn) Revisit this decision.
   // Always returning false simplifies the createInstance() implementation,
   // But creates an additional child Fiber for raw text children.
   // No additional native views are created though.

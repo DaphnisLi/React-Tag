@@ -101,7 +101,7 @@ export type InspectedElement = {|
   rendererVersion: string | null,
 |};
 
-// TODO: Add profiling type
+// todo: Add profiling type
 
 export type DehydratedData = {|
   cleaned: Array<Array<string | number>>,

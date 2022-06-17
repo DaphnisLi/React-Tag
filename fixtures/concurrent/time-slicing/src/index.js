@@ -107,7 +107,7 @@ class App extends PureComponent {
         this.debouncedHandleChange(value);
         break;
       case 'async':
-        // TODO: useTransition hook instead.
+        // todo: useTransition hook instead.
         setTimeout(() => {
           this.setState({value});
         }, 0);

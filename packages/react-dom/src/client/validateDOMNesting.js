@@ -120,7 +120,7 @@ if (__DEV__) {
     'template',
 
     // https://html.spec.whatwg.org/multipage/syntax.html#html-integration-point
-    // TODO: Distinguish by namespace here -- for <title>, including it here
+    // todo: Distinguish by namespace here -- for <title>, including it here
     // errs on the side of fewer warnings
     'foreignObject',
     'desc',

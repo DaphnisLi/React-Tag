@@ -52,7 +52,7 @@ describe('ReactDOMServer', () => {
       expect(response).toBe('');
     });
 
-    // TODO: Test that listeners are not registered onto any document/container.
+    // todo: Test that listeners are not registered onto any document/container.
 
     it('should render composite components', () => {
       class Parent extends React.Component {

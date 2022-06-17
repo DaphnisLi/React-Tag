@@ -748,7 +748,7 @@ type Props = {|
   defaultSelectedElementIndex?: ?number,
 |};
 
-// TODO Remove TreeContextController wrapper element once global ConsearchText.write API exists.
+// todo Remove TreeContextController wrapper element once global ConsearchText.write API exists.
 function TreeContextController({
   children,
   defaultInspectedElementID,

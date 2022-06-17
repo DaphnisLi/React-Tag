@@ -521,7 +521,7 @@ describe('ReactIncrementalUpdates', () => {
         Scheduler.unstable_yieldValue('Committed: ' + log);
         if (log === 'B') {
           // Right after B commits, schedule additional updates.
-          // TODO: Double wrapping is temporary while we remove Scheduler runWithPriority.
+          // todo: Double wrapping is temporary while we remove Scheduler runWithPriority.
           ReactNoop.unstable_runWithPriority(InputContinuousLanePriority, () =>
             Scheduler.unstable_runWithPriority(
               Scheduler.unstable_UserBlockingPriority,
@@ -547,7 +547,7 @@ describe('ReactIncrementalUpdates', () => {
     await ReactNoop.act(async () => {
       pushToLog('A');
 
-      // TODO: Double wrapping is temporary while we remove Scheduler runWithPriority.
+      // todo: Double wrapping is temporary while we remove Scheduler runWithPriority.
       ReactNoop.unstable_runWithPriority(InputContinuousLanePriority, () =>
         Scheduler.unstable_runWithPriority(
           Scheduler.unstable_UserBlockingPriority,
@@ -586,7 +586,7 @@ describe('ReactIncrementalUpdates', () => {
         Scheduler.unstable_yieldValue('Committed: ' + this.state.log);
         if (this.state.log === 'B') {
           // Right after B commits, schedule additional updates.
-          // TODO: Double wrapping is temporary while we remove Scheduler runWithPriority.
+          // todo: Double wrapping is temporary while we remove Scheduler runWithPriority.
           ReactNoop.unstable_runWithPriority(InputContinuousLanePriority, () =>
             Scheduler.unstable_runWithPriority(
               Scheduler.unstable_UserBlockingPriority,
@@ -613,7 +613,7 @@ describe('ReactIncrementalUpdates', () => {
 
     await ReactNoop.act(async () => {
       pushToLog('A');
-      // TODO: Double wrapping is temporary while we remove Scheduler runWithPriority.
+      // todo: Double wrapping is temporary while we remove Scheduler runWithPriority.
       ReactNoop.unstable_runWithPriority(InputContinuousLanePriority, () =>
         Scheduler.unstable_runWithPriority(
           Scheduler.unstable_UserBlockingPriority,

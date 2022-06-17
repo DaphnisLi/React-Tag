@@ -76,7 +76,7 @@ export function setAttemptHydrationAtPriority(
   attemptHydrationAtPriority = fn;
 }
 
-// TODO: Upgrade this definition once we're on a newer version of Flow that
+// todo: Upgrade this definition once we're on a newer version of Flow that
 // has this definition built-in.
 type PointerEvent = Event & {
   pointerId: number,
@@ -423,7 +423,7 @@ export function queueIfContinuousEvent(
 function attemptExplicitHydrationTarget(
   queuedTarget: QueuedHydrationTarget,
 ): void {
-  // TODO: This function shares a lot of logic with attemptToDispatchEvent.
+  // todo: This function shares a lot of logic with attemptToDispatchEvent.
   // Try to unify them. It's a bit tricky since it would require two return
   // values.
   const targetInst = getClosestInstanceFromNode(queuedTarget.target);

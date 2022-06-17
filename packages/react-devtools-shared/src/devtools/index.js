@@ -16,6 +16,6 @@ type Shell = {|
 
 export function initDevTools(shell: Shell) {
   shell.connect((bridge: FrontendBridge) => {
-    // TODO ...
+    // todo ...
   });
 }

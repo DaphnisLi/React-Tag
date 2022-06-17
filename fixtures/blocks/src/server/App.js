@@ -11,10 +11,10 @@ import {matchRoute} from './ServerRouter';
 import FeedPage from './FeedPage';
 import ProfilePage from './ProfilePage';
 
-// TODO: Replace with asset reference.
+// todo: Replace with asset reference.
 import Shell from '../client/Shell';
 
-// TODO: Router component?
+// todo: Router component?
 const AppRoutes = {
   '/': props => <FeedPage {...props} key="home" />,
   '/profile/:userId/*': props => (

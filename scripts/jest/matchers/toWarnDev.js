@@ -144,7 +144,7 @@ const createMatcherFor = (consoleMethod, matcherName) =>
         unexpectedWarnings.push(new Error(errorMessage));
       };
 
-      // TODO Decide whether we need to support nested toWarn* expectations.
+      // todo Decide whether we need to support nested toWarn* expectations.
       // If we don't need it, add a check here to see if this is already our spy,
       // And throw an error.
       const originalMethod = console[consoleMethod];
