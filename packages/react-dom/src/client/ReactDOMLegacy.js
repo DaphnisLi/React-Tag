@@ -181,6 +181,11 @@ function warnOnInvalidCallback(callback: mixed, callerName: string): void {
   }
 }
 
+// TAGD Render 函数的主要逻辑 —— Legacy
+/**
+ * Render 函数的主要逻辑，用来创建 ReactDOMBlockingRoot
+ * 最终会 new 一个 ReactDOMBlockingRoot 的实例
+ */
 function legacyRenderSubtreeIntoContainer(
   parentComponent: ?React$Component<any, any>, // null
   children: ReactNodeList, // <App />
@@ -200,7 +205,7 @@ function legacyRenderSubtreeIntoContainer(
   if (!root) {
     // Initial mount  (初始挂载)
     // 初次调用, root还未初始化, 会进入此分支
-    //1. 创建ReactDOMRoot对象, 初始化react应用环境
+    // 创建ReactDOMRoot对象, 初始化react应用环境
     // 给 root 增加了 _internalRoot 属性
     root = container._reactRootContainer = legacyCreateRootFromDOMContainer(
       container,
@@ -210,15 +215,19 @@ function legacyRenderSubtreeIntoContainer(
     if (typeof callback === 'function') {
       const originalCallback = callback;
       callback = function() {
+        // instance最终指向 children(入参: 如<App/>)生成的dom节点
         const instance = getPublicRootInstance(fiberRoot);
         originalCallback.call(instance);
       };
     }
     // Initial mount should not be batched.
+    // 更新容器
     unbatchedUpdates(() => {
       updateContainer(children, fiberRoot, parentComponent, callback);
     });
   } else {
+    // root已经初始化, 二次调用render会进入
+    // 获取FiberRoot对象
     fiberRoot = root._internalRoot;
     if (typeof callback === 'function') {
       const originalCallback = callback;
@@ -227,7 +236,7 @@ function legacyRenderSubtreeIntoContainer(
         originalCallback.call(instance);
       };
     }
-    // Update
+    // Update 更新
     updateContainer(children, fiberRoot, parentComponent, callback);
   }
   return getPublicRootInstance(fiberRoot);
@@ -296,6 +305,7 @@ export function hydrate(
   );
 }
 
+//TAGD Render —— Legacy
 export function render(
   element: React$Element<any>, // <App />
   container: Container, // #root

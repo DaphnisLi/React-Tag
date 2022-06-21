@@ -244,9 +244,11 @@ export function createContainer(
   hydrate: boolean,
   hydrationCallbacks: null | SuspenseHydrationCallbacks,
 ): OpaqueRoot {
+  // 创建fiberRoot对象
   return createFiberRoot(containerInfo, tag, hydrate, hydrationCallbacks);
 }
 
+// TAGR 执行 Render 后，由此进入 Reconciler 包
 export function updateContainer(
   element: ReactNodeList,
   container: OpaqueRoot,

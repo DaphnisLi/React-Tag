@@ -118,6 +118,11 @@ ReactDOMRoot.prototype.unmount = ReactDOMBlockingRoot.prototype.unmount = functi
   });
 };
 
+// TAGD 创建 FiberRoot 对象 —— 就是 Fiber 对象
+/**
+ * 就是 Fiber 对象
+ * 创建 ReactDOMRoot / ReactDOMBlockingRoot 对象时，最后都会执行此函数
+ */
 function createRootImpl(
   container: Container,
   tag: RootTag,
@@ -133,9 +138,9 @@ function createRootImpl(
       options.hydrationOptions != null &&
       options.hydrationOptions.mutableSources) ||
     null;
-  // 创建fiberRoot
+  // ? 创建 fiberRoot
   const root = createContainer(container, tag, hydrate, hydrationCallbacks);
-  // 标记dom对象, 把dom和fiber对象关联起来
+  // ? 标记 dom 对象, 把 dom 和 fiber 对象关联起来
   markContainerAsRoot(root.current, container);
   const containerNodeType = container.nodeType;
 
@@ -172,6 +177,10 @@ function createRootImpl(
   return root;
 }
 
+//TAGD CreateRoot —— Concurrent
+/**
+ * Concurrent 的 render
+ */
 export function createRoot(
   container: Container,
   options?: RootOptions,
@@ -184,6 +193,10 @@ export function createRoot(
   return new ReactDOMRoot(container, options);
 }
 
+// TAGD CreateBlockingRoot —— Blocking
+/**
+ * Blocking 的 render
+ */
 export function createBlockingRoot(
   container: Container,
   options?: RootOptions,
@@ -196,6 +209,10 @@ export function createBlockingRoot(
   return new ReactDOMBlockingRoot(container, BlockingRoot, options);
 }
 
+// TAGD CreateLegacyRoot —— Legacy
+/**
+ * Legacy 的 render
+ */
 export function createLegacyRoot(
   container: Container,
   options?: RootOptions,
