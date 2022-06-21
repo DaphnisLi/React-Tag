@@ -59,9 +59,17 @@ var LOW_PRIORITY_TIMEOUT = 10000;
 var IDLE_PRIORITY_TIMEOUT = maxSigned31BitInt;
 
 // Tasks are stored on a min heap
-/** 任务队列 */
+
+// TAGS 任务队列
+/**
+ * 任务队列
+ * 小顶堆数组
+ */
 var taskQueue = [];
-/** 延时任务 */
+
+/** 
+ * 延时任务，应该是延时回调的任务
+ */
 var timerQueue = [];
 
 // Incrementing id counter. Used to maintain insertion order.
@@ -120,7 +128,8 @@ function handleTimeout(currentTime) {
     }
   }
 }
-/** 调度任务函数 */
+
+// TAGS 调度任务回调函数
 function flushWork(hasTimeRemaining, initialTime) {
   if (enableProfiling) {
     markSchedulerUnsuspended(initialTime);
@@ -133,13 +142,13 @@ function flushWork(hasTimeRemaining, initialTime) {
     isHostTimeoutScheduled = false;
     cancelHostTimeout();
   }
-  //? 1.做好全局标记, 表示现在已经进入调度阶段
+  // ? 做好全局标记, 表示现在已经进入调度阶段
   isPerformingWork = true;
   const previousPriorityLevel = currentPriorityLevel;
   try {
     if (enableProfiling) {
       try {
-        //? 2.循环任务队列
+        // ? 循环执行任务队列
         return workLoop(hasTimeRemaining, initialTime);
       } catch (error) {
         if (currentTask !== null) {
@@ -154,7 +163,7 @@ function flushWork(hasTimeRemaining, initialTime) {
       return workLoop(hasTimeRemaining, initialTime);
     }
   } finally { // 无论try是否有异常抛出或捕获它总是执行
-    //? 3.还原全局标记
+    // ? 还原全局标记
     currentTask = null;
     currentPriorityLevel = previousPriorityLevel;
     isPerformingWork = false;
@@ -165,12 +174,23 @@ function flushWork(hasTimeRemaining, initialTime) {
   }
 }
 
+// TAGS 调度任务循环函数
 function workLoop(hasTimeRemaining, initialTime) {
   // 保存当前时间, 用于判断任务是否过期
   let currentTime = initialTime;
   advanceTimers(currentTime);
-  // 获取任务队列中的第一个任务
+  // 获取任务队列中的第一个任务，小顶堆
   currentTask = peek(taskQueue);
+
+  // TAGS 时间切片
+  // 任务太多，一个时间切片内只能执行一部分
+  // 时间切片原理：消费任务队列的过程中, 可以消费 1~n 个 task, 甚至清空整个 queue. 但是在每一次具体执行 task.callback 之前都要进行超时检测, 如果超时可以立即退出循环并等待下一次调用.
+  // 每一次 while 循环的退出就是一个时间切片，深入分析 while 循环的退出条件:
+  // 1、队列被完全清空: 这种情况就是很正常的情况, 一气呵成, 没有遇到任何阻碍.
+  // 2、执行超时: 在消费 taskQueue 时, 在执行 task.callback 之前, 都会检测是否超时, 所以超时检测是以 task 为单位。
+  //        如果某个 task.callback 执行时间太长(如: fiber 树很大, 或逻辑很重)也会造成超时。
+  //        所以在执行 task.callback 过程中, 也需要一种机制检测是否超时, 如果超时了就立刻暂停 task.callback 的执行。
+  
   while (
     currentTask !== null &&
     !(enableSchedulerDebugging && isSchedulerPaused)
@@ -180,7 +200,7 @@ function workLoop(hasTimeRemaining, initialTime) {
       (!hasTimeRemaining || shouldYieldToHost())
     ) {
       // This currentTask hasn't expired, and we've reached the deadline.
-      // 虽然currentTask没有过期, 但是执行时间超过了限制(毕竟只有5ms, shouldYieldToHost()返回true). 停止继续执行, 让出主线程
+      // 虽然 currentTask 没有过期, 但是执行时间超过了限制(毕竟只有5ms, shouldYieldToHost()返回true). 停止继续执行, 让出主线程
       break;
     }
     const callback = currentTask.callback;
@@ -196,19 +216,20 @@ function workLoop(hasTimeRemaining, initialTime) {
       currentTime = getCurrentTime();
       // 回调完成, 判断是否还有连续(派生)回调
       if (typeof continuationCallback === 'function') {
-        // 产生了连续回调(如fiber树太大, 出现了中断渲染), 保留currentTask
+        // TAGS 可中断渲染剩下的部分未执行的 Callback
+        // 产生了连续回调(如 Fiber 树太大, 出现了中断渲染), 保留 currentTask
         currentTask.callback = continuationCallback;
         if (enableProfiling) {
           markTaskYield(currentTask, currentTime);
         }
       } else {
         if (enableProfiling) {
-          // 把currentTask移出队列
+          // 把 currentTask 移出队列
           markTaskCompleted(currentTask, currentTime);
           currentTask.isQueued = false;
         }
         if (currentTask === peek(taskQueue)) {
-          // 如果当前任务被取消(这时currentTask.callback = null), 将其移出队列
+          // 如果当前任务被取消(这时 currentTask.callback = null), 将其移出队列
           pop(taskQueue);
         }
       }
@@ -216,19 +237,19 @@ function workLoop(hasTimeRemaining, initialTime) {
     } else {
       pop(taskQueue);
     }
-    // 更新currentTask
+    // 更新 currentTask
     currentTask = peek(taskQueue);
   }
   // Return whether there's additional work
   if (currentTask !== null) {
-    // 如果task队列没有清空, 返回true. 等待调度中心下一次回调
+    // 如果 task 队列没有清空, 返回 true. 等待调度中心下一次回调
     return true;
   } else {
     const firstTimer = peek(timerQueue);
     if (firstTimer !== null) {
       requestHostTimeout(handleTimeout, firstTimer.startTime - currentTime);
     }
-    // task队列已经清空, 返回false.
+    // task 队列已经清空, 返回 false.
     return false;
   }
 }
@@ -295,18 +316,18 @@ function unstable_wrapCallback(callback) {
   };
 }
 
+// TAGS 创建调度任务，然后请求调度
 /**
- * 创建任务
- * @callback 其实就是performSyncWorkOnRoot或performConcurrentWorkOnRoot
+ * 创建调度任务
+ * @callback performSyncWorkOnRoot/performConcurrentWorkOnRoot
  */
 function unstable_scheduleCallback(priorityLevel, callback, options) {
-  //? 1.获取当前时间
+  // ? 1.获取当前时间
   var currentTime = getCurrentTime();
 
   var startTime;
   if (typeof options === 'object' && options !== null) {
-    // 从函数调用关系来看, 在v17.0.2中,所有调用 unstable_scheduleCallback 都未传入options
-    // 所以省略延时任务相关的代码
+    // 从函数调用关系来看, 在v17.0.2中，所有调用 unstable_scheduleCallback 都未传入options
     var delay = options.delay;
     if (typeof delay === 'number' && delay > 0) {
       startTime = currentTime + delay;
@@ -316,7 +337,7 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
   } else {
     startTime = currentTime;
   }
-  //? 2.根据传入的优先级, 设置任务的过期时间 expirationTime
+  // ? 2.根据传入的优先级, 设置任务的过期时间 expirationTime
   var timeout;
   switch (priorityLevel) {
     case ImmediatePriority:
@@ -350,12 +371,12 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
     expirationTime, // task的过期时间, 优先级越高 expirationTime = startTime + timeout 越小
     sortIndex: -1, // 排序索引, 全等于过期时间. 控制 task 在队列中的次序，过期时间越小、越紧急的任务排在最前面
   };
+
   if (enableProfiling) {
     newTask.isQueued = false;
   }
-
+  // 开始时间 > 当前时间，延时任务时会 > ，正常是 ===
   if (startTime > currentTime) {
-    // 省略无关代码 v17.0.2中不会使用
     // This is a delayed task.
     newTask.sortIndex = startTime;
     push(timerQueue, newTask);
@@ -372,7 +393,7 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
     }
   } else {
     newTask.sortIndex = expirationTime;
-    //? 4.将新任务加入到任务队列
+    // ? 4.将新任务加入到任务队列
     push(taskQueue, newTask);
     if (enableProfiling) {
       markTaskStart(newTask, currentTime);
@@ -380,7 +401,7 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
     }
     // Schedule a host callback, if needed. If we're already performing work,
     // wait until the next time we yield.
-    //? 5. 请求调度
+    // ? 5.请求调度
     if (!isHostCallbackScheduled && !isPerformingWork) {
       isHostCallbackScheduled = true;
       requestHostCallback(flushWork);

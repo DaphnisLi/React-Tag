@@ -754,9 +754,9 @@ function ensureRootIsScheduled(root: FiberRoot, currentTime: number) {
   }
 
   // Check if there's an existing task. We may be able to reuse it.
-  //? 节流防抖
-  // 节流(判断条件: existingCallbackPriority === newCallbackPriority, 新旧更新的优先级相同, 如连续多次执行setState), 则无需注册新task(继续沿用上一个优先级相同的task), 直接退出调用.
-  // 防抖(判断条件: existingCallbackPriority !== newCallbackPriority, 新旧更新的优先级不同), 则取消旧task, 重新注册新task.
+  // TAGS 注册调度任务前的节流防抖
+  // 节流：(判断条件: existingCallbackPriority === newCallbackPriority, 新旧更新的优先级相同, 如连续多次执行 setState), 则无需注册新 task(继续沿用上一个优先级相同的task), 直接退出调用。
+  // 防抖：(判断条件: existingCallbackPriority !== newCallbackPriority, 新旧更新的优先级不同), 则取消旧 task, 重新注册新 task。
   if (existingCallbackNode !== null) {
     const existingCallbackPriority = root.callbackPriority;
     if (existingCallbackPriority === newCallbackPriority) {
@@ -1745,14 +1745,17 @@ function renderRootConcurrent(root: FiberRoot, lanes: Lanes) {
 }
 
 /**
- * @noinline
- * 循环构造 fiber 树
+ * 循环构造 Fiber 树
  * 深度优先遍历
  */
 function workLoopConcurrent() {
   // Perform work until Scheduler asks us to yield
-  // ? 深度优先遍历
-  // ? 这里会比前两个模式多一个停顿机制, 这个机制实现了时间切片和可中断渲染
+  // TAGR 可中断渲染
+  // 单个任务执行时间过多
+  // 可中断渲染原理：在时间切片的基础之上, 如果单个 task.callback 执行时间就很长(假设 200ms)。就需要 task.callback 自己能够检测是否超时, 所以在 fiber 树构造过程中, 每构造完成一个单元, 都会检测一次超时(源码链接), 如遇超时就退出 Fiber 树构造循环, 并返回一个新的回调函数等待下一次回调继续未完成的 Fiber 树构造.
+
+  // 深度优先遍历
+  // 这里会比前两个模式多一个停顿机制, 这个机制实现了可中断渲染
   while (workInProgress !== null && !shouldYield()) {
     performUnitOfWork(workInProgress);
   }

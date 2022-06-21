@@ -7,32 +7,24 @@
 
 import { enableIsInputPending } from '../SchedulerFeatureFlags';
 
-// todo 调度相关: 请求或取消调度
+// TAGS Scheduler 关键函数：请求调度，时间切片
+// 调度相关: 请求或取消调度
+export let requestHostCallback; // 请求及时回调
+export let cancelHostCallback; // 取消及时回调
+export let requestHostTimeout; // 请求延时回调，应该是在下一次事件循环执行
+export let cancelHostTimeout; // 取消延时回调
 
-/** 请求及时回调 */
-export let requestHostCallback;
-/** 取消及时回调 */
-export let cancelHostCallback;
-/** 请求延时回调 */
-export let requestHostTimeout;
-/** 取消延时回调 */
-export let cancelHostTimeout;
-
-// todo 时间切片(time slicing)相关: 执行时间分割, 让出主线程(把控制权归还浏览器, 浏览器可以处理用户输入, UI 绘制等紧急任务).
-
-/** 是否让出主线程 */
-export let shouldYieldToHost;
-/** 请求绘制 */
-export let requestPaint;
-/** 获取当前时间 */
-export let getCurrentTime;
-/** 强制设置 yieldInterval (让出主线程的周期) */
-export let forceFrameRate;
+// 时间切片(time slicing)相关: 执行时间分割, 让出主线程(把控制权归还浏览器, 浏览器可以处理用户输入, UI 绘制等紧急任务).
+export let shouldYieldToHost; // 是否让出主线程
+export let requestPaint; // 请求绘制
+export let getCurrentTime; // 获取当前时间
+export let forceFrameRate; // 强制设置 yieldInterval (让出主线程的周期)
 
 const hasPerformanceNow =
   typeof performance === 'object' && typeof performance.now === 'function';
 
 // 如果有 performance 可以使用就用，没有就用Date
+// TAGS 获取当前时间
 if (hasPerformanceNow) {
   const localPerformance = performance;
   getCurrentTime = () => localPerformance.now();
@@ -126,9 +118,8 @@ if (
   // thread, like user events. By default, it yields multiple times per frame.
   // It does not attempt to align with frame boundaries, since most tasks don't
   // need to be frame aligned; for those that do, use requestAnimationFrame.
-  /**
-   * 时间切片周期, 默认是5ms(如果一个task运行超过该周期, 下一个task执行之前, 会把控制权归还浏览器)
-   */
+
+  // TAGS 时间切片周期, 默认是5ms，只能通过 forceFrameRate 改变时间周期。如果一个 task 运行超过该周期, 下一个 task 执行之前, 会把控制权归还浏览器。
   let yieldInterval = 5;
   /** 任务到期的最后期限，其实就是倒计时5ms */
   let deadline = 0;
@@ -146,14 +137,18 @@ if (
   ) {
     const scheduling = navigator.scheduling;
 
-    //! 注意shouldYieldToHost的判定条件:
+    // ! 注意shouldYieldToHost的判定条件:
     // currentTime >= deadline: 只有时间超过deadline之后才会让出主线程(其中deadline = currentTime + yieldInterval).
     // yieldInterval默认是5ms, 只能通过forceFrameRate函数来修改(事实上在 v17.0.2 源码中, 并没有使用到该函数).
     // 如果一个task运行时间超过5ms, 下一个task执行之前, 会把控制权归还浏览器.
     // navigator.scheduling.isInputPending(): 这 facebook 官方贡献给 Chromium 的 api, 现在已经列入 W3C 标准(具体解释), 用于判断是否有输入事件(包括: input 框输入事件, 点击事件等).
+    
+    // TAGS 是否让出主线程
     shouldYieldToHost = function () {
       const currentTime = getCurrentTime();
+      // deadline = currentTime + yieldInterval 其实就是开始执行任务的时间 + 5ms。可以简单理解成倒计时 5ms
       if (currentTime >= deadline) {
+        // ? 让出主线程
         // There's no time left. We may want to yield control of the main
         // thread, so the browser can perform high priority tasks. The main ones
         // are painting and user input. If there's a pending paint or a pending
@@ -176,6 +171,7 @@ if (
       }
     };
 
+    //TAGS 请求绘制
     requestPaint = function () {
       needsPaint = true;
     };
@@ -190,6 +186,7 @@ if (
     requestPaint = function () { };
   }
 
+  // TAGS 设置时间切片的周期
   forceFrameRate = function (fps) {
     if (fps < 0 || fps > 125) {
       // Using console['error'] to evade Babel and ESLint
@@ -207,43 +204,42 @@ if (
     }
   };
   /**
-   * 接收 MessageChannel 消息
+   * ? 接收 port2.postMessage 的消息
+   * 作用：执行 Task 回调函数
    */
   const performWorkUntilDeadline = () => {
     if (scheduledHostCallback !== null) {
-      //? 1. 获取当前时间
+      // 1. 获取当前时间
       const currentTime = getCurrentTime();
       // Yield after `yieldInterval` ms, regardless of where we are in the vsync
       // cycle. This means there's always time remaining at the beginning of
       // the message event.'
 
-      //? 2. 更新deadline
+      // 2. 更新deadline
       deadline = currentTime + yieldInterval;
       const hasTimeRemaining = true;
       try {
-        //? 3. 执行回调, 返回是否有还有剩余任务
+        // 3. 执行回调, 返回是否有还有剩余任务
         const hasMoreWork = scheduledHostCallback(
           hasTimeRemaining,
           currentTime,
         );
         if (!hasMoreWork) {
-          //? 没有剩余任务, 退出
+          // 没有剩余任务, 退出
           isMessageLoopRunning = false;
           scheduledHostCallback = null;
         } else {
           // If there's more work, schedule the next message event at the end
           // of the preceding one.
 
-          //? 有剩余任务, 发起新的调度
-          // 通过 MessageChannel 发送消息
+          // 有剩余任务, 发起新的调度
           port.postMessage(null);
         }
       } catch (error) {
         // If a scheduler task throws, exit the current browser task so the
         // error can be observed.
 
-        //? 如有异常, 重新发起调度
-        // 通过 MessageChannel 发送消息
+        // 如有异常, 重新发起调度
         port.postMessage(null);
         throw error;
       }
@@ -252,36 +248,43 @@ if (
     }
     // Yielding to the browser will give it a chance to paint, so we can
     // reset this.
-    //? 重置开关
+    // 重置开关
     needsPaint = false;
   };
+
+  //TAGS MessageChannel
   /**
-   * 此处需要注意: MessageChannel在浏览器事件循环中属于宏任务, 所以调度中心永远是异步执行回调函数.
+   * 此处需要注意: MessageChannel 在浏览器事件循环中属于宏任务，所以调度中心永远是异步执行回调函数。
    */
   const channel = new MessageChannel();
   const port = channel.port2;
   channel.port1.onmessage = performWorkUntilDeadline;
 
+  // TAGS 请求及时回调
   requestHostCallback = function (callback) {
-    // 保存callback
+    // 保存 callback
     scheduledHostCallback = callback;
     if (!isMessageLoopRunning) {
       isMessageLoopRunning = true;
-      // 通过 MessageChannel 发送消息
+      // ? 给 port1.onmessage 发送消息
       port.postMessage(null);
     }
   };
 
+  // TAGS 取消及时回调
   cancelHostCallback = function () {
+    // 直接把调度的回调函数给弄没了
     scheduledHostCallback = null;
   };
 
+  // TAGS 请求延时回调
   requestHostTimeout = function (callback, ms) {
     taskTimeoutID = setTimeout(() => {
       callback(getCurrentTime());
     }, ms);
   };
 
+  // TAGS 取消延时回调
   cancelHostTimeout = function () {
     clearTimeout(taskTimeoutID);
     taskTimeoutID = -1;
