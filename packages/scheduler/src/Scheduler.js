@@ -338,15 +338,17 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
   }
 
   var expirationTime = startTime + timeout;
-  //? 3.创建新任务
-  /** 新任务 */
+  // ? 3.创建新任务
+
+  // TAGT Task
+  // 保存在小顶堆数组 taskQueue 中, 始终保证数组中的第一个 task 对象优先级最高
   var newTask = {
-    id: taskIdCounter++, // id: 一个自增编号
-    callback, // callback: 传入的回调函数
-    priorityLevel, // priorityLevel: 优先级等级
-    startTime, // startTime: 创建task时的开始时间
-    expirationTime, // expirationTime: task的过期时间, 优先级越高 expirationTime = startTime + timeout 越小
-    sortIndex: -1, // sortIndex: 排序索引, 全等于过期时间. 保证过期时间越小, 越紧急的任务排在最前面
+    id: taskIdCounter++, // 位移标识，一个自增编号
+    callback, // 传入的回调函数， 指向react-reconciler包所提供的回调函数
+    priorityLevel, // 优先级
+    startTime, // 一个时间戳,代表 task 的开始时间(创建时间 + 延时时间)
+    expirationTime, // task的过期时间, 优先级越高 expirationTime = startTime + timeout 越小
+    sortIndex: -1, // 排序索引, 全等于过期时间. 控制 task 在队列中的次序，过期时间越小、越紧急的任务排在最前面
   };
   if (enableProfiling) {
     newTask.isQueued = false;

@@ -103,33 +103,30 @@ import invariant from 'shared/invariant';
 
 import {disableLogs, reenableLogs} from 'shared/ConsolePatchingDev';
 
+// TAGT Update
 export type Update<State> = {|
   // todo: Temporary field. Will remove this by storing a map of
   // transition -> event time on the root.
-  /** 发起update事件的时间(17.0.2中作为临时字段, 即将移出) */
-  eventTime: number,
-  /** update所属的优先级 */
-  lane: Lane,
-  /** 表示update的4种类型 */
-  tag: 0 | 1 | 2 | 3,
-  /** 载荷, 根据场景可以设置成一个回调函数或者对象 */
-  payload: any,
-  /** 回调函数 */
-  callback: (() => mixed) | null,
-  /** 指向链表中的下一个, 由于UpdateQueue是一个环形链表, 最后一个update.next指向第一个update对象 */
-  next: Update<State> | null,
+  eventTime: number, // 发起 update 事件的时间(17.0.2中作为临时字段, 即将移出)
+  lane: Lane, // update 所属的优先级
+  tag: 0 | 1 | 2 | 3, // 表示 update 的 4 种类型
+  payload: any, // 载荷, 根据场景可以设置成一个回调函数或者对象
+  callback: (() => mixed) | null, // 回调函数
+  next: Update<State> | null, // 指向链表中的下一个, 由于 UpdateQueue 是一个环形链表, 最后一个 update.next 指向第一个 update 对象
 |};
 
+// TAGT SharedQueue
 type SharedQueue<State> = {|
-  pending: Update<State> | null,
+  pending: Update<State> | null, // 指向即将输入的update队列. 在class组件中调用setState()之后, 会将新的 update 对象添加到这个队列中来.
 |};
 
+// TAGT UpdateQueue
 export type UpdateQueue<State> = {|
-  baseState: State,
-  firstBaseUpdate: Update<State> | null,
-  lastBaseUpdate: Update<State> | null,
-  shared: SharedQueue<State>,
-  effects: Array<Update<State>> | null,
+  baseState: State, // 表示此队列的基础 state
+  firstBaseUpdate: Update<State> | null, // 指向基础队列的队首
+  lastBaseUpdate: Update<State> | null, // 指向基础队列的队尾
+  shared: SharedQueue<State>, // 共享队列
+  effects: Array<Update<State>> | null, // 用于保存有 callback 回调函数的 update 对象, 在 commit 之后, 会依次调用这里的回调函数.
 |};
 
 export const UpdateState = 0;

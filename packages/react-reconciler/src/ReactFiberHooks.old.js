@@ -92,22 +92,6 @@ import {markStateUpdateScheduled} from './SchedulingProfiler';
 
 const {ReactCurrentDispatcher, ReactCurrentBatchConfig} = ReactSharedInternals;
 
-type Update<S, A> = {|
-  lane: Lane,
-  action: A,
-  eagerReducer: ((S, A) => S) | null,
-  eagerState: S | null,
-  next: Update<S, A>,
-  priority?: ReactPriorityLevel,
-|};
-
-type UpdateQueue<S, A> = {|
-  pending: Update<S, A> | null,
-  dispatch: (A => mixed) | null,
-  lastRenderedReducer: ((S, A) => S) | null,
-  lastRenderedState: S | null,
-|};
-
 export type HookType =
   | 'useState'
   | 'useReducer'
@@ -131,12 +115,30 @@ if (__DEV__) {
   didWarnAboutMismatchedHooksForComponent = new Set();
 }
 
+type Update<S, A> = {|
+  lane: Lane,
+  action: A,
+  eagerReducer: ((S, A) => S) | null,
+  eagerState: S | null,
+  next: Update<S, A>,
+  priority?: ReactPriorityLevel,
+|};
+
+type UpdateQueue<S, A> = {|
+  pending: Update<S, A> | null,
+  dispatch: (A => mixed) | null,
+  lastRenderedReducer: ((S, A) => S) | null,
+  lastRenderedState: S | null,
+|};
+
+// TAGT Hook
+// Hook.queue 和 Hook.baseQueue(即 UpdateQueue 和 Update）是为了保证Hook对象能够顺利更新,
 export type Hook = {|
-  memoizedState: any,
-  baseState: any,
-  baseQueue: Update<any, any> | null,
-  queue: UpdateQueue<any, any> | null,
-  next: Hook | null,
+  memoizedState: any, // 内存状态, 用于输出成最终的 fiber 树
+  baseState: any, // 基础状态, 当 Hook.queue 更新过后, baseState 也会更新.
+  baseQueue: Update<any, any> | null, // 基础状态队列, 在 reconciler 阶段会辅助状态合并.
+  queue: UpdateQueue<any, any> | null, // 指向一个 Update 队列
+  next: Hook | null, // 指向该 function 组件的下一个 Hook 对象, 使得多个 Hook 之间也构成了一个链表。这就是 Hook 要保持顺序一致的原因
 |};
 
 export type Effect = {|
