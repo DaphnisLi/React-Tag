@@ -7,6 +7,7 @@
  * @flow
  */
 
+// TAGT Flags
 export type Flags = number;
 
 // Don't change these two values. They're used by React Dev Tools.
