@@ -10,6 +10,8 @@
 export type PriorityLevel = 0 | 1 | 2 | 3 | 4 | 5;
 
 // todo: Use symbols?
+
+// TAGL Scheduler 调度中心相关的优先级
 export const NoPriority = 0;
 export const ImmediatePriority = 1;
 export const UserBlockingPriority = 2;

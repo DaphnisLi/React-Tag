@@ -43,6 +43,7 @@ import {
   NoPriority as NoSchedulerPriority,
 } from './SchedulerWithReactIntegration.new';
 
+// TAGL LanePriority。Fiber 构造过程相关的优先级(如fiber.updateQueue,fiber.lanes)
 export const SyncLanePriority: LanePriority = 15;
 export const SyncBatchedLanePriority: LanePriority = 14;
 
@@ -68,6 +69,8 @@ const IdleLanePriority: LanePriority = 2;
 const OffscreenLanePriority: LanePriority = 1;
 
 export const NoLanePriority: LanePriority = 0;
+
+// ————————————————————————————————————————————————————————————————————
 
 const TotalLanes = 31;
 
@@ -193,6 +196,7 @@ function getHighestPriorityLanes(lanes: Lanes | Lane): Lanes {
   return lanes;
 }
 
+// TAGL LanePriority 优先级转换
 export function schedulerPriorityToLanePriority(
   schedulerPriorityLevel: ReactPriorityLevel,
 ): LanePriority {
@@ -212,6 +216,7 @@ export function schedulerPriorityToLanePriority(
   }
 }
 
+// TAGL ReactPriorityLevel 优先级转换
 export function lanePriorityToSchedulerPriority(
   lanePriority: LanePriority,
 ): ReactPriorityLevel {
@@ -246,8 +251,9 @@ export function lanePriorityToSchedulerPriority(
   }
 }
 
+// TAGD 获取 Render 优先级
 /**
- * 获取本次 render 的优先级，在 render之前会执行
+ * 获取本次 render 的优先级，在 render 之前会执行
  * getNextLanes会根据fiberRoot对象上的属性(expiredLanes, suspendedLanes, pingedLanes等), 确定出当前最紧急的lanes.
  * 此处返回的lanes会作为全局渲染的优先级, 用于fiber树构造过程中. 针对fiber对象或update对象, 只要它们的优先级(如: fiber.lanes和update.lane)比渲染优先级低, 都将会被忽略.
 */
