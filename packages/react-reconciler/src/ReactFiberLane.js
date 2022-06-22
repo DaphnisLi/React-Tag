@@ -251,15 +251,16 @@ export function lanePriorityToSchedulerPriority(
   }
 }
 
-// TAGD 获取 Render 优先级
+// TAG 获取 Render 优先级 ——— 会被用于 fiber 构造过程，影响到 fiber.lanes 和 update.lanes
+// 此处返回的 lanes 会作为全局渲染的优先级, 用于 Fiber 树构造过程中. 针对 Fiber 对象或 Update 对象, 只要它们的优先级(如: fiber.lanes 和 update.lanes)比渲染优先级低, 都将会被忽略.
+
 /**
- * 获取本次 render 的优先级，在 render 之前会执行
- * getNextLanes会根据fiberRoot对象上的属性(expiredLanes, suspendedLanes, pingedLanes等), 确定出当前最紧急的lanes.
- * 此处返回的lanes会作为全局渲染的优先级, 用于fiber树构造过程中. 针对fiber对象或update对象, 只要它们的优先级(如: fiber.lanes和update.lane)比渲染优先级低, 都将会被忽略.
-*/
+ * 获取本次 Render 的优先级，在 Render 之前会执行
+ * getNextLanes会 根据 FiberRoot 对象上的属性(expiredLanes, suspendedLanes, pingedLanes等), 确定出当前最紧急的 lanes.
+ */
 export function getNextLanes(root: FiberRoot, wipLanes: Lanes): Lanes {
   // Early bailout if there's no pending work left.
-  // ? 1. 检查是否有等待中的lanes
+  // 检查是否有等待中的 lanes
   const pendingLanes = root.pendingLanes;
   if (pendingLanes === NoLanes) {
     return_highestLanePriority = NoLanePriority;
@@ -274,7 +275,7 @@ export function getNextLanes(root: FiberRoot, wipLanes: Lanes): Lanes {
   const pingedLanes = root.pingedLanes;
 
   // Check if any work has expired.
-  // ? 2. check是否有已过期的lanes
+  // 检查是否有已过期的lanes
   if (expiredLanes !== NoLanes) {
     nextLanes = expiredLanes;
     nextLanePriority = return_highestLanePriority = SyncLanePriority;
@@ -283,7 +284,7 @@ export function getNextLanes(root: FiberRoot, wipLanes: Lanes): Lanes {
     // even if the work is suspended.
     const nonIdlePendingLanes = pendingLanes & NonIdleLanes;
     if (nonIdlePendingLanes !== NoLanes) {
-      // 非Idle任务
+      // 非 Idle 任务
       const nonIdleUnblockedLanes = nonIdlePendingLanes & ~suspendedLanes;
       if (nonIdleUnblockedLanes !== NoLanes) {
         nextLanes = getHighestPriorityLanes(nonIdleUnblockedLanes);
@@ -297,7 +298,7 @@ export function getNextLanes(root: FiberRoot, wipLanes: Lanes): Lanes {
       }
     } else {
       // The only remaining work is Idle.
-      // Idle任务
+      // Idle 任务
       const unblockedLanes = pendingLanes & ~suspendedLanes;
       if (unblockedLanes !== NoLanes) {
         nextLanes = getHighestPriorityLanes(unblockedLanes);

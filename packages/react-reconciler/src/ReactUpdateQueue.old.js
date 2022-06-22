@@ -182,16 +182,16 @@ export function cloneUpdateQueue<State>(
   }
 }
 
+// TAG 创建 Update
+// 只有在初始化和组件更新的时候才会创建
 export function createUpdate(eventTime: number, lane: Lane): Update<*> {
   const update: Update<*> = {
     eventTime,
     /** 优先级 */
     lane,
-
     tag: UpdateState,
     payload: null,
     callback: null,
-
     next: null,
   };
   return update;

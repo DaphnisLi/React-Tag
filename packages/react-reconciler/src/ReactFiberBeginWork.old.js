@@ -3098,12 +3098,13 @@ function remountFiber(
   }
 }
 
+// TAGR 构建 Fiber 树，探寻阶段
 /**
  * 深度优先遍历构造 fiber 树，探寻阶段
  * 功能：构造 fiber 节点
- * 1、根据 ReactElement对象创建所有的fiber节点, 最终构造出fiber树形结构(设置return和sibling指针)
- * 2、设置fiber.flags(二进制形式变量, 用来标记 fiber节点 的增,删,改状态, 等待completeWork阶段处理)
- * 3、设置fiber.stateNode局部状态(如Class类型节点: fiber.stateNode=new Class())
+ * 1、根据 ReactElement 对象创建所有的 fiber 节点, 最终构造出 fiber 树形结构(设置 return 和 sibling 指针)
+ * 2、设置 fiber.flags (二进制形式变量, 用来标记 fiber 节点 的增,删,改状态, 等待 completeWork 阶段处理)
+ * 3、设置 fiber.stateNode 局部状态(如 Class 类型节点: fiber.stateNode = new Class())
  */
 function beginWork(
   current: Fiber | null,
@@ -3131,7 +3132,7 @@ function beginWork(
   }
 
   if (current !== null) {
-    // ? update逻辑, 首次render不会进入
+    // ? update逻辑, 首次 render 不会进入
     const oldProps = current.memoizedProps;
     const newProps = workInProgress.pendingProps;
 
@@ -3320,7 +3321,9 @@ function beginWork(
         }
       }
 
-      // ? 本`fiber`节点的没有更新, 可以复用, 进入bailout逻辑
+      // ? 本 fiber 节点没有更新, 可以复用, 进入bailout逻辑
+      // 如果全局的渲染优先级renderLanes不包括fiber.lanes, 证明该fiber节点没有更新, 可以复用.
+      // TODO 不包括指的是什么
       return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);
     } else {
       if ((current.flags & ForceUpdateForLegacySuspense) !== NoFlags) {
@@ -3346,9 +3349,9 @@ function beginWork(
   // move this assignment out of the common path and into each branch.
 
   // ? 不能复用, 创建新的fiber节点
-  // ? 设置workInProgress优先级为NoLanes(最高优先级)
+  // 设置 workInProgress 优先级为 NoLanes(最高优先级)
   workInProgress.lanes = NoLanes;
-  // ? 根据workInProgress节点的类型, 用不同的方法派生出子节点
+  // 根据 workInProgress 节点的类型, 用不同的方法派生出子节点
   switch (workInProgress.tag) {
     case IndeterminateComponent: {
       return mountIndeterminateComponent(
@@ -3369,7 +3372,7 @@ function beginWork(
       );
     }
 
-    // ? 函数组件
+    // Function 组件
     // 1.执行 function, 获取下级reactElement
     // 2.根据实际情况, 设置fiber.flags ———— 副作用
     case FunctionComponent: {
@@ -3388,7 +3391,7 @@ function beginWork(
       );
     }
 
-    // ? class组件
+    // Class 组件
     // 1.构建React.Component实例
     // 2.把新实例挂载到fiber.stateNode上
     // 3.执行render之前的生命周期函数
@@ -3410,11 +3413,11 @@ function beginWork(
         renderLanes,
       );
     }
-    // ? HostRootFiber(fiber 树的跟节点)
+    // HostRootFiber(fiber 树的跟节点)
     case HostRoot:
       return updateHostRoot(current, workInProgress, renderLanes);
 
-    // ? HostComponent(原生dom节点)
+    // HostComponent(原生dom节点)
     // 1.pendingProps.children作为下级reactElement
     // 2.如果下级节点是文本节点,则设置下级节点为 null. 准备进入completeUnitOfWork阶段
     // 3.根据实际情况, 设置fiber.flags ———— 副作用

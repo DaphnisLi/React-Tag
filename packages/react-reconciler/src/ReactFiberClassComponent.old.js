@@ -190,7 +190,7 @@ export function applyDerivedStateFromProps(
   }
 }
 
-/** Class 组件更新 */
+// TAGR Class 组件更新
 const classComponentUpdater = {
   isMounted,
   enqueueSetState(inst, payload, callback) {

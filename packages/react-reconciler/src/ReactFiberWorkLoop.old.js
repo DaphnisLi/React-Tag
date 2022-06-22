@@ -246,7 +246,7 @@ const {
 
 type ExecutionContext = number;
 
-// ! 源码中的8种执行栈
+// TAG 8种代表渲染期间的执行栈(执行上下文)
 /** 无上下文 */
 export const NoContext = /*             */ 0b0000000;
 /** 批处理上下文 */
@@ -272,6 +272,7 @@ const RootSuspended = 3;
 const RootSuspendedWithDelay = 4;
 const RootCompleted = 5;
 
+// TAGR Fiber 构造阶段的全局变量
 // Describes where we are in the React execution stack
 /** 当前React的执行栈(执行上下文) */
 let executionContext: ExecutionContext = NoContext;
@@ -314,7 +315,7 @@ let workInProgressRootFatalError: mixed = null;
 /** 整个render期间所使用到的所有lanes */
 let workInProgressRootIncludedLanes: Lanes = NoLanes;
 // The work left over by components that were visited during this render. Only
-// includes unprocessed updates, not work in bailed out children.
+// includes unprocessed updates, not work in bailed out children. 
 /** 在render期间被跳过(由于优先级不够)的lanes: 只包括未处理的updates, 不包括被复用的fiber节点 */
 let workInProgressRootSkippedLanes: Lanes = NoLanes;
 // Lanes that were updated (in an interleaved event) during this render.
@@ -414,7 +415,11 @@ export function getCurrentTime() {
   return now();
 }
 
-/** requestUpdateLane的作用是返回一个合适的 update 优先级. */
+// TAG 获得 Update 优先级
+// 是否更新会受 Render 优先级影响
+// Legacy 模式: 返回 SyncLane
+// Blocking 模式: 返回 SyncLane
+// Concurrent 模式：正常情况下, 根据当前的调度优先级来生成一个 Lane。特殊情况下(处于 Suspense 过程中), 会优先选择 TransitionLanes 通道中的空闲通道(如果所有 TransitionLanes 通道都被占用, 就取最高优先级. 源码)。
 export function requestUpdateLane(fiber: Fiber): Lane {
   // Special cases
   const mode = fiber.mode;
@@ -476,7 +481,7 @@ export function requestUpdateLane(fiber: Fiber): Lane {
 
   // todo: Remove this dependency on the Scheduler priority.
   // To do that, we're replacing it with an update lane priority.
-  // 正常情况, 获取调度优先级
+  // 正常情况, 获取调度优先级 
   const schedulerPriority = getCurrentPriorityLevel();
 
   // The old behavior was using the priority level of the Scheduler.
@@ -548,9 +553,15 @@ function requestRetryLane(fiber: Fiber) {
 }
 
 // TAGR Reconciler 包的入口函数
+
+// TAGQ setState 是同步还是异步
+// Legacy / Blocking 模式
+//      首次渲染：直接构建 Fiber 树
+//      后续更新：注册调度任务。然后：如果执行上下文为空，就直接构建 Fiber 树，并且取消调度任务
+// Concurrent 模式：无论是否首次渲染，都注册调度任务
+  
 /**  
- * Reconciler 包的入口函数。
- * 决定了是直接构建 Fiber，还是进入调度
+ * Reconciler 包的入口函数
  */
 export function scheduleUpdateOnFiber(
   fiber: Fiber,
@@ -559,7 +570,7 @@ export function scheduleUpdateOnFiber(
 ) {
   checkForNestedUpdates();
   warnAboutRenderPhaseUpdatesInDEV(fiber);
-  // ? 标记优先级
+  // 标记优先级
   const root = markUpdateLaneFromFiberToRoot(fiber, lane);
   if (root === null) {
     warnAboutUpdateOnUnmountedFiberInDEV(fiber);
@@ -598,44 +609,47 @@ export function scheduleUpdateOnFiber(
   // todo: requestUpdateLanePriority also reads the priority. Pass the
   // priority as an argument to that function and this one.
   const priorityLevel = getCurrentPriorityLevel();
-  if (lane === SyncLane) {
-    // ? legacy或blocking模式
-    // ? 下面这判断条件可以判断是否是初次构建 fiber 树
+
+  // TAGR 首次渲染。构建 Fiber 或者进入调度
+  if (lane === SyncLane) { // Legacy / Blocking 模式下 Updata 的 Lane === SyncLane
+    // ? Legacy / Blocking 模式
     if (
       // Check if we're inside unbatchedUpdates
       (executionContext & LegacyUnbatchedContext) !== NoContext &&
       // Check if we're not already rendering
       (executionContext & (RenderContext | CommitContext)) === NoContext
     ) {
+      // ?  执行上下文（executionContext）为空（NoContext）———— 首次渲染
       // Register pending interactions on the root to avoid losing traced interaction data.
       schedulePendingInteractions(root, lane);
 
       // This is a legacy edge case. The initial mount of a ReactDOM.render-ed
       // root inside of batchedUpdates should be synchronous, but layout updates
       // should be deferred until the end of the batch.
-      // ? 首次渲染, 直接进行`fiber构造`
+      // ? 首次渲染, 直接进行 Fiber 构造
       performSyncWorkOnRoot(root);
-    } else {
-      // ? 后续的更新
-      // ? 进入第 2 阶段, 注册调度任务
+    } else { // ? 后续更新
+
+      // ? 注册调度任务
       ensureRootIsScheduled(root, eventTime);
       schedulePendingInteractions(root, lane);
+
       if (executionContext === NoContext) {
-        // 如果执行上下文为空, 会取消调度任务, 手动执行回调
-        // 进入第3阶段, 进行fiber树构造
+        // ? 执行上下文为空
+        // ? 进行 Fiber 树构造
         // Flush the synchronous work now, unless we're already working or inside
         // a batch. This is intentionally inside scheduleUpdateOnFiber instead of
         // scheduleCallbackForFiber to preserve the ability to schedule a callback
         // without immediately flushing it. We only do this for user-initiated
         // updates, to preserve historical behavior of legacy mode.
         resetRenderTimer();
-        // ? 取消schedule调度，主动刷新回调队列
+        // ? 取消 Schedule 调度，主动刷新回调队列
         flushSyncCallbackQueue();
       }
     }
   } else {
-    // ?concurrent模式
-    // ?无论是否初次更新, 都正常进入第2阶段, 注册调度任务
+    // ? Concurrent 模式
+    // ? 无论是否首次渲染, 都注册调度任务
     // Schedule a discrete update but only if it's not Sync.
     if (
       (executionContext & DiscreteEventContext) !== NoContext &&
@@ -1041,8 +1055,9 @@ function markRootSuspended(root, suspendedLanes) {
 
 // TAGS Task 回调函数 —— Legacy / Blocking
 /** 
- * legacy 或 blocking 模式 Scheduler 回调函数，构建 Fiber 树 
-*/
+ * 构建 Fiber 树
+ * legacy 或 blocking 模式 Scheduler 回调函数
+ */
 function performSyncWorkOnRoot(root) {
   invariant(
     (executionContext & (RenderContext | CommitContext)) === NoContext,
@@ -1393,9 +1408,11 @@ export function popRenderLanes(fiber: Fiber) {
   popFromStack(subtreeRenderLanesCursor, fiber);
 }
 
+// TAGR 刷新栈帧 —— 主要逻辑
 /**
-  * 刷新栈帧: 重置 FiberRoot上的全局属性 和 `fiber树构造`循环过程中的全局变量
-*/
+  * 在进行fiber树构造之前, 如果不需要恢复上一次构造进度, 都会刷新栈帧。
+  * 重置 FiberRoot 上的全局属性 和 fiber 树构造循环过程中的全局变量
+ */
 function prepareFreshStack(root: FiberRoot, lanes: Lanes) {
   // ? 重置FiberRoot对象上的属性
   root.finishedWork = null;
@@ -1419,7 +1436,7 @@ function prepareFreshStack(root: FiberRoot, lanes: Lanes) {
   }
   // ? 重置全局变量
   workInProgressRoot = root;
-  // ? 给HostRootFiber对象创建一个alternate, 并将其设置成全局 workInProgress
+  // ? 给 HostRootFiber 对象创建一个 alternate, 并将其设置成全局 workInProgress
   workInProgress = createWorkInProgress(root.current, null);
   workInProgressRootRenderLanes = subtreeRenderLanes = workInProgressRootIncludedLanes = lanes;
   workInProgressRootExitStatus = RootIncomplete;
@@ -1673,6 +1690,7 @@ function workLoopSync() {
   }
 }
 
+// TAGR 刷新栈帧 —— 入口
 function renderRootConcurrent(root: FiberRoot, lanes: Lanes) {
   const prevExecutionContext = executionContext;
   executionContext |= RenderContext;
