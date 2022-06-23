@@ -1793,9 +1793,9 @@ function renderRootConcurrent(root: FiberRoot, lanes: Lanes) {
  */
 function workLoopConcurrent() {
   // Perform work until Scheduler asks us to yield
-  // TAGQ 可中断渲染
+  // TAGQ 可中断渲染 —— 每个 Fiber 节点构造前检查一次
   // 单个任务执行时间过多
-  // 可中断渲染原理：在时间切片的基础之上, 如果单个 task.callback 执行时间就很长(假设 200ms)。就需要 task.callback 自己能够检测是否超时, 所以在 fiber 树构造过程中, 每构造完成一个单元, 都会检测一次超时(源码链接), 如遇超时就退出 Fiber 树构造循环, 并返回一个新的回调函数等待下一次回调继续未完成的 Fiber 树构造.
+  // 可中断渲染原理：在时间切片的基础之上, 如果单个 task.callback 执行时间就很长(假设 200ms)。就需要 task.callback 自己能够检测是否超时, 所以在 Fiber 树构造过程中, 每构造完成一个 Fiber, 都会检测一次超时(源码链接), 如遇超时就退出 Fiber 树构造循环, 并返回一个新的回调函数等待下一次回调继续未完成的 Fiber 树构造.
 
   // 深度优先遍历
   // ? 这里会比前两个模式多一个停顿机制, 这个机制实现了可中断渲染
@@ -2082,8 +2082,17 @@ function commitRoot(root) {
 }
 
 // TAGD Commit 阶段的主要逻辑
+/**
+ * 1、处理副作用队列。(步骤 1、2、3 都会处理, 只是处理节点的标识 fiber.flags 不同)。
+ * 2、调用渲染器，输出最终结果。(在步骤 2：commitMutationEffects 中执行)。
+ * 
+ * 其实就是处理是 "副作用队列" 和 "DOM 对象"。所以无论 Fiber 树结构有多么复杂, 到了 commitRoot 阶段, 实际起作用的只有 2 个节点:
+ *     副作用队列所在节点：根节点, 即 HostRootFiber 节点。
+ *     DOM对象所在节点：从上至下首个 HostComponent 类型的 Fiber 节点，此节点 fiber.stateNode 实际上指向最新的 DOM 树。
+ */
 function commitRootImpl(root, renderPriorityLevel) {
 
+  // TAGD 渲染前
   // ! —————————————————————————————— 渲染前: 准备 —————————————————————————————————
 
   do {
@@ -2129,7 +2138,7 @@ function commitRootImpl(root, renderPriorityLevel) {
     return null;
   }
 
-  // ? 清空FiberRoot对象上的属性
+  // ? 清空 FiberRoot 对象上的属性
   root.finishedWork = null;
   root.finishedLanes = NoLanes;
 
@@ -2194,6 +2203,7 @@ function commitRootImpl(root, renderPriorityLevel) {
     firstEffect = finishedWork.firstEffect;
   }
 
+  // TAGD 渲染
   // ! ———————————————————————————————————— 渲染 ——————————————————————————————————————
 
   if (firstEffect !== null) {
@@ -2220,7 +2230,7 @@ function commitRootImpl(root, renderPriorityLevel) {
     focusedInstanceHandle = prepareForCommit(root.containerInfo);
     shouldFireAfterActiveInstanceBlur = false;
 
-    // TAGD 阶段1: DOM 突变之前
+    // TAGD 阶段1: DOM 变更之前
     nextEffect = firstEffect;
     do {
       if (__DEV__) {
@@ -2253,7 +2263,7 @@ function commitRootImpl(root, renderPriorityLevel) {
 
     // The next phase is the mutation phase, where we mutate the host tree.
 
-    // TAGD 阶段2: DOM 突变, 界面发生改变
+    // TAGD 阶段2: DOM 变更, 界面发生改变
     nextEffect = firstEffect;
     do {
       if (__DEV__) {
@@ -2291,14 +2301,14 @@ function commitRootImpl(root, renderPriorityLevel) {
     // the mutation phase, so that the previous tree is still current during
     // componentWillUnmount, but before the layout phase, so that the finished
     // work is current during componentDidMount/Update.
-    // ? 切换Fiber树 current 指针
+    // ? 切换 Fiber 树 current 指针
     root.current = finishedWork;
 
     // The next phase is the layout phase, where we call effects that read
     // the host tree after it's been mutated. The idiomatic use case for this is
     // layout, but class component lifecycles also fire here for legacy reasons.
 
-    // TAGD 阶段3: Layout 阶段, 调用生命周期 ComponentDidUpdate 和回调函数等
+    // TAGD 阶段3: DOM 变更后，Layout 阶段, 调用生命周期 ComponentDidUpdate 和回调函数等
     nextEffect = firstEffect;
     do {
       if (__DEV__) {
@@ -2348,12 +2358,13 @@ function commitRootImpl(root, renderPriorityLevel) {
 
   const rootDidHavePassiveEffects = rootDoesHavePassiveEffects;
 
+  // TAGD 渲染后
   // ! ———————————————————————————————— 渲染后: 重置与清理 ——————————————————————————————————————
   if (rootDoesHavePassiveEffects) {
     // This commit has passive effects. Stash a reference to them. But don't
     // schedule a callback until after flushing layout work.
 
-    // ? 有被动作用(使用useEffect), 保存一些全局变量
+    // ? 有被动作用(使用 useEffect), 保存一些全局变量
     rootDoesHavePassiveEffects = false;
     rootWithPendingPassiveEffects = root;
     pendingPassiveEffectsLanes = lanes;
@@ -2362,9 +2373,9 @@ function commitRootImpl(root, renderPriorityLevel) {
     // We are done with the effect chain at this point so let's clear the
     // nextEffect pointers to assist with GC. If we have passive effects, we'll
     // clear this in flushPassiveEffects.
-
-    // ? 分解副作用队列链表, 辅助垃圾回收
-    // ? 如果有被动作用(使用useEffect), 会把分解操作放在flushPassiveEffects函数中
+    // TAGQ 分解副作用链表
+    // 因为副作用链表是一个循环链表，垃圾回收程序不会主动回收，必须要主动分解后，才能回收。
+    // ? 如果有被动作用(使用 useEffect), 会把分解操作放在 flushPassiveEffects 函数中。
     nextEffect = firstEffect;
     while (nextEffect !== null) {
       const nextNextEffect = nextEffect.nextEffect;
@@ -2433,10 +2444,10 @@ function commitRootImpl(root, renderPriorityLevel) {
   // Always call this before exiting `commitRoot`, to ensure that any
   // additional work on this root is scheduled.
 
-  // ? 下面代码用于检测是否有新的更新任务
-  // ? 比如在componentDidMount函数中, 再次调用setState()
+  // TAGQ 检测是否有新的更新任务
+  // ? 比如在 componentDidMount、useEffect 中, 再次调用 setState()
 
-  // ? 1. 检测常规(异步)任务, 如果有则会发起异步调度(调度中心`scheduler`只能异步调用)
+  // ? 1. 检测常规(异步)任务, 如果有则会发起异步调度(调度中心 Scheduler 只能异步调用)
   ensureRootIsScheduled(root, now());
 
   if (hasUncaughtError) {
@@ -2465,7 +2476,7 @@ function commitRootImpl(root, renderPriorityLevel) {
   }
 
   // If layout work was scheduled, flush it now.
-  // ? 2. 检测同步任务, 如果有则主动调用flushSyncCallbackQueue(无需再次等待scheduler调度), 再次进入fiber树构造循环
+  // ? 2. 检测同步任务, 如果有则主动调用 flushSyncCallbackQueue (无需再次等待 Scheduler 调度), 再次进入 Fiber 树构造循环
 
   flushSyncCallbackQueue();
 
@@ -2484,10 +2495,10 @@ function commitRootImpl(root, renderPriorityLevel) {
 
 // TAGD DOM 变更前
 /**
- * dom 变更之前
+ * DOM 变更之前
  * 处理以下副作用标记 Flags
  * Snapshot：HostRoot 和 ClassComponent。
- * Passive：只在使用了hook(useEffect)会出现，所以此处是针对hook对象的处理。
+ * Passive：只在使用了 Hook、useEffect会出现，所以此处是针对 Hook 对象的处理。
  */
 function commitBeforeMutationEffects() {
   while (nextEffect !== null) {
@@ -2513,7 +2524,7 @@ function commitBeforeMutationEffects() {
     }
 
     const flags = nextEffect.flags;
-    // ? 处理`Snapshot`标记
+    // TAGD 处理 Snapshot 标记
     if ((flags & Snapshot) !== NoFlags) {
       setCurrentDebugFiberInDEV(nextEffect);
 
@@ -2521,11 +2532,13 @@ function commitBeforeMutationEffects() {
 
       resetCurrentDebugFiberInDEV();
     }
-    // ? 处理`Passive`标记
+    // TAGD 处理 Passive 标记
+    // TAGQ 调用 useEffect 等 Hook
     if ((flags & Passive) !== NoFlags) {
       // If there are passive effects, schedule a callback to flush at
       // the earliest opportunity.
-      // ? Passive 标记只在使用了hook, useEffect会出现. 所以此处是针对hook对象的处理
+      // ? Passive 标记只会在使用了 Hook 对象的 Function 类型的节点上存在，为了处理 Hook 对象(如 useEffect), 通过scheduleCallback 单独注册了一个调度任务 task，等待调度中心 Scheduler 处理。
+      // ? 因为要注册调度任务，所以 Hook 的执行表现为宏任务
       if (!rootDoesHavePassiveEffects) {
         rootDoesHavePassiveEffects = true;
         scheduleCallback(NormalSchedulerPriority, () => {
@@ -2540,7 +2553,7 @@ function commitBeforeMutationEffects() {
 
 // TAGD DOM 变更时
 /**
- * dom 变更, 界面得到更新
+ * 这里会操纵 DOM，所以页面会更新
  * 处理以下副作用标记 Flags
  * Ref：useRef
  * Placement：新增节点
@@ -2554,7 +2567,7 @@ function commitMutationEffects(
   renderPriorityLevel: ReactPriorityLevel,
 ) {
   // todo: Should probably move the bulk of this function to commitWork.
-  // ? 处理DOM突变
+  // ? 处理 DOM 突变
   while (nextEffect !== null) {
     setCurrentDebugFiberInDEV(nextEffect);
 
@@ -2563,11 +2576,12 @@ function commitMutationEffects(
     if (flags & ContentReset) {
       commitResetTextContent(nextEffect);
     }
-    // ? 处理Ref
+    // ? 处理 Ref
     if (flags & Ref) {
       const current = nextEffect.alternate;
       if (current !== null) {
-        // ? 先清空ref, 在commitRoot的第三阶段(dom变更后), 再重新赋值
+        // TAGQ 处理 Ref —— 清空
+        // ? 先清空 Ref, 在 commitRoot 的第三阶段(dom变更后), 再重新赋值
         commitDetachRef(current);
       }
       if (enableScopeAPI) {
@@ -2602,7 +2616,7 @@ function commitMutationEffects(
         commitPlacement(nextEffect);
         // Clear the "placement" from effect tag so that we know that this is
         // inserted, before any life-cycles like componentDidMount gets called.
-        nextEffect.flags &= ~Placement;
+        nextEffect.flags &= ~Placement; // 注意 Placement 标记会被清除
 
         // Update
         const current = nextEffect.alternate;
@@ -2641,10 +2655,10 @@ function commitMutationEffects(
 
 // TAGD DOM 变更后
 /**
- * dom 变更后
+ * DOM 变更后
  * 处理以下副作用标记 Flags
  * Update：componentDidMount、componentDidUpdate
- * Callback：update.callback
+ * Callback：Update.callback
  * Ref：useRef
  */
 function commitLayoutEffects(root: FiberRoot, committedLanes: Lanes) {
@@ -2663,7 +2677,7 @@ function commitLayoutEffects(root: FiberRoot, committedLanes: Lanes) {
     setCurrentDebugFiberInDEV(nextEffect);
 
     const flags = nextEffect.flags;
-    // 处理 Update和Callback标记
+    // 处理 Update 和 Callback标记
     if (flags & (Update | Callback)) {
       const current = nextEffect.alternate;
       commitLayoutEffectOnFiber(root, current, nextEffect, committedLanes);
@@ -2677,7 +2691,8 @@ function commitLayoutEffects(root: FiberRoot, committedLanes: Lanes) {
       }
     } else {
       if (flags & Ref) {
-        // 重新设置ref
+        // TAGQ 处理 Ref —— 赋值
+        // 重新设置 Ref
         commitAttachRef(nextEffect);
       }
     }

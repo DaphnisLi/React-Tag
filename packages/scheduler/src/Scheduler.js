@@ -182,7 +182,7 @@ function workLoop(hasTimeRemaining, initialTime) {
   // 获取任务队列中的第一个任务，小顶堆
   currentTask = peek(taskQueue);
 
-  // TAGQ 时间切片
+  // TAGQ 时间切片 —— 每个调度任务检查一次
   /**
    * 任务太多，一个时间切片内只能执行一部分
    * 时间切片原理：消费任务队列的过程中, 可以消费 1~n 个 task, 甚至清空整个 queue. 但是在每一次具体执行 task.callback 之前都要进行超时检测, 如果超时可以立即退出循环并等待下一次调用。
@@ -193,7 +193,7 @@ function workLoop(hasTimeRemaining, initialTime) {
    *         所以在执行 task.callback 过程中, 也需要一种机制检测是否超时, 如果超时了就立刻暂停 task.callback 的执行。
    */
 
-  // ? 每一次 while 循环的退出就是一个时间切片
+  // ? while 循环退出就代表是一个时间切片
   while (
     currentTask !== null &&
     !(enableSchedulerDebugging && isSchedulerPaused)

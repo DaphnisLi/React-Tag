@@ -15,16 +15,16 @@ export const NoFlags = /*                      */ 0b000000000000000000;
 export const PerformedWork = /*                */ 0b000000000000000001;
 
 // You can change the rest (and add more).
-export const Placement = /*                    */ 0b000000000000000010;
-export const Update = /*                       */ 0b000000000000000100;
+export const Placement = /*                    */ 0b000000000000000010; // 新增节点
+export const Update = /*                       */ 0b000000000000000100; // 更新节点、componentDidMount、componentDidUpdate
 export const PlacementAndUpdate = /*           */ 0b000000000000000110;
-export const Deletion = /*                     */ 0b000000000000001000;
+export const Deletion = /*                     */ 0b000000000000001000; // 删除节点
 export const ContentReset = /*                 */ 0b000000000000010000;
-export const Callback = /*                     */ 0b000000000000100000;
+export const Callback = /*                     */ 0b000000000000100000; // Update.callback
 export const DidCapture = /*                   */ 0b000000000001000000;
-export const Ref = /*                          */ 0b000000000010000000;
-export const Snapshot = /*                     */ 0b000000000100000000;
-export const Passive = /*                      */ 0b000000001000000000;
+export const Ref = /*                          */ 0b000000000010000000; // useRef
+export const Snapshot = /*                     */ 0b000000000100000000; // HostRoot 和 ClassComponent。
+export const Passive = /*                      */ 0b000000001000000000; // 只在使用了 Hook、useEffect会出现，所以此处是针对 Hook 对象的处理。
 // todo (effects) Remove this bit once the new reconciler is synced to the old.
 export const PassiveUnmountPendingDev = /*     */ 0b000010000000000000;
 export const Hydrating = /*                    */ 0b000000010000000000;

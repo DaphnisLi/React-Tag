@@ -213,6 +213,7 @@ function safelyCallDestroy(current: Fiber, destroy: () => void) {
     }
   }
 }
+
 /**
  * 与 Snapshot 标记相关的类型只有 ClassComponent 和 HostRoot.
  * 对于ClassComponent类型节点, 调用了instance.getSnapshotBeforeUpdate生命周期函数
@@ -455,6 +456,7 @@ export function commitPassiveEffectDurations(
   }
 }
 
+// TAGD DOM 变更后 —— 主要逻辑
 function commitLifeCycles(
   finishedRoot: FiberRoot,
   current: Fiber | null,
@@ -529,6 +531,8 @@ function commitLifeCycles(
           ) {
             try {
               startLayoutEffectTimer();
+              // TAGQ 调用 componentDidMount
+              // ? 初次渲染: 调用 componentDidMount
               instance.componentDidMount();
             } finally {
               recordLayoutEffectDuration(finishedWork);
@@ -588,6 +592,8 @@ function commitLifeCycles(
               recordLayoutEffectDuration(finishedWork);
             }
           } else {
+            // TAGQ 调用 componentDidUpdate
+            // ? 更新阶段: 调用 componentDidUpdate
             instance.componentDidUpdate(
               prevProps,
               prevState,
@@ -633,6 +639,7 @@ function commitLifeCycles(
         // We could update instance props and state here,
         // but instead we rely on them being set during last render.
         // todo: revisit this when we implement resuming.
+        // ? 处理 update 回调函数 如: this.setState({}, callback)
         commitUpdateQueue(finishedWork, updateQueue, instance);
       }
       return;
@@ -669,6 +676,7 @@ function commitLifeCycles(
       if (current === null && finishedWork.flags & Update) {
         const type = finishedWork.type;
         const props = finishedWork.memoizedProps;
+        // ? 设置 focus 等原生状态
         commitMount(instance, type, props, finishedWork);
       }
 
