@@ -280,7 +280,7 @@ let executionContext: ExecutionContext = NoContext;
 /** 当前root节点 */
 let workInProgressRoot: FiberRoot | null = null;
 // The fiber we're working on
-/** 正在处理中的fiber节点 */
+/** 正在构建中的 Fiber 节点 */
 let workInProgress: Fiber | null = null;
 // The lanes we're rendering
 /** 正在渲染的车道(复数) */
@@ -559,7 +559,11 @@ function requestRetryLane(fiber: Fiber) {
 //      首次渲染：直接构建 Fiber 树
 //      后续更新：注册调度任务。然后：如果执行上下文为空，就直接构建 Fiber 树，并且取消调度任务
 // Concurrent 模式：无论是否首次渲染，都注册调度任务
-  
+
+// TAGQ 执行上下文何时为空
+// 在react自身上下文之外触发更新时, executionContext就为空。
+// 正常情况下的节点更新都是在合成事件的回调函数中，进行 setState。在执行这个回调之前，react 已经设置好了 executionContext。如果绕过 react 内部设置 executionContext 的时机，比如在 setTimeout 的回调，原生事件的回调，Promise.resolve 回调等中去执行 setState, 这个回调函数是 JavaScript 直接运行, 没有通过 react 内核来运行, 所以 react 没有机会设置 executionContext，此时就为空。
+
 /**  
  * Reconciler 包的入口函数
  */
@@ -723,7 +727,7 @@ function markUpdateLaneFromFiberToRoot(
     parent = parent.return;
   }
   if (node.tag === HostRoot) {
-    const root: FiberRoot = node.stateNode;
+    const   root: FiberRoot = node.stateNode;
     return root;
   } else {
     return null;
@@ -1057,6 +1061,7 @@ function markRootSuspended(root, suspendedLanes) {
 /** 
  * 构建 Fiber 树
  * legacy 或 blocking 模式 Scheduler 回调函数
+ * 在执行 fiber 树构造前(workLoopSync)会先刷新栈帧 prepareFreshStack(参考fiber 树构造(基础准备)).在这里创建了 HostRootFiber.alternate, 重置全局变量 workInProgress 和 workInProgressRoot 等。
  */
 function performSyncWorkOnRoot(root) {
   invariant(
@@ -1077,7 +1082,7 @@ function performSyncWorkOnRoot(root) {
     // There's a partial tree, and at least one of its lanes has expired. Finish
     // rendering it before rendering the rest of the expired work.
 
-    // 无论是renderRootSync或renderRootConcurrent在调用render之前, 都会通过getNextLanes获取全局渲染优先级, 并且在fiber树构造过程中使用.
+    // 无论是 renderRootSync 或 renderRootConcurrent 在调用 render 之前, 都会通过 getNextLanes 获取全局渲染优先级, 并且在 fiber 树构造过程中使用.
     lanes = workInProgressRootRenderLanes;
     // ? 构建 Fiber 树
     exitStatus = renderRootSync(root, lanes);
@@ -1142,7 +1147,7 @@ function performSyncWorkOnRoot(root) {
   root.finishedWork = finishedWork;
   root.finishedLanes = lanes;
 
-  // ? 进入commit阶段
+  // ? 进入 commit 阶段
   commitRoot(root);
 
   // Before exiting, make sure there's a callback scheduled for the next
@@ -1408,7 +1413,7 @@ export function popRenderLanes(fiber: Fiber) {
   popFromStack(subtreeRenderLanesCursor, fiber);
 }
 
-// TAGR 刷新栈帧 —— 主要逻辑
+// TAGR 刷新栈帧主要逻辑
 /**
   * 在进行fiber树构造之前, 如果不需要恢复上一次构造进度, 都会刷新栈帧。
   * 重置 FiberRoot 上的全局属性 和 fiber 树构造循环过程中的全局变量
@@ -1605,6 +1610,7 @@ export function renderHasNotSuspendedYet(): boolean {
   return workInProgressRootExitStatus === RootIncomplete;
 }
 
+// TAGR 刷新栈帧入口 —— Legacy / Blocking
 /** 从root节点开始, 至上而下更新(渲染) */
 function renderRootSync(root: FiberRoot, lanes: Lanes) {
   const prevExecutionContext = executionContext;
@@ -1677,10 +1683,15 @@ function renderRootSync(root: FiberRoot, lanes: Lanes) {
 }
 
 // The work loop is an extremely hot path. Tell Closure not to inline it.
+
+// TAGR 循环构造 Fiber 树 —— Legacy / Blocking
+
+// TAGQ 深度优先遍历
+// 当前节点处理完会一直向下遍历，如果子节点是文本或者没有就会停止向下遍历（这里并不会向下遍历了，是直接从左到右遍历兄弟节点，所以就不会回溯）。接着遍历兄弟节点，然后遍历兄弟节点的子节点。等最后一个兄弟节点遍历完了就会返回到父节点。然后遍历父节点的兄弟节点。
+// 记住：只有当子节点是文本或者没有的时候才会遍历兄弟节点。
+
 /**
- * @noinline
  * 循环构造 fiber 树
- * 深度优先遍历
  */
 function workLoopSync() {
   // Already timed out, so perform work without checking if we need to yield.
@@ -1690,7 +1701,7 @@ function workLoopSync() {
   }
 }
 
-// TAGR 刷新栈帧 —— 入口
+// TAGR 刷新栈帧入口 —— Concurrent
 function renderRootConcurrent(root: FiberRoot, lanes: Lanes) {
   const prevExecutionContext = executionContext;
   executionContext |= RenderContext;
@@ -1762,18 +1773,19 @@ function renderRootConcurrent(root: FiberRoot, lanes: Lanes) {
   }
 }
 
+// TAGR 循环构造 Fiber 树 —— Concurrent
 /**
  * 循环构造 Fiber 树
  * 深度优先遍历
  */
 function workLoopConcurrent() {
   // Perform work until Scheduler asks us to yield
-  // TAGR 可中断渲染
+  // TAGQ 可中断渲染
   // 单个任务执行时间过多
   // 可中断渲染原理：在时间切片的基础之上, 如果单个 task.callback 执行时间就很长(假设 200ms)。就需要 task.callback 自己能够检测是否超时, 所以在 fiber 树构造过程中, 每构造完成一个单元, 都会检测一次超时(源码链接), 如遇超时就退出 Fiber 树构造循环, 并返回一个新的回调函数等待下一次回调继续未完成的 Fiber 树构造.
 
   // 深度优先遍历
-  // 这里会比前两个模式多一个停顿机制, 这个机制实现了可中断渲染
+  // ? 这里会比前两个模式多一个停顿机制, 这个机制实现了可中断渲染
   while (workInProgress !== null && !shouldYield()) {
     performUnitOfWork(workInProgress);
   }
@@ -1784,7 +1796,8 @@ function performUnitOfWork(unitOfWork: Fiber): void {
   // The current, flushed, state of this fiber is the alternate. Ideally
   // nothing should rely on this, but relying on it here means that we don't
   // need an additional field on the work in progress.
-  // ? unitOfWork就是被传入的workInProgress
+  // ? unitOfWork 就是被传入的 workInProgress
+  /** current 指向的是页面正在使用的 Fiber 节点 */
   const current = unitOfWork.alternate;
   setCurrentDebugFiberInDEV(unitOfWork);
 
@@ -1810,16 +1823,19 @@ function performUnitOfWork(unitOfWork: Fiber): void {
   ReactCurrentOwner.current = null;
 }
 
-/**
- * 深度优先遍历构造 fiber 树，回溯阶段
- * 功能：处理 beginWork 阶段已经创建出来的 fiber 节点
- * 调用completeWork
- *** 给fiber节点(tag=HostComponent, HostText)创建 DOM 实例, 设置fiber.stateNode局部状态(如tag=HostComponent, HostText节点: fiber.stateNode 指向这个 DOM 实例).
- *** 为 DOM 节点设置属性, 绑定事件(这里先说明有这个步骤, 详细的事件处理流程, 在合成事件原理中详细说明).
- *** 设置fiber.flags标记
- * 把当前 fiber 对象的副作用队列(firstEffect和lastEffect)添加到父节点的副作用队列之后, 更新父节点的firstEffect和lastEffect指针.
- * 识别beginWork阶段设置的fiber.flags, 判断当前 fiber 是否有副作用(增,删,改), 如果有, 需要将当前 fiber 加入到父节点的effects队列, 等待commit阶段处理.
+// TAGR 回溯阶段
+
+/** 
+ * 处理 beginWork 阶段已经创建出来的 fiber 节点
+ * 
+ * 1、调用 completeWork
+ *      创建 DOM 实例：给 fiber 节点(tag=HostComponent, HostText)创建 DOM 实例, 设置 fiber.stateNode 局部状态(如tag = HostComponent, HostText 节点: fiber.stateNode 指向这个 DOM 实例)。
+ *      设置 DOM 节点属性, 绑定事件。
+ *      设置 fiber.flags 标记。
+ * 2、上移副作用队列：把当前 fiber 对象的副作用队列(firstEffect 和l astEffect)添加到父节点的副作用队列之后, 更新父节点的 firstEffect 和 lastEffect 指针。
+ * 3、识别 beginWork 阶段设置的 fiber.flags, 判断当前 fiber 是否有副作用(增,删,改), 如果有, 需要将当前 fiber 加入到父节点的 effects 队列, 等待 commit 阶段处理。
  */
+
 function completeUnitOfWork(unitOfWork: Fiber): void {
   // Attempt to complete the current unit of work, then move to the next
   // sibling. If there are no more siblings, return to the parent fiber.
@@ -1842,7 +1858,6 @@ function completeUnitOfWork(unitOfWork: Fiber): void {
         (completedWork.mode & ProfileMode) === NoMode
       ) {
         // ? 1. 处理Fiber节点, 会调用渲染器(调用react-dom包, 关联Fiber节点和dom对象, 绑定事件等)
-        // ? 处理单个节点
         next = completeWork(current, completedWork, subtreeRenderLanes);
       } else {
         startProfilerTimer(completedWork);
@@ -1854,7 +1869,7 @@ function completeUnitOfWork(unitOfWork: Fiber): void {
 
       if (next !== null) {
         // Completing this fiber spawned new work. Work on that next.
-        // ? 如果派生出其他的子节点, 则回到`beginWork`阶段进行处理
+        // ? 如果派生出其他的子节点, 则回到 beginWork 阶段进行处理
         workInProgress = next;
         return;
       }
@@ -1869,7 +1884,7 @@ function completeUnitOfWork(unitOfWork: Fiber): void {
         // Append all the effects of the subtree and this fiber onto the effect
         // list of the parent. The completion order of the children affects the
         // side-effect order.
-        // ? 2. 收集当前Fiber节点以及其子树的副作用effects
+        // ? 2. 收集当前 Fiber 节点以及其子树的副作用 effects
         // ? 2.1 把子节点的副作用队列添加到父节点上
         if (returnFiber.firstEffect === null) {
           returnFiber.firstEffect = completedWork.firstEffect;
@@ -1888,7 +1903,7 @@ function completeUnitOfWork(unitOfWork: Fiber): void {
         // reusing children we'll schedule this effect onto itself since we're
         // at the end.
 
-        // ? 2.2 如果当前fiber节点有副作用, 将其添加到子节点的副作用队列之后.
+        // ? 2.2 如果当前 fiber 节点有副作用, 将其添加到子节点的副作用队列之后.
         const flags = completedWork.flags;
 
         // Skip both NoWork and PerformedWork tags when creating the effect
@@ -1948,7 +1963,7 @@ function completeUnitOfWork(unitOfWork: Fiber): void {
 
     const siblingFiber = completedWork.sibling;
     if (siblingFiber !== null) {
-      // ? 如果有兄弟节点, 返回之后再次进入beginWork阶段
+      // ? 如果有兄弟节点, 返回之后再次进入 beginWork 阶段
       // If there is more work to do in this returnFiber, do that next.
       workInProgress = siblingFiber;
       return;
@@ -1961,7 +1976,7 @@ function completeUnitOfWork(unitOfWork: Fiber): void {
   } while (completedWork !== null);
 
   // We've reached the root.
-  // ? 已回溯到根节点, 设置workInProgressRootExitStatus = RootCompleted
+  // ? 已回溯到根节点, 设置 workInProgressRootExitStatus = RootCompleted
   if (workInProgressRootExitStatus === RootIncomplete) {
     workInProgressRootExitStatus = RootCompleted;
   }

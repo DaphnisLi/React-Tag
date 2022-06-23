@@ -642,11 +642,16 @@ function cutOffTailIfNeeded(
   }
 }
 
+// TAGR 回溯阶段 —— 处理 Fiber 节点
+
 /**
- * 处理Fiber节点, 会调用渲染器(调用react-dom包, 关联Fiber节点和dom对象, 绑定事件等)。
- *
- * 一般情况下都会返回 null。但是如果当前 fiber 节点是 SuspenseComponent、SuspenseListComponent 的时候就会派生出新的子节点 fallback  官方文档: https://zh-hans.reactjs.org/docs/react-api.html#reactsuspense
+ * 创建 DOM 实例：给 fiber 节点(tag=HostComponent, HostText)创建 DOM 实例, 设置 fiber.stateNode 局部状态(如tag = HostComponent, HostText 节点: fiber.stateNode 指向这个 DOM 实例)。
+ * 设置 DOM 节点属性, 绑定事件。
+ * 设置 fiber.flags 标记。
+ * 
+ * ? 一般情况下都会返回 null。但是如果当前 fiber 节点是 SuspenseComponent、SuspenseListComponent 的时候就会派生出新的子节点 fallback  https://zh-hans.reactjs.org/docs/react-api.html#reactsuspense    https://github.com/7kms/react-illustration-series/issues/69
  */
+
 function completeWork(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -787,7 +792,7 @@ function completeWork(
 
         if (workInProgress.ref !== null) {
           // If there is a ref on a host node we need to schedule a callback
-          // ? 设置fiber.flags标记(Ref)
+          // TAGR 设置 fiber.flags —— Ref
           markRef(workInProgress);
         }
       }

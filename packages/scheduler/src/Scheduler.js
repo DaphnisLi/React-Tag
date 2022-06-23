@@ -182,15 +182,18 @@ function workLoop(hasTimeRemaining, initialTime) {
   // 获取任务队列中的第一个任务，小顶堆
   currentTask = peek(taskQueue);
 
-  // TAGS 时间切片
-  // 任务太多，一个时间切片内只能执行一部分
-  // 时间切片原理：消费任务队列的过程中, 可以消费 1~n 个 task, 甚至清空整个 queue. 但是在每一次具体执行 task.callback 之前都要进行超时检测, 如果超时可以立即退出循环并等待下一次调用.
-  // 每一次 while 循环的退出就是一个时间切片，深入分析 while 循环的退出条件:
-  // 1、队列被完全清空: 这种情况就是很正常的情况, 一气呵成, 没有遇到任何阻碍.
-  // 2、执行超时: 在消费 taskQueue 时, 在执行 task.callback 之前, 都会检测是否超时, 所以超时检测是以 task 为单位。
-  //        如果某个 task.callback 执行时间太长(如: fiber 树很大, 或逻辑很重)也会造成超时。
-  //        所以在执行 task.callback 过程中, 也需要一种机制检测是否超时, 如果超时了就立刻暂停 task.callback 的执行。
-  
+  // TAGQ 时间切片
+  /**
+   * 任务太多，一个时间切片内只能执行一部分
+   * 时间切片原理：消费任务队列的过程中, 可以消费 1~n 个 task, 甚至清空整个 queue. 但是在每一次具体执行 task.callback 之前都要进行超时检测, 如果超时可以立即退出循环并等待下一次调用。
+   * 深入分析 while 循环的退出条件:
+   * 1、队列被完全清空: 这种情况就是很正常的情况, 一气呵成, 没有遇到任何阻碍。
+   * 2、执行超时: 在消费 taskQueue 时, 在执行 task.callback 之前, 都会检测是否超时, 所以超时检测是以 task 为单位。
+   *         如果某个 task.callback 执行时间太长(如: fiber 树很大, 或逻辑很重)也会造成超时。
+   *         所以在执行 task.callback 过程中, 也需要一种机制检测是否超时, 如果超时了就立刻暂停 task.callback 的执行。
+   */
+
+  // ? 每一次 while 循环的退出就是一个时间切片
   while (
     currentTask !== null &&
     !(enableSchedulerDebugging && isSchedulerPaused)

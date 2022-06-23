@@ -231,7 +231,8 @@ if (__DEV__) {
   didWarnAboutDefaultPropsOnFunctionComponent = {};
 }
 
-/** 根据ReactElement对象，生成Fiber子节点(只生成次级子节点) */
+// TAGR 真正生成 Fiber 子节点的地方
+/** 根据 ReactElement 对象，生成 Fiber 子节点(只生成次级子节点) */
 export function reconcileChildren(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -699,7 +700,18 @@ function markRef(current: Fiber | null, workInProgress: Fiber) {
     workInProgress.flags |= Ref;
   }
 }
-11
+
+// TAGR 生成 Function Fiber 子节点
+
+/**
+ * 1、计算输出状态：根据 fiber.pendingProps, fiber.updateQueue 等输入数据状态, 计算 fiber.memoizedState 作为输出状态
+ * 2、获取下级 ReactElement 对象
+ *      执行 function, 获取下级reactElement
+ *      根据实际情况, 设置fiber.flags ——— 副作用
+ * 3、获取下即 Fiber 节点
+ *      根据 ReactElement 对象, 调用 reconcileChildren 生成 Fiber 子节点(只生成次级子节点)。
+ *      根据实际情况, 设置 fiber.flags
+ */
 function updateFunctionComponent(
   current,
   workInProgress,
@@ -852,6 +864,20 @@ function updateBlock<Props, Data>(
   return workInProgress.child;
 }
 
+// TAGR 生成 Class Fiber 子节点
+
+/**
+ * 1、计算输出状态：根据 fiber.pendingProps, fiber.updateQueue 等输入数据状态, 计算 fiber.memoizedState 作为输出状态
+ * 2、获取下级 ReactElement 对象
+ *        构建React.Component实例
+ *        把新实例挂载到fiber.stateNode上
+ *        执行render之前的生命周期函数
+ *        执行render方法, 获取下级 ReactElement
+ *        根据实际情况, 设置 fiber.flags ———— 副作用
+ * 3、获取下即 Fiber 节点
+ *      根据 ReactElement 对象, 调用 reconcileChildren 生成 Fiber 子节点(只生成次级子节点)。
+ *      根据实际情况, 设置 fiber.flags
+ */
 function updateClassComponent(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -1051,11 +1077,12 @@ function pushHostRootContext(workInProgress) {
   pushHostContainer(workInProgress, root.containerInfo);
 }
 
+// TAGR 生成根节点 Fiber 子节点
 /** fiber 树的跟节点 */
 function updateHostRoot(current, workInProgress, renderLanes) {
   pushHostRootContext(workInProgress);
 
-  // ? 1. 状态计算, 更新整合到 workInProgress.memoizedState中来, memoizedState里面保存了节点的状态(state、hook)
+  // ? 1. 状态计算, 更新整合到 workInProgress.memoizedState 中来, memoizedState 里面保存了节点的状态(State、Hook)
   const updateQueue = workInProgress.updateQueue;
   invariant(
     current !== null && updateQueue !== null,
@@ -1068,13 +1095,13 @@ function updateHostRoot(current, workInProgress, renderLanes) {
   const prevChildren = prevState !== null ? prevState.element : null;
   cloneUpdateQueue(current, workInProgress);
 
-  // ? 遍历updateQueue.shared.pending, 提取有足够优先级的update对象, 计算出最终的状态 workInProgress.memoizedState
+  // ? 遍历 updateQueue.shared.pending, 提取有足够优先级的 update 对象, 计算出最终的状态 workInProgress.memoizedState
   processUpdateQueue(workInProgress, nextProps, null, renderLanes);
   const nextState = workInProgress.memoizedState;
   // Caution: React DevTools currently depends on this property
   // being called "element".
 
-  // ? 2. 获取下级`ReactElement`对象
+  // ? 2. 获取下级 ReactElement 对象
   const nextChildren = nextState.element;
   if (nextChildren === prevChildren) {
     resetHydrationState();
@@ -1125,14 +1152,25 @@ function updateHostRoot(current, workInProgress, renderLanes) {
     // Otherwise reset hydration state in case we aborted and resumed another
     // root.
 
-    // ? 3. 根据`ReactElement`对象, 调用`reconcileChildren`生成`Fiber`子节点(只生成`次级子节点`)
+    // ? 3. 根据 ReactElement 对象, 调用 reconcileChildren 生成 Fiber 子节点(只生成 次级子节点)
     reconcileChildren(current, workInProgress, nextChildren, renderLanes);
     resetHydrationState();
   }
   return workInProgress.child;
 }
 
-/** dom节点 */
+// TAGR 生成原生 DOM Fiber 子节点
+
+/**
+ * 1、计算输出状态：根据 fiber.pendingProps, fiber.updateQueue 等输入数据状态, 计算 fiber.memoizedState 作为输出状态
+ * 2、获取下级 ReactElement 对象
+ *      pendingProps.children作为下级reactElement
+ *      如果下级节点是文本节点,则设置下级节点为 null. 准备进入completeUnitOfWork阶段
+ *      根据实际情况, 设置fiber.flags ———— 副作用
+ * 3、获取下即 Fiber 节点
+ *      根据 ReactElement 对象, 调用 reconcileChildren 生成 Fiber 子节点(只生成次级子节点)。
+ *      根据实际情况, 设置 fiber.flags
+ */
 function updateHostComponent(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -1143,11 +1181,11 @@ function updateHostComponent(
   if (current === null) {
     tryToClaimNextHydratableInstance(workInProgress);
   }
-  // ? 1. 状态计算, 由于HostComponent是无状态组件, 所以只需要收集 nextProps即可, 它没有 memoizedState
+  // ? 1. 状态计算, 由于 HostComponent 是无状态组件, 所以只需要收集 nextProps 即可, 它没有 memoizedState
   const type = workInProgress.type;
   const nextProps = workInProgress.pendingProps;
   const prevProps = current !== null ? current.memoizedProps : null;
-  // ? 2. 获取下级`ReactElement`对象
+  // ? 2. 获取下级 ReactElement 对象
   let nextChildren = nextProps.children;
   const isDirectTextChild = shouldSetTextContent(type, nextProps);
 
@@ -1157,19 +1195,19 @@ function updateHostComponent(
     // this in the host environment that also has access to this prop. That
     // avoids allocating another HostText fiber and traversing it.
 
-    // ? 如果子节点只有一个文本节点, 不用再创建一个HostText类型的fiber
+    // ? 如果子节点只有一个文本节点, 不用再创建一个 HostText 类型的fiber
     nextChildren = null;
   } else if (prevProps !== null && shouldSetTextContent(type, prevProps)) {
     // If we're switching from a direct text child to a normal child, or to
     // empty, we need to schedule the text content to be reset.
 
-    // ? 特殊操作需要设置fiber.flags
+    // ? 特殊操作需要设置 fiber.flags
     workInProgress.flags |= ContentReset;
   }
 
-  // ? 特殊操作需要设置fiber.flags
+  // ? 特殊操作需要设置 fiber.flags
   markRef(current, workInProgress);
-  // ? 3. 根据`ReactElement`对象, 调用`reconcileChildren`生成`Fiber`子节点(只生成`次级子节点`)
+  // ? 3. 根据 ReactElement 对象, 调用 reconcileChildren 生成 Fiber 子节点(只生成 次级子节点)
   reconcileChildren(current, workInProgress, nextChildren, renderLanes);
   return workInProgress.child;
 }
@@ -3098,7 +3136,9 @@ function remountFiber(
   }
 }
 
-// TAGR 构建 Fiber 树，探寻阶段
+// TAGR 探寻阶段
+
+// ? 如果子节点只是一个文本，就不必再往下遍历了
 /**
  * 深度优先遍历构造 fiber 树，探寻阶段
  * 功能：构造 fiber 节点
@@ -3107,7 +3147,9 @@ function remountFiber(
  * 3、设置 fiber.stateNode 局部状态(如 Class 类型节点: fiber.stateNode = new Class())
  */
 function beginWork(
+  /** 页面上的 fiber 节点 */
   current: Fiber | null,
+  /** 正在构建的 fiber 节点 */
   workInProgress: Fiber,
   renderLanes: Lanes,
 ): Fiber | null {
@@ -3132,7 +3174,7 @@ function beginWork(
   }
 
   if (current !== null) {
-    // ? update逻辑, 首次 render 不会进入
+    // ? update 逻辑, 首次 render 不会进入
     const oldProps = current.memoizedProps;
     const newProps = workInProgress.pendingProps;
 
@@ -3348,10 +3390,12 @@ function beginWork(
   // sometimes bails out later in the begin phase. This indicates that we should
   // move this assignment out of the common path and into each branch.
 
-  // ? 不能复用, 创建新的fiber节点
+  // ? 不能复用, 创建新的 fiber 节点
   // 设置 workInProgress 优先级为 NoLanes(最高优先级)
   workInProgress.lanes = NoLanes;
-  // 根据 workInProgress 节点的类型, 用不同的方法派生出子节点
+
+  // TAGR 首次渲染根据 tag 生成不同的 Fiber 子节点
+  // 不同的 updateXXX 函数处理的 fiber 节点类型不同, 总的目的是为了向下生成子节点. 在这个过程中把一些需要持久化的数据挂载到 fiber 节点上(如 fiber.stateNode,fiber.memoizedState 等); 把 fiber 节点的特殊操作设置到 fiber.flags(如:节点 ref，class 组件的生命周期，function 组件的 hook，节点删除等).
   switch (workInProgress.tag) {
     case IndeterminateComponent: {
       return mountIndeterminateComponent(
@@ -3373,8 +3417,6 @@ function beginWork(
     }
 
     // Function 组件
-    // 1.执行 function, 获取下级reactElement
-    // 2.根据实际情况, 设置fiber.flags ———— 副作用
     case FunctionComponent: {
       const Component = workInProgress.type;
       const unresolvedProps = workInProgress.pendingProps;
@@ -3392,11 +3434,6 @@ function beginWork(
     }
 
     // Class 组件
-    // 1.构建React.Component实例
-    // 2.把新实例挂载到fiber.stateNode上
-    // 3.执行render之前的生命周期函数
-    // 4.执行render方法, 获取下级reactElement
-    // 5.根据实际情况, 设置fiber.flags ———— 副作用
     case ClassComponent: {
       const Component = workInProgress.type;
       const unresolvedProps = workInProgress.pendingProps;
@@ -3418,9 +3455,6 @@ function beginWork(
       return updateHostRoot(current, workInProgress, renderLanes);
 
     // HostComponent(原生dom节点)
-    // 1.pendingProps.children作为下级reactElement
-    // 2.如果下级节点是文本节点,则设置下级节点为 null. 准备进入completeUnitOfWork阶段
-    // 3.根据实际情况, 设置fiber.flags ———— 副作用
     case HostComponent:
       return updateHostComponent(current, workInProgress, renderLanes);
     case HostText:
