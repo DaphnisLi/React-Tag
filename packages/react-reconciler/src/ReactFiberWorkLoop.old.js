@@ -2533,12 +2533,12 @@ function commitBeforeMutationEffects() {
       resetCurrentDebugFiberInDEV();
     }
     // TAGD 处理 Passive 标记
-    // TAGQ 调用 useEffect 等 Hook
+    // TAGQ 调用 useEffect
     if ((flags & Passive) !== NoFlags) {
       // If there are passive effects, schedule a callback to flush at
       // the earliest opportunity.
       // ? Passive 标记只会在使用了 Hook 对象的 Function 类型的节点上存在，为了处理 Hook 对象(如 useEffect), 通过scheduleCallback 单独注册了一个调度任务 task，等待调度中心 Scheduler 处理。
-      // ? 因为要注册调度任务，所以 Hook 的执行表现为宏任务
+      // ? 因为要注册调度任务，所以 useEffect 内的函数执行表现为宏任务
       if (!rootDoesHavePassiveEffects) {
         rootDoesHavePassiveEffects = true;
         scheduleCallback(NormalSchedulerPriority, () => {

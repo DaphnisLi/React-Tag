@@ -266,6 +266,7 @@ function commitBeforeMutationLifeCycles(
               }
             }
           }
+          // TAGQ 调用 getSnapshotBeforeUpdate
           const snapshot = instance.getSnapshotBeforeUpdate(
             finishedWork.elementType === finishedWork.type
               ? prevProps
@@ -472,6 +473,7 @@ function commitLifeCycles(
       // This is done to prevent sibling component effects from interfering with each other,
       // e.g. a destroy function in one component should never override a ref set
       // by a create function in another component during the same commit.
+      // TAGQ 调用 useLayoutEffect
       if (
         enableProfilerTimer &&
         enableProfilerCommitHooks &&
