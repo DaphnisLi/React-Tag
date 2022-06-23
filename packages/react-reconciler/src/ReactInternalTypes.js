@@ -105,7 +105,7 @@ export type Fiber = {|
   // This type will be more specific once we overload the tag.
   pendingProps: any, // 输入属性, 从 ReactElement 对象传入的 props. 用于和 Fiber.memoizedProps 比较可以得出属性是否变动.
   // The props used to create the output.
-  memoizedProps: any, // 上一次生成子节点时用到的属性, 生成子节点之后保持在内存中. 向下生成子节点之前叫做 pendingProps, 生成子节点之后会把 pendingProps 赋值给 memoizedProps 用于下一次比较.pendingProps 和 memoizedProps 比较可以得出属性是否变动.
+  memoizedProps: any, // 上一次生成子节点时用到的属性, 生成子节点之后保持在内存中. 向下生成子节点之前叫做 pendingProps, 生成子节点之后会把 pendingProps 赋值给 memoizedProps 用于下一次比较。pendingProps 和 memoizedProps 比较可以得出属性是否变动.
 
   // A queue of state updates and callbacks.
   updateQueue: mixed, // 存储 update 更新对象的队列, 每一次发起更新, 都需要在该队列上创建一个 update 对象.
@@ -144,7 +144,7 @@ export type Fiber = {|
   // This is a pooled version of a Fiber. Every fiber that gets updated will
   // eventually have a pair. There are cases when we can clean up pairs to save
   // memory if we need to.
-  alternate: Fiber | null, // 指向内存中的另一个 fiber, 每个被更新过 fiber 节点在内存中都是成对出现(current 和 workInProgress)
+  alternate: Fiber | null, // 指向内存中的另一个 fiber, 每个被更新的 fiber 节点在内存中都是成对出现(current 和 workInProgress)
 
   // Time spent rendering this Fiber and its descendants for the current update.
   // This tells us how well the tree makes use of sCU for memoization.

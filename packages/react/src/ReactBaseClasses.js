@@ -54,6 +54,8 @@ Component.prototype.isReactComponent = {};
  * @final
  * @protected
  */
+
+// TAGR Class 更新函数 —— setState 原型
 Component.prototype.setState = function(partialState, callback) {
   invariant(
     typeof partialState === 'object' ||

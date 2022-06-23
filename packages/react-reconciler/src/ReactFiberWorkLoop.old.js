@@ -246,7 +246,7 @@ const {
 
 type ExecutionContext = number;
 
-// TAG 8种代表渲染期间的执行栈(执行上下文)
+// TAGR 8 种代表渲染期间的执行栈(执行上下文)
 /** 无上下文 */
 export const NoContext = /*             */ 0b0000000;
 /** 批处理上下文 */
@@ -415,7 +415,7 @@ export function getCurrentTime() {
   return now();
 }
 
-// TAG 获得 Update 优先级
+// TAGR 获得 Update 优先级
 // 是否更新会受 Render 优先级影响
 // Legacy 模式: 返回 SyncLane
 // Blocking 模式: 返回 SyncLane
@@ -552,7 +552,7 @@ function requestRetryLane(fiber: Fiber) {
   return findRetryLane(currentEventWipLanes);
 }
 
-// TAGR Reconciler 包的入口函数
+// TAGR Reconciler 入口函数
 
 // TAGQ setState 是同步还是异步
 // Legacy / Blocking 模式
@@ -574,7 +574,7 @@ export function scheduleUpdateOnFiber(
 ) {
   checkForNestedUpdates();
   warnAboutRenderPhaseUpdatesInDEV(fiber);
-  // 标记优先级
+  // ? 后续更新会发挥作用，找到受更新影响的 Fiber 节点，标记优先级
   const root = markUpdateLaneFromFiberToRoot(fiber, lane);
   if (root === null) {
     warnAboutUpdateOnUnmountedFiberInDEV(fiber);
@@ -687,17 +687,29 @@ export function scheduleUpdateOnFiber(
 // work without treating it as a typical update that originates from an event;
 // e.g. retrying a Suspense boundary isn't an update, but it does schedule work
 // on a fiber.
+
+// TAGR 找到受更新影响的 Fiber 节点
 /**
- * 只在对比更新阶段才发挥出它的作用, 它找出了fiber树中受到本次update影响的所有节点, 并设置这些节点的fiber.lanes或fiber.childLanes(在legacy模式下为SyncLane)以备fiber树构造阶段使用
+ * 只在对比更新阶段才发挥作用
+ * 它找出了 Fiber 树中受到本次 update 影响的所有节点。（应该是只找出了顶层的父节点）
+ * 设置这些节点的优先级：fiber.lanes 或 fiber.childLanes(在legacy模式下为SyncLane)，以备fiber树构造阶段使用
+ */
+
+/**
+ * 以 sourceFiber 为起点, 设置起点的 fiber.lanes
+ * 从起点开始, 直到 HostRootFiber, 设置父路径上所有节点(也包括 fiber.alternate)的 fiber.childLanes。
+ * 通过设置 fiber.lanes 和 fiber.childLanes 就可以辅助判断子树是否需要更新。
  */
 function markUpdateLaneFromFiberToRoot(
-  sourceFiber: Fiber,
-  lane: Lane,
+  sourceFiber: Fiber, // 被更新的节点
+  lane: Lane, // update优先级
 ): FiberRoot | null {
   // Update the source fiber's lanes
+  // 1. 将 update 优先级设置到 sourceFiber.lanes
   sourceFiber.lanes = mergeLanes(sourceFiber.lanes, lane);
   let alternate = sourceFiber.alternate;
   if (alternate !== null) {
+    // 同时设置 sourceFiber.alternate 的优先级
     alternate.lanes = mergeLanes(alternate.lanes, lane);
   }
   if (__DEV__) {
@@ -709,6 +721,7 @@ function markUpdateLaneFromFiberToRoot(
     }
   }
   // Walk the parent path to the root and update the child expiration time.
+  // 2. 从 sourceFiber 开始, 向上遍历所有节点, 直到 HostRoot. 设置沿途所有节点(包括alternate)的 childLanes
   let node = sourceFiber;
   let parent = sourceFiber.return;
   while (parent !== null) {

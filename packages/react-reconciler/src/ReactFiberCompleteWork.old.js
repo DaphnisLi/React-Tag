@@ -231,6 +231,8 @@ if (supportsMutation) {
     workInProgress.updateQueue = (updatePayload: any);
     // If the update payload indicates that there is a change or if there
     // is a new ref we mark this as an update. All the work is done in commitWork.
+
+    // ? 如果有属性变动, 设置 fiber.flags |= Update, 等待 commit 阶段的处理
     if (updatePayload) {
       markUpdate(workInProgress);
     }
@@ -242,6 +244,8 @@ if (supportsMutation) {
     newText: string,
   ) {
     // If the text differs, mark it as an update. All the work in done in commitWork.
+
+    // ? 如果有属性变动, 设置 fiber.flags |= Update, 等待 commit 阶段的处理
     if (oldText !== newText) {
       markUpdate(workInProgress);
     }
@@ -649,6 +653,8 @@ function cutOffTailIfNeeded(
  * 设置 DOM 节点属性, 绑定事件。
  * 设置 fiber.flags 标记。
  * 
+ * 注意：如果 DOM 属性有变化, 不会再次新建 DOM 对象, 而是设置 fiber.flags |= Update, 等待 commit 阶段处理。
+ * 
  * ? 一般情况下都会返回 null。但是如果当前 fiber 节点是 SuspenseComponent、SuspenseListComponent 的时候就会派生出新的子节点 fallback  https://zh-hans.reactjs.org/docs/react-api.html#reactsuspense    https://github.com/7kms/react-illustration-series/issues/69
  */
 
@@ -804,6 +810,7 @@ function completeWork(
         const oldText = current.memoizedProps;
         // If we have an alternate, that means this is an update and we need
         // to schedule a side-effect to do the updates.
+        // 处理改动
         updateHostText(current, workInProgress, oldText, newText);
       } else {
         if (typeof newText !== 'string') {

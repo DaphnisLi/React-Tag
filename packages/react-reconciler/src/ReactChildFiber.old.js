@@ -1412,6 +1412,8 @@ function ChildReconciler(shouldTrackSideEffects) {
 export const reconcileChildFibers = ChildReconciler(true);
 export const mountChildFibers = ChildReconciler(false);
 
+// TAGR 克隆并返回子节点
+// 克隆之后, 新 fiber 节点会丢弃旧 fiber 上的标志位(flags)和副作用(effects), 其他属性会继续保留.
 export function cloneChildFibers(
   current: Fiber | null,
   workInProgress: Fiber,

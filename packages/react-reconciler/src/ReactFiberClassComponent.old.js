@@ -194,10 +194,12 @@ export function applyDerivedStateFromProps(
 const classComponentUpdater = {
   isMounted,
   enqueueSetState(inst, payload, callback) {
+    // 1. 获取 class 实例对应的 fiber 节点
     const fiber = getInstance(inst);
     const eventTime = requestEventTime();
+    // 确定当前 update 对象的优先级
     const lane = requestUpdateLane(fiber);
-
+    // 2. 创建 update 对象
     const update = createUpdate(eventTime, lane);
     update.payload = payload;
     if (callback !== undefined && callback !== null) {
@@ -206,9 +208,10 @@ const classComponentUpdater = {
       }
       update.callback = callback;
     }
-
+    // 3. 将 update 对象添加到当前 Fiber 节点的 updateQueue 队列当中
     enqueueUpdate(fiber, update);
-    scheduleUpdateOnFiber(fiber, lane, eventTime);
+    // 4. 进入 reconciler 运作流程中的输入环节
+    scheduleUpdateOnFiber(fiber, lane, eventTime);  // 传入的 lane 是 update 优先级
 
     if (__DEV__) {
       if (enableDebugTracing) {

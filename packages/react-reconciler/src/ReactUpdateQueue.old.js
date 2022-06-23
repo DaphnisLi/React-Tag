@@ -104,6 +104,7 @@ import invariant from 'shared/invariant';
 import {disableLogs, reenableLogs} from 'shared/ConsolePatchingDev';
 
 // TAGT Update
+// 会被添加到 fiber.updateQueue
 export type Update<State> = {|
   // todo: Temporary field. Will remove this by storing a map of
   // transition -> event time on the root.
@@ -182,8 +183,8 @@ export function cloneUpdateQueue<State>(
   }
 }
 
-// TAG 创建 Update
-// 只有在初始化和组件更新的时候才会创建
+// TAGR 创建 Update
+// 只有在初始化和组件更新的时候才会创建，会被添加到 fiber.updateQueue
 export function createUpdate(eventTime: number, lane: Lane): Update<*> {
   const update: Update<*> = {
     eventTime,

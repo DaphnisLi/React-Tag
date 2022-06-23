@@ -251,7 +251,7 @@ export function lanePriorityToSchedulerPriority(
   }
 }
 
-// TAG 获取 Render 优先级 ——— 会被用于 fiber 构造过程，影响到 fiber.lanes 和 update.lanes
+// TAGR 获取 Render 优先级 ——— 会被用于 fiber 构造过程，影响到 fiber.lanes 和 update.lanes
 // 此处返回的 lanes 会作为全局渲染的优先级, 用于 Fiber 树构造过程中. 针对 Fiber 对象或 Update 对象, 只要它们的优先级(如: fiber.lanes 和 update.lanes)比渲染优先级低, 都将会被忽略.
 
 /**
@@ -621,6 +621,7 @@ function laneToIndex(lane: Lane) {
   return pickArbitraryLaneIndex(lane);
 }
 
+/** 比较优先级 */
 export function includesSomeLane(a: Lanes | Lane, b: Lanes | Lane) {
   return (a & b) !== NoLanes;
 }

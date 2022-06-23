@@ -1644,6 +1644,7 @@ function rerenderOpaqueIdentifier(): OpaqueIDType | void {
   return id;
 }
 
+// TAGR Hook 更新函数
 function dispatchAction<S, A>(
   fiber: Fiber,
   queue: UpdateQueue<S, A>,
@@ -1661,7 +1662,7 @@ function dispatchAction<S, A>(
 
   const eventTime = requestEventTime();
   const lane = requestUpdateLane(fiber);
-
+  // ? 1. 创建 update 对象
   const update: Update<S, A> = {
     lane,
     action,
@@ -1671,6 +1672,7 @@ function dispatchAction<S, A>(
   };
 
   // Append the update to the end of the list.
+  // ? 2. 将 update 对象添加到当前 Hook 对象的 updateQueue 队列当中
   const pending = queue.pending;
   if (pending === null) {
     // This is the first update. Create a circular list.
@@ -1737,7 +1739,9 @@ function dispatchAction<S, A>(
         warnIfNotCurrentlyActingUpdatesInDev(fiber);
       }
     }
-    scheduleUpdateOnFiber(fiber, lane, eventTime);
+
+    // ? 3. 请求调度, 进入 reconciler 运作流程中的输入环节。
+    scheduleUpdateOnFiber(fiber, lane, eventTime); // 传入的 lane 是 update 优先级
   }
 
   if (__DEV__) {
