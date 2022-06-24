@@ -101,6 +101,7 @@ export type Fiber = {|
     | (((handle: mixed) => void) & {_stringRef: ?string, ...})
     | RefObject,
 
+  // ? 状态相关
   // Input is the data coming into process this fiber. Arguments. Props.
   // This type will be more specific once we overload the tag.
   pendingProps: any, // 输入属性, 从 ReactElement 对象传入的 props. 用于和 Fiber.memoizedProps 比较可以得出属性是否变动.
@@ -111,6 +112,7 @@ export type Fiber = {|
   updateQueue: mixed, // 存储 update 更新对象的队列, 每一次发起更新, 都需要在该队列上创建一个 update 对象.
 
   // The state used to create the output
+  // Hook 存储在这里。是一个链表。https://github.com/7kms/react-illustration-series/blob/main/docs/main/hook-summary.md#:~:text=workInProgressHook%3B%0A%7D-,%E9%80%BB%E8%BE%91,-%E6%98%AF%E5%88%9B%E5%BB%BAHook
   memoizedState: any, // 上一次生成子节点之后保持在内存中的局部状态.
 
   // Dependencies (contexts, events) for this fiber, if it has any
@@ -124,7 +126,7 @@ export type Fiber = {|
   // before its child fibers are created.
   mode: TypeOfMode, // 二进制位 Bitfield,继承至父节点,影响本 fiber 节点及其子树中所有节点. 与 react 应用的运行模式有关(有 ConcurrentMode, BlockingMode, NoMode 等选项).
 
-  // ? 副作用
+  // ? 副作用相关
   flags: Flags, // 标志位, 副作用标记(在 16.x 版本中叫做effectTag, 相应pr), 在ReactFiberFlags.js中定义了所有的标志位. reconciler阶段会将所有拥有flags标记的节点添加到副作用链表中, 等待 commit 阶段的处理.
   subtreeFlags: Flags, // 替代16.x版本中的 firstEffect, nextEffect. 当设置了 enableNewReconciler=true 才会启用
   deletions: Array<Fiber> | null, // 存储将要被删除的子节点. 默认未开启, 当设置了 enableNewReconciler=true 才会启用
@@ -137,6 +139,7 @@ export type Fiber = {|
   // this fiber.
   firstEffect: Fiber | null, // 指向副作用链表中的第一个 fiber 节点.
   lastEffect: Fiber | null, // 指向副作用链表中的最后一个 fiber 节点.
+
   // ? 优先级
   lanes: Lanes, // 本 fiber 节点所属的优先级, 创建 fiber 的时候设置.
   childLanes: Lanes, // 子节点所属的优先级.

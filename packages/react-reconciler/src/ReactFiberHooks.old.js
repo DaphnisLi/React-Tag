@@ -92,15 +92,20 @@ import {markStateUpdateScheduled} from './SchedulingProfiler';
 
 const {ReactCurrentDispatcher, ReactCurrentBatchConfig} = ReactSharedInternals;
 
+// TAGT HookType
 export type HookType =
+  // 状态 Hook 
+  // 得益于双缓冲技术(double buffering), 在多次 render 时, 以 fiber 为载体, 保证复用同一个 Hook 对象, 进而实现数据持久化。
   | 'useState'
   | 'useReducer'
   | 'useContext'
   | 'useRef'
-  | 'useEffect'
-  | 'useLayoutEffect'
   | 'useCallback'
   | 'useMemo'
+
+  // 副作用 Hook
+  | 'useEffect'
+  | 'useLayoutEffect'
   | 'useImperativeHandle'
   | 'useDebugValue'
   | 'useDeferredValue'
@@ -133,12 +138,13 @@ type UpdateQueue<S, A> = {|
 
 // TAGT Hook
 // Hook.queue 和 Hook.baseQueue(即 UpdateQueue 和 Update）是为了保证Hook对象能够顺利更新,
+// ! 注意：此处的 update/updateQueue 和 Fiber 中的无关，是 Hook 自己的。只维护 Hook 的状态。
 export type Hook = {|
-  memoizedState: any, // 内存状态, 用于输出成最终的 fiber 树
-  baseState: any, // 基础状态, 当 Hook.queue 更新过后, baseState 也会更新.
-  baseQueue: Update<any, any> | null, // 基础状态队列, 在 reconciler 阶段会辅助状态合并.
-  queue: UpdateQueue<any, any> | null, // 指向一个 Update 队列
-  next: Hook | null, // 指向该 function 组件的下一个 Hook 对象, 使得多个 Hook 之间也构成了一个链表。这就是 Hook 要保持顺序一致的原因
+  memoizedState: any, // 保持在内存中的局部状态。用于输出成最终的 fiber 树。
+  baseState: any, // Hook.baseQueue 中所有 update 对象合并之后的状态。
+  baseQueue: Update<any, any> | null, // 基础状态队列，存储此 Hook 相关的 update 对象的环形链表，只包括高于本次渲染优先级的 update 对象。
+  queue: UpdateQueue<any, any> | null, // 存储此 Hook 相关的 update 对象的环形链表, 包括所有优先级的 update 对象。
+  next: Hook | null, // 指向该 function 组件的下一个 Hook 对象, 使得多个 Hook 之间也构成了一个链表。这就是 Hook 要保持顺序一致的原因。
 |};
 
 export type Effect = {|
@@ -156,29 +162,39 @@ type BasicStateAction<S> = (S => S) | S;
 type Dispatch<A> = A => void;
 
 // These are set right before calling the component.
+/** 渲染优先级 */
 let renderLanes: Lanes = NoLanes;
 // The work-in-progress fiber. I've named it differently to distinguish it from
 // the work-in-progress hook.
+/** 当前正在构造的 fiber, 等同于 workInProgress, 为了和当前 hook 区分, 所以将其改名 */
 let currentlyRenderingFiber: Fiber = (null: any);
 
 // Hooks are stored as a linked list on the fiber's memoizedState field. The
 // current hook list is the list that belongs to the current fiber. The
 // work-in-progress hook list is a new list that will be added to the
 // work-in-progress fiber.
-let currentHook: Hook | null = null;
-let workInProgressHook: Hook | null = null;
+/** Hook 被存储在 fiber.memoizedState 链表上 */
+let currentHook: Hook | null = null; // currentHook = fiber(current).memoizedState
+
+/** Hook 被存储在 fiber.memoizedState 链表上 */
+let workInProgressHook: Hook | null = null; // workInProgressHook = fiber(workInProgress).memoizedState
 
 // Whether an update was scheduled at any point during the render phase. This
 // does not get reset if we do another render pass; only when we're completely
 // finished evaluating this component. This is an optimization so we know
 // whether we need to clear render phase updates after a throw.
+
+// 在 function 的执行过程中, 是否再次发起了更新. 只有 function 被完全执行之后才会重置.
+// 当 render 异常时, 通过该变量可以决定是否清除 render 过程中的更新.
 let didScheduleRenderPhaseUpdate: boolean = false;
 // Where an update was scheduled only during the current render pass. This
 // gets reset after each attempt.
 // todo: Maybe there's some way to consolidate this with
 // `didScheduleRenderPhaseUpdate`. Or with `numberOfReRenders`.
+// 在本次 function 的执行过程中, 是否再次发起了更新. 每一次调用 function 都会被重置
 let didScheduleRenderPhaseUpdateDuringThisPass: boolean = false;
 
+// 在本次 function 的执行过程中, 重新发起更新的最大次数
 const RE_RENDER_LIMIT = 25;
 
 // In DEV, this is the name of the currently executing primitive hook
@@ -341,6 +357,10 @@ function areHookInputsEqual(
   return true;
 }
 
+// TAGR updateFunctionComponent 中 Hook 相关逻辑
+/**
+ * Hook 相关逻辑
+ */
 export function renderWithHooks<Props, SecondArg>(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -349,8 +369,9 @@ export function renderWithHooks<Props, SecondArg>(
   secondArg: SecondArg,
   nextRenderLanes: Lanes,
 ): any {
-  renderLanes = nextRenderLanes;
-  currentlyRenderingFiber = workInProgress;
+  // ? --------------- 1. 设置全局变量 -------------------
+  renderLanes = nextRenderLanes; // 当前渲染优先级
+  currentlyRenderingFiber = workInProgress; // 当前 fiber 节点, 也就是 function 组件对应的 fiber 节点
 
   if (__DEV__) {
     hookTypesDev =
@@ -363,6 +384,7 @@ export function renderWithHooks<Props, SecondArg>(
       current !== null && current.type !== workInProgress.type;
   }
 
+  // 清除当前 fiber 的遗留状态
   workInProgress.memoizedState = null;
   workInProgress.updateQueue = null;
   workInProgress.lanes = NoLanes;
@@ -394,12 +416,14 @@ export function renderWithHooks<Props, SecondArg>(
       ReactCurrentDispatcher.current = HooksDispatcherOnMountInDEV;
     }
   } else {
+    // ? --------------- 2. 调用 function, 生成子级 ReactElement 对象 -------------------
+    // 指定 dispatcher, 区分 mount 和 update
     ReactCurrentDispatcher.current =
       current === null || current.memoizedState === null
         ? HooksDispatcherOnMount
         : HooksDispatcherOnUpdate;
   }
-
+  // 执行 function 函数, 其中进行分析 Hooks 的使用
   let children = Component(props, secondArg);
 
   // Check if there was a render phase update
@@ -454,6 +478,8 @@ export function renderWithHooks<Props, SecondArg>(
   const didRenderTooFewHooks =
     currentHook !== null && currentHook.next !== null;
 
+  // ? --------------- 3. 重置全局变量,并返回 -------------------
+  // 执行 function 之后, 还原被修改的全局变量, 不影响下一次调用
   renderLanes = NoLanes;
   currentlyRenderingFiber = (null: any);
 
@@ -530,6 +556,7 @@ export function resetHooksAfterThrow(): void {
   didScheduleRenderPhaseUpdateDuringThisPass = false;
 }
 
+/** 创建 Hook 并挂载到 fiber.memoizedState 上, 多个 Hook 以链表结构保存。 */
 function mountWorkInProgressHook(): Hook {
   const hook: Hook = {
     memoizedState: null,
@@ -542,21 +569,27 @@ function mountWorkInProgressHook(): Hook {
   };
 
   if (workInProgressHook === null) {
+    // 链表中首个 Hook
     // This is the first hook in the list
     currentlyRenderingFiber.memoizedState = workInProgressHook = hook;
   } else {
+    // 将 Hook 添加到链表末尾
     // Append to the end of the list
     workInProgressHook = workInProgressHook.next = hook;
   }
   return workInProgressHook;
 }
-
+/**
+ * 让 currentHook 和 workInProgressHook 两个指针同时向后移动.
+ */
 function updateWorkInProgressHook(): Hook {
   // This function is used both for updates and for re-renders triggered by a
   // render phase update. It assumes there is either a current hook we can
   // clone, or a work-in-progress hook from a previous render pass that we can
   // use as a base. When we reach the end of the base list, we must switch to
   // the dispatcher used for mounts.
+
+  // 1. 移动 currentHook 指针
   let nextCurrentHook: null | Hook;
   if (currentHook === null) {
     const current = currentlyRenderingFiber.alternate;
@@ -569,13 +602,13 @@ function updateWorkInProgressHook(): Hook {
     nextCurrentHook = currentHook.next;
   }
 
+  // 2. 移动 workInProgressHook 指针
   let nextWorkInProgressHook: null | Hook;
   if (workInProgressHook === null) {
     nextWorkInProgressHook = currentlyRenderingFiber.memoizedState;
   } else {
     nextWorkInProgressHook = workInProgressHook.next;
   }
-
   if (nextWorkInProgressHook !== null) {
     // There's already a work-in-progress. Reuse it.
     workInProgressHook = nextWorkInProgressHook;
@@ -589,6 +622,8 @@ function updateWorkInProgressHook(): Hook {
       nextCurrentHook !== null,
       'Rendered more hooks than during the previous render.',
     );
+    // 3. 克隆 currentHook 作为新的 workInProgressHook
+    // 随后逻辑与 mountWorkInProgressHook 一致
     currentHook = nextCurrentHook;
 
     const newHook: Hook = {
@@ -650,6 +685,7 @@ function mountReducer<S, I, A>(
   return [hook.memoizedState, dispatch];
 }
 
+// TAGH useState —— 更新
 function updateReducer<S, I, A>(
   reducer: (S, A) => S,
   initialArg: I,
@@ -1112,6 +1148,7 @@ function updateMutableSource<Source, Snapshot>(
   return useMutableSource(hook, source, getSnapshot, subscribe);
 }
 
+// TAGH useState —— 初次
 function mountState<S>(
   initialState: (() => S) | S,
 ): [S, Dispatch<BasicStateAction<S>>] {
@@ -1192,6 +1229,7 @@ function updateRef<T>(initialValue: T): {|current: T|} {
   return hook.memoizedState;
 }
 
+// TAGH useEffect —— 初次, 主要逻辑
 function mountEffectImpl(fiberFlags, hookFlags, create, deps): void {
   const hook = mountWorkInProgressHook();
   const nextDeps = deps === undefined ? null : deps;
@@ -1204,6 +1242,7 @@ function mountEffectImpl(fiberFlags, hookFlags, create, deps): void {
   );
 }
 
+// TAGH useEffect —— 更新
 function updateEffectImpl(fiberFlags, hookFlags, create, deps): void {
   const hook = updateWorkInProgressHook();
   const nextDeps = deps === undefined ? null : deps;
@@ -1231,6 +1270,7 @@ function updateEffectImpl(fiberFlags, hookFlags, create, deps): void {
   );
 }
 
+// TAGH useEffect —— 初次
 function mountEffect(
   create: () => (() => void) | void,
   deps: Array<mixed> | void | null,

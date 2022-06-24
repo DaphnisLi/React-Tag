@@ -708,7 +708,7 @@ function markRef(current: Fiber | null, workInProgress: Fiber) {
   }
 }
 
-// TAGR 生成 Function Fiber 子节点
+// TAGR Function 生成 Fiber 子节点
 
 /**
  * 1、计算输出状态：根据 fiber.pendingProps, fiber.updateQueue 等输入数据状态, 计算 fiber.memoizedState 作为输出状态
@@ -767,6 +767,7 @@ function updateFunctionComponent(
     ) {
       disableLogs();
       try {
+        // ? 进入Hooks相关逻辑, 最后返回下级ReactElement对象
         nextChildren = renderWithHooks(
           current,
           workInProgress,
@@ -867,11 +868,13 @@ function updateBlock<Props, Data>(
 
   // React DevTools reads this flag.
   workInProgress.flags |= PerformedWork;
+  // 进入reconcile函数, 生成下级 fiber 节点
   reconcileChildren(current, workInProgress, nextChildren, renderLanes);
+  // 返回下级子节点
   return workInProgress.child;
 }
 
-// TAGR 生成 Class Fiber 子节点
+// TAGR Class 生成 Fiber 子节点
 
 /**
  * 1、计算输出状态：根据 fiber.pendingProps, fiber.updateQueue 等输入数据状态, 计算 fiber.memoizedState 作为输出状态
@@ -1084,7 +1087,7 @@ function pushHostRootContext(workInProgress) {
   pushHostContainer(workInProgress, root.containerInfo);
 }
 
-// TAGR 生成根节点 Fiber 子节点
+// TAGR 根节点 生成 Fiber 子节点
 /** fiber 树的跟节点 */
 function updateHostRoot(current, workInProgress, renderLanes) {
   pushHostRootContext(workInProgress);
@@ -1166,7 +1169,7 @@ function updateHostRoot(current, workInProgress, renderLanes) {
   return workInProgress.child;
 }
 
-// TAGR 生成原生 DOM Fiber 子节点
+// TAGR 原生 DOM 生成 Fiber 子节点
 
 /**
  * 1、计算输出状态：根据 fiber.pendingProps, fiber.updateQueue 等输入数据状态, 计算 fiber.memoizedState 作为输出状态
