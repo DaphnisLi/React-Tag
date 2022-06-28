@@ -147,11 +147,12 @@ export type Hook = {|
   next: Hook | null, // 指向该 function 组件的下一个 Hook 对象, 使得多个 Hook 之间也构成了一个链表。这就是 Hook 要保持顺序一致的原因。
 |};
 
+// TAGT Effect
 export type Effect = {|
-  tag: HookFlags,
-  create: () => (() => void) | void,
+  tag: HookFlags, // 二进制属性, 代表effect的类型
+  create: () => (() => void) | void, //  useEffect 的回调函数
   destroy: (() => void) | void,
-  deps: Array<mixed> | null,
+  deps: Array<mixed> | null, // 依赖项, 如果依赖项变动, 会创建新的 Effect
   next: Effect,
 |};
 
@@ -359,7 +360,7 @@ function areHookInputsEqual(
 
 // TAGR updateFunctionComponent 中 Hook 相关逻辑
 /**
- * Hook 相关逻辑
+ * Hook 相关逻辑 —— 执行 Function 并创建 Hook
  */
 export function renderWithHooks<Props, SecondArg>(
   current: Fiber | null,
@@ -1214,7 +1215,13 @@ function rerenderState<S>(
   return rerenderReducer(basicStateReducer, (initialState: any));
 }
 
+// TAGH 创建 Effect
+
+/**
+ * 创建 Effect, 并挂载到 hook.memoizedState
+ */
 function pushEffect(tag, create, destroy, deps) {
+  // 1. 创建effect对象
   const effect: Effect = {
     tag,
     create,
@@ -1223,10 +1230,13 @@ function pushEffect(tag, create, destroy, deps) {
     // Circular
     next: (null: any),
   };
+  // 2. 把effect对象添加到环形链表末尾
   let componentUpdateQueue: null | FunctionComponentUpdateQueue = (currentlyRenderingFiber.updateQueue: any);
   if (componentUpdateQueue === null) {
+    // 新建 workInProgress.updateQueue 用于挂载effect对象
     componentUpdateQueue = createFunctionComponentUpdateQueue();
     currentlyRenderingFiber.updateQueue = (componentUpdateQueue: any);
+    // updateQueue.lastEffect是一个环形链表
     componentUpdateQueue.lastEffect = effect.next = effect;
   } else {
     const lastEffect = componentUpdateQueue.lastEffect;
@@ -1239,6 +1249,7 @@ function pushEffect(tag, create, destroy, deps) {
       componentUpdateQueue.lastEffect = effect;
     }
   }
+  // 3. 返回effect
   return effect;
 }
 
@@ -1257,11 +1268,14 @@ function updateRef<T>(initialValue: T): {|current: T|} {
   return hook.memoizedState;
 }
 
-// TAGH useEffect —— 初次, 主要逻辑
+// TAGH Effect —— 初次, 主要逻辑
 function mountEffectImpl(fiberFlags, hookFlags, create, deps): void {
+  // 1. 创建 Hook
   const hook = mountWorkInProgressHook();
   const nextDeps = deps === undefined ? null : deps;
-  currentlyRenderingFiber.flags |= fiberFlags;
+  // 2. 设置 workInProgress 的副作用标记
+  currentlyRenderingFiber.flags |= fiberFlags; // fiberFlags 被标记到 workInProgress
+  // 2. 创建 Effect, 挂载到 hook.memoizedState上
   hook.memoizedState = pushEffect(
     HookHasEffect | hookFlags,
     create,
@@ -1270,24 +1284,30 @@ function mountEffectImpl(fiberFlags, hookFlags, create, deps): void {
   );
 }
 
-// TAGH useEffect —— 更新
+// TAGH Effect —— 更新
 function updateEffectImpl(fiberFlags, hookFlags, create, deps): void {
+  // 1. 获取当前hook
   const hook = updateWorkInProgressHook();
   const nextDeps = deps === undefined ? null : deps;
   let destroy = undefined;
-
+  // 2. 分析依赖
   if (currentHook !== null) {
     const prevEffect = currentHook.memoizedState;
+    // 继续使用先前 effect.destroy
     destroy = prevEffect.destroy;
     if (nextDeps !== null) {
       const prevDeps = prevEffect.deps;
+      // TAGH 检查 Effect 的依赖是否改变
+      // TAGQ HasEffect, 是否有这个 flag, 决定着是否执行 Effect 回调函数和销毁函数
+      // ? 比较依赖是否变化
       if (areHookInputsEqual(nextDeps, prevDeps)) {
+        // ? 2.1 如果依赖不变, 新建 Effect(tag不含HookHasEffect)
         pushEffect(hookFlags, create, destroy, nextDeps);
         return;
       }
     }
   }
-
+  // 2.2 如果依赖改变, 更改 fiber.flag, 新建 Effect
   currentlyRenderingFiber.flags |= fiberFlags;
 
   hook.memoizedState = pushEffect(
@@ -1310,13 +1330,14 @@ function mountEffect(
     }
   }
   return mountEffectImpl(
-    UpdateEffect | PassiveEffect,
-    HookPassive,
+    UpdateEffect | PassiveEffect, // fiberFlags
+    HookPassive, // hookFlags
     create,
     deps,
   );
 }
 
+// TAGH useEffect —— 更新
 function updateEffect(
   create: () => (() => void) | void,
   deps: Array<mixed> | void | null,
@@ -1335,13 +1356,20 @@ function updateEffect(
   );
 }
 
+// TAGH useLayoutEffect —— 初次
 function mountLayoutEffect(
   create: () => (() => void) | void,
   deps: Array<mixed> | void | null,
 ): void {
-  return mountEffectImpl(UpdateEffect, HookLayout, create, deps);
+  return mountEffectImpl(
+    UpdateEffect, // fiberFlags
+    HookLayout, // hookFlags
+    create, 
+    deps
+  );
 }
 
+// TAGH useLayoutEffect —— 更新
 function updateLayoutEffect(
   create: () => (() => void) | void,
   deps: Array<mixed> | void | null,

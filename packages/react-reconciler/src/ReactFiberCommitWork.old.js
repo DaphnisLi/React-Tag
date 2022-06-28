@@ -312,6 +312,7 @@ function commitBeforeMutationLifeCycles(
   );
 }
 
+// TAGH 执行 useLayoutEffect 销毁函数
 function commitHookEffectListUnmount(tag: number, finishedWork: Fiber) {
   const updateQueue: FunctionComponentUpdateQueue | null = (finishedWork.updateQueue: any);
   const lastEffect = updateQueue !== null ? updateQueue.lastEffect : null;
@@ -381,19 +382,23 @@ function commitHookEffectListMount(tag: number, finishedWork: Fiber) {
     } while (effect !== firstEffect);
   }
 }
-
+// TAGD 为 flushPassiveEffects 做准备
 function schedulePassiveEffects(finishedWork: Fiber) {
+  // 1. 获取 fiber.updateQueue
   const updateQueue: FunctionComponentUpdateQueue | null = (finishedWork.updateQueue: any);
+  // 2. 获取 effect 环形队列
   const lastEffect = updateQueue !== null ? updateQueue.lastEffect : null;
   if (lastEffect !== null) {
     const firstEffect = lastEffect.next;
     let effect = firstEffect;
     do {
       const {next, tag} = effect;
+      // 3. 筛选出由 useEffect() 创建的`effect`
       if (
         (tag & HookPassive) !== NoHookEffect &&
         (tag & HookHasEffect) !== NoHookEffect
       ) {
+        // 把 effect 添加到全局数组, 等待`flushPassiveEffects`处理
         enqueuePendingPassiveHookEffectUnmount(finishedWork, effect);
         enqueuePendingPassiveHookEffectMount(finishedWork, effect);
       }
@@ -481,6 +486,8 @@ function commitLifeCycles(
       ) {
         try {
           startLayoutEffectTimer();
+          // 在此之前commitMutationEffects函数中, effect.destroy已经被调用, 所以effect.destroy永远不会影响到effect.create
+          // TAGH 执行 useLayoutEffect 回调函数
           commitHookEffectListMount(HookLayout | HookHasEffect, finishedWork);
         } finally {
           recordLayoutEffectDuration(finishedWork);
@@ -488,7 +495,8 @@ function commitLifeCycles(
       } else {
         commitHookEffectListMount(HookLayout | HookHasEffect, finishedWork);
       }
-
+      // TAGD 为 useEffect 作准备
+      // 把带有 Passive 标记的 Effect(useEffect) 筛选出来, 添加到一个全局数组
       schedulePassiveEffects(finishedWork);
       return;
     }
@@ -1464,6 +1472,7 @@ function commitWork(current: Fiber | null, finishedWork: Fiber): void {
         ) {
           try {
             startLayoutEffectTimer();
+            // 在突变阶段调用销毁函数, 保证所有的effect.destroy函数都会在effect.create之前执行
             commitHookEffectListUnmount(
               HookLayout | HookHasEffect,
               finishedWork,

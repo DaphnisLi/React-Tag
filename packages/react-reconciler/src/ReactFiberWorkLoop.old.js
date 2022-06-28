@@ -2533,7 +2533,7 @@ function commitBeforeMutationEffects() {
       resetCurrentDebugFiberInDEV();
     }
     // TAGD 处理 Passive 标记
-    // TAGQ 调用 useEffect
+    // TAGD 调用 useEffect
     if ((flags & Passive) !== NoFlags) {
       // If there are passive effects, schedule a callback to flush at
       // the earliest opportunity.
@@ -2638,6 +2638,7 @@ function commitMutationEffects(
       // ? 更新节点
       case Update: {
         const current = nextEffect.alternate;
+        // TAGD 执行 useLayoutEffect 销毁函数
         commitWork(current, nextEffect);
         break;
       }
@@ -2680,6 +2681,7 @@ function commitLayoutEffects(root: FiberRoot, committedLanes: Lanes) {
     // 处理 Update 和 Callback标记
     if (flags & (Update | Callback)) {
       const current = nextEffect.alternate;
+      // TAGD 执行 useLayoutEffect 回调函数
       commitLayoutEffectOnFiber(root, current, nextEffect, committedLanes);
     }
 
@@ -2712,6 +2714,7 @@ function commitLayoutEffects(root: FiberRoot, committedLanes: Lanes) {
   }
 }
 
+// TAGD flushPassiveEffects
 export function flushPassiveEffects(): boolean {
   // Returns whether passive effects were flushed.
   if (pendingPassiveEffectsRenderPriority !== NoSchedulerPriority) {
@@ -2731,6 +2734,7 @@ export function flushPassiveEffects(): boolean {
         setCurrentUpdateLanePriority(previousLanePriority);
       }
     } else {
+      // `runWithPriority`设置Schedule中的调度优先级, 如果在flushPassiveEffectsImpl中处理effect时又发起了新的更新, 那么新的update.lane将会受到这个priorityLevel影响.
       return runWithPriority(priorityLevel, flushPassiveEffectsImpl);
     }
   }
@@ -2790,6 +2794,7 @@ function invokePassiveEffectCreate(effect: HookEffect): void {
   effect.destroy = create();
 }
 
+// TAGD flushPassiveEffects 主要逻辑
 function flushPassiveEffectsImpl() {
   if (rootWithPendingPassiveEffects === null) {
     return false;
@@ -2831,6 +2836,7 @@ function flushPassiveEffectsImpl() {
   // Layout effects have the same constraint.
 
   // First pass: Destroy stale passive effects.
+  // TAGH 执行 useEffect 销毁函数
   const unmountEffects = pendingPassiveHookEffectsUnmount;
   pendingPassiveHookEffectsUnmount = [];
   for (let i = 0; i < unmountEffects.length; i += 2) {
@@ -2891,6 +2897,7 @@ function flushPassiveEffectsImpl() {
     }
   }
   // Second pass: Create new passive effects.
+  // TAGH 执行 useEffect 回调函数, 返回值赋值给销毁函数
   const mountEffects = pendingPassiveHookEffectsMount;
   pendingPassiveHookEffectsMount = [];
   for (let i = 0; i < mountEffects.length; i += 2) {
