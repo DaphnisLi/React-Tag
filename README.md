@@ -1,7 +1,7 @@
 # React source code marking
 
 
-# TAG
+# 标签
 https://marketplace.visualstudio.com/items?itemName=Gruntfuggly.todo-tree
 "BUG",
 "HACK",
