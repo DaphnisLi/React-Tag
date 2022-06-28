@@ -653,16 +653,19 @@ function createFunctionComponentUpdateQueue(): FunctionComponentUpdateQueue {
   };
 }
 
+// TAGH useState 默认的 dispatch
 function basicStateReducer<S>(state: S, action: BasicStateAction<S>): S {
   // $FlowFixMe: Flow doesn't like mixed types
   return typeof action === 'function' ? action(state) : action;
 }
 
+// TAGH useReducer —— 初次
 function mountReducer<S, I, A>(
   reducer: (S, A) => S,
   initialArg: I,
   init?: I => S,
 ): [S, Dispatch<A>] {
+  // 1. 创建hook
   const hook = mountWorkInProgressHook();
   let initialState;
   if (init !== undefined) {
@@ -670,27 +673,32 @@ function mountReducer<S, I, A>(
   } else {
     initialState = ((initialArg: any): S);
   }
+  // 2. 初始化hook的属性
+  // 2.1 设置 hook.memoizedState/hook.baseState
   hook.memoizedState = hook.baseState = initialState;
+  // 2.2 设置 hook.queue
   const queue = (hook.queue = {
     pending: null,
     dispatch: null,
     lastRenderedReducer: reducer,
     lastRenderedState: (initialState: any),
   });
+  // 2.3 设置 hook.dispatch
   const dispatch: Dispatch<A> = (queue.dispatch = (dispatchAction.bind(
     null,
     currentlyRenderingFiber,
     queue,
   ): any));
+  // 3. 返回[当前状态, dispatch函数]
   return [hook.memoizedState, dispatch];
 }
 
-// TAGH useState —— 更新
 function updateReducer<S, I, A>(
   reducer: (S, A) => S,
   initialArg: I,
   init?: I => S,
 ): [S, Dispatch<A>] {
+  // 1. 获取workInProgressHook对象
   const hook = updateWorkInProgressHook();
   const queue = hook.queue;
   invariant(
@@ -706,6 +714,7 @@ function updateReducer<S, I, A>(
   let baseQueue = current.baseQueue;
 
   // The last pending update that hasn't been processed yet.
+  // 2. 链表拼接: 将 hook.queue.pending 拼接到 current.baseQueue
   const pendingQueue = queue.pending;
   if (pendingQueue !== null) {
     // We have new updates that haven't been processed yet.
@@ -730,7 +739,7 @@ function updateReducer<S, I, A>(
     current.baseQueue = baseQueue = pendingQueue;
     queue.pending = null;
   }
-
+  // 3. 状态计算
   if (baseQueue !== null) {
     // We have a queue to process.
     const first = baseQueue.next;
@@ -742,10 +751,13 @@ function updateReducer<S, I, A>(
     let update = first;
     do {
       const updateLane = update.lane;
+      // 3.1 优先级提取 update
       if (!isSubsetOfLanes(renderLanes, updateLane)) {
         // Priority is insufficient. Skip this update. If this is the first
         // skipped update, the previous update/state is the new base
         // update/state.
+
+        // 优先级不够: 加入到 baseQueue 中, 等待下一次render
         const clone: Update<S, A> = {
           lane: updateLane,
           action: update.action,
@@ -770,7 +782,9 @@ function updateReducer<S, I, A>(
       } else {
         // This update does have sufficient priority.
 
+        // 优先级足够: 状态合并
         if (newBaseQueueLast !== null) {
+          // 更新 baseQueue
           const clone: Update<S, A> = {
             // This update is going to be committed so we never want uncommit
             // it. Using NoLane works because 0 is a subset of all bitmasks, so
@@ -788,15 +802,19 @@ function updateReducer<S, I, A>(
         if (update.eagerReducer === reducer) {
           // If this update was processed eagerly, and its reducer matches the
           // current reducer, we can use the eagerly computed state.
+
+          // 性能优化: 如果存在 update.eagerReducer, 直接使用 update.eagerState, 避免重复调用reducer
           newState = ((update.eagerState: any): S);
         } else {
           const action = update.action;
+          // 调用 reducer 获取最新状态
           newState = reducer(newState, action);
         }
       }
       update = update.next;
     } while (update !== null && update !== first);
 
+    // 3.2. 更新属性
     if (newBaseQueueLast === null) {
       newBaseState = newState;
     } else {
@@ -808,7 +826,7 @@ function updateReducer<S, I, A>(
     if (!is(newState, hook.memoizedState)) {
       markWorkInProgressReceivedUpdate();
     }
-
+    // 把计算之后的结果更新到 workInProgressHook 上
     hook.memoizedState = newState;
     hook.baseState = newBaseState;
     hook.baseQueue = newBaseQueueLast;
@@ -1152,18 +1170,26 @@ function updateMutableSource<Source, Snapshot>(
 function mountState<S>(
   initialState: (() => S) | S,
 ): [S, Dispatch<BasicStateAction<S>>] {
+  // 1. 创建 Hook
   const hook = mountWorkInProgressHook();
   if (typeof initialState === 'function') {
     // $FlowFixMe: Flow doesn't like mixed types
     initialState = initialState();
   }
+  // 2. 初始化 Hook 的属性
+  // 2.1 设置 hook.memoizedState / hook.baseState
+  // 2.2 设置 hook.queue
+  // hook.memoizedState 保持在内存中的局部状态。用于输出成最终的 fiber 树。
+  // hook.baseQueue 中所有 update 对象合并之后的状态。
   hook.memoizedState = hook.baseState = initialState;
   const queue = (hook.queue = {
     pending: null,
     dispatch: null,
+    // queue.lastRenderedReducer 是内置函数
     lastRenderedReducer: basicStateReducer,
     lastRenderedState: (initialState: any),
   });
+  // 2.3 设置 hook.dispatch
   const dispatch: Dispatch<
     BasicStateAction<S>,
   > = (queue.dispatch = (dispatchAction.bind(
@@ -1171,9 +1197,11 @@ function mountState<S>(
     currentlyRenderingFiber,
     queue,
   ): any));
+  // 3. 返回[当前状态, dispatch函数]
   return [hook.memoizedState, dispatch];
 }
 
+// TAGH useState —— 更新
 function updateState<S>(
   initialState: (() => S) | S,
 ): [S, Dispatch<BasicStateAction<S>>] {
@@ -1684,7 +1712,7 @@ function rerenderOpaqueIdentifier(): OpaqueIDType | void {
   return id;
 }
 
-// TAGR Hook 更新函数
+// TAGH useState 更新函数 —— dispatch
 function dispatchAction<S, A>(
   fiber: Fiber,
   queue: UpdateQueue<S, A>,
@@ -1701,7 +1729,7 @@ function dispatchAction<S, A>(
   }
 
   const eventTime = requestEventTime();
-  const lane = requestUpdateLane(fiber);
+  const lane = requestUpdateLane(fiber); // Legacy 模式返回 SyncLane
   // ? 1. 创建 update 对象
   const update: Update<S, A> = {
     lane,
@@ -1712,9 +1740,10 @@ function dispatchAction<S, A>(
   };
 
   // Append the update to the end of the list.
-  // ? 2. 将 update 对象添加到当前 Hook 对象的 updateQueue 队列当中
+  // ? 2. 将 update 对象添加到 hook.queue.pending 队列
   const pending = queue.pending;
   if (pending === null) {
+    // 首个 update, 创建一个环形链表
     // This is the first update. Create a circular list.
     update.next = update;
   } else {
@@ -1731,8 +1760,11 @@ function dispatchAction<S, A>(
     // This is a render phase update. Stash it in a lazily-created map of
     // queue -> linked list of updates. After this render pass, we'll restart
     // and apply the stashed updates on top of the work-in-progress hook.
+
+    // 渲染时更新, 做好全局标记
     didScheduleRenderPhaseUpdateDuringThisPass = didScheduleRenderPhaseUpdate = true;
   } else {
+    // 下面这个if判断, 能保证当前创建的update, 是`queue.pending`中第一个`update`. 为什么? 发起更新之后fiber.lanes会被改动, 如果`fiber.lanes && alternate.lanes`没有被改动, 自然就是首个 update
     if (
       fiber.lanes === NoLanes &&
       (alternate === null || alternate.lanes === NoLanes)
@@ -1754,9 +1786,14 @@ function dispatchAction<S, A>(
           // it, on the update object. If the reducer hasn't changed by the
           // time we enter the render phase, then the eager state can be used
           // without calling the reducer again.
+          // TAGH 如果两次 setState 的更新函数相同，则不会发起调度
+          // ? 暂存`eagerReducer`和`eagerState`, 如果在render阶段reducer==update.eagerReducer, 则可以直接使用无需再次计算
           update.eagerReducer = lastRenderedReducer;
           update.eagerState = eagerState;
           if (is(eagerState, currentState)) {
+          // ? 快速通道, eagerState与currentState相同, 无需调度更新
+          // 注: update已经被添加到了queue.pending, 并没有丢弃. 之后需要更新的时候, 此update还是会起作用
+
             // Fast path. We can bail out without scheduling React to re-render.
             // It's still possible that we'll need to rebase this update later,
             // if the component re-renders for a different reason and by that
