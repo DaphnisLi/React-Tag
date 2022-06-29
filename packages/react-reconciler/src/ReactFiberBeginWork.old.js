@@ -2905,6 +2905,11 @@ function updatePortalComponent(
 
 let hasWarnedAboutUsingNoValuePropOnContextProvider = false;
 
+// TAGR updateContextProvider
+/**
+ * updateContextProvider()在fiber初次创建时十分简单, 仅仅就是保存了pendingProps.value做为context的最新值, 之后这个最新的值用于供给消费.
+ * 更新阶段: value没有改变, 直接进入Bailout, value改变, 调用propagateContextChange
+ */
 function updateContextProvider(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -2916,6 +2921,7 @@ function updateContextProvider(
   const newProps = workInProgress.pendingProps;
   const oldProps = workInProgress.memoizedProps;
 
+  // 接收新value
   const newValue = newProps.value;
 
   if (__DEV__) {
@@ -2934,12 +2940,16 @@ function updateContextProvider(
     }
   }
 
+  // 更新 ContextProvider._currentValue
   pushProvider(workInProgress, newValue);
 
   if (oldProps !== null) {
+    // 更新阶段进入
     const oldValue = oldProps.value;
+    // 对比 newValue 和 oldValue
     const changedBits = calculateChangedBits(context, newValue, oldValue);
     if (changedBits === 0) {
+      // value没有变动, 进入 Bailout 逻辑
       // No change. Bailout early if children are the same.
       if (
         oldProps.children === newProps.children &&
@@ -2954,6 +2964,8 @@ function updateContextProvider(
     } else {
       // The context value changed. Search for matching consumers and schedule
       // them to update.
+
+      // value变动, 查找对应的consumers, 并使其能够被更新
       propagateContextChange(workInProgress, context, changedBits, renderLanes);
     }
   }
@@ -2965,6 +2977,7 @@ function updateContextProvider(
 
 let hasWarnedAboutUsingContextAsConsumer = false;
 
+// TAGR updateContextConsumer
 function updateContextConsumer(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -3010,6 +3023,7 @@ function updateContextConsumer(
     }
   }
 
+  // 读取context
   prepareToReadContext(workInProgress, renderLanes);
   const newValue = readContext(context, newProps.unstable_observedBits);
   let newChildren;
@@ -3510,6 +3524,7 @@ function beginWork(
       return updateMode(current, workInProgress, renderLanes);
     case Profiler:
       return updateProfiler(current, workInProgress, renderLanes);
+    // TAGR 处理 Context 节点
     case ContextProvider:
       return updateContextProvider(current, workInProgress, renderLanes);
     case ContextConsumer:

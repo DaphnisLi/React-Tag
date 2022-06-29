@@ -11,6 +11,16 @@ import {REACT_PROVIDER_TYPE, REACT_CONTEXT_TYPE} from 'shared/ReactSymbols';
 
 import type {ReactContext} from 'shared/ReactTypes';
 
+// TAGH createContext
+/**
+ * 其初始值保存在context._currentValue(同时保存到context._currentValue2. 英文注释已经解释, 保存 2 个 value 是为了支持多个渲染器并发渲染)
+ * 同时创建了context.Provider, context.Consumer2 个reactElement对象.
+ */
+/**
+ * 核心思想
+ * 在消费状态时, ContextConsumer 节点调用 readContext(MyContext) 获取最新状态.
+ * 在更新状态时, 由 ContextProvider 节点负责查找所有 ContextConsumer 节点, 并设置消费节点的父路径上所有节点的 fiber.childLanes, 保证消费节点可以得到更新.
+ */
 export function createContext<T>(
   defaultValue: T,
   calculateChangedBits: ?(a: T, b: T) => number,

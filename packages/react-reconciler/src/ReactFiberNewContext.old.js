@@ -179,6 +179,11 @@ export function scheduleWorkOnParentPath(
   }
 }
 
+// TAGR propagateContextChange
+/**
+ * 向下遍历: 从ContextProvider类型的节点开始, 向下查找所有fiber.dependencies依赖该context的节点(假设叫做consumer).
+ * 向上遍历: 从consumer节点开始, 向上遍历, 修改父路径上所有节点的fiber.childLanes属性, 表明其子节点有改动, 子节点会进入更新逻辑.
+ */
 export function propagateContextChange(
   workInProgress: Fiber,
   context: ReactContext<mixed>,
@@ -200,20 +205,22 @@ export function propagateContextChange(
 
       let dependency = list.firstContext;
       while (dependency !== null) {
+        // 检查 dependency中依赖的context
         // Check if the context matches.
         if (
           dependency.context === context &&
           (dependency.observedBits & changedBits) !== 0
         ) {
           // Match! Schedule an update on this fiber.
-
+          // 符合条件, 安排调度
           if (fiber.tag === ClassComponent) {
             // Schedule a force update on the work-in-progress.
+            // class 组件需要创建一个update对象, 添加到updateQueue队列
             const update = createUpdate(
               NoTimestamp,
               pickArbitraryLane(renderLanes),
             );
-            update.tag = ForceUpdate;
+            update.tag = ForceUpdate; // 注意ForceUpdate, 保证class组件一定执行render
             // todo: Because we don't have a work-in-progress, this will add the
             // update to the current fiber, too, which means it will persist even if
             // this render is thrown away. Since it's a race condition, not sure it's
@@ -225,13 +232,16 @@ export function propagateContextChange(
           if (alternate !== null) {
             alternate.lanes = mergeLanes(alternate.lanes, renderLanes);
           }
+          // 向上
           scheduleWorkOnParentPath(fiber.return, renderLanes);
 
           // Mark the updated lanes on the list, too.
+          // 标记优先级
           list.lanes = mergeLanes(list.lanes, renderLanes);
 
           // Since we already found a match, we can stop traversing the
           // dependency list.
+          // 退出查找
           break;
         }
         dependency = dependency.next;
@@ -298,6 +308,7 @@ export function prepareToReadContext(
   workInProgress: Fiber,
   renderLanes: Lanes,
 ): void {
+  // 1. 设置全局变量, 为readContext做准备
   currentlyRenderingFiber = workInProgress;
   lastContextDependency = null;
   lastContextWithAllBitsObserved = null;
@@ -356,6 +367,7 @@ export function readContext<T>(
       next: null,
     };
 
+    // 1. 构造一个contextItem, 加入到 workInProgress.dependencies链表之后
     if (lastContextDependency === null) {
       invariant(
         currentlyRenderingFiber !== null,
@@ -377,5 +389,7 @@ export function readContext<T>(
       lastContextDependency = lastContextDependency.next = contextItem;
     }
   }
+
+  // 2. 返回 currentValue
   return isPrimaryRenderer ? context._currentValue : context._currentValue2;
 }
