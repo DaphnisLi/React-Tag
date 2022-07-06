@@ -232,13 +232,22 @@ if (__DEV__) {
 }
 
 // TAGR 调和算法 —— 真正生成 Fiber 子节点的地方
+
 /** 
  * 根据 ReactElement 对象，生成 Fiber 子节点(只生成次级子节点) 
  * 首次渲染：直接生成 Fiber 子节点
  * 后续更新：Diff 算法
  * 
  * 1、新增、移动、删除节点设置 fiber.flags(新增、移动: Placement, 删除: Deletion)
- * 2、如果是需要删除的 fiber, 除了自身打上 Deletion 之外, 还要将其添加到父节点的 effects 链表中(正常副作用队列的处理是在completeWork 函数, 但是该节点(被删除)会脱离 fiber 树, 不会再进入 completeWork 阶段, 所以在 beginWork 阶段提前加入副作用队列).
+ * 2、如果是需要删除的 fiber, 除了自身打上 Deletion 之外, 还要将其添加到父节点的 effects 链表中(正常副作用队列的处理是在completeWork 函数, 但是该节点(被删除)会脱离 fiber 树, 不会再进入 completeWork 阶段, 所以在 beginWork 阶段提前加入副作用队列). ———— 这里也会提前操作副作用队列
+ */
+
+/**
+ * https://react.iamkasong.com/diff/prepare.html#diff%E7%9A%84%E7%93%B6%E9%A2%88%E4%BB%A5%E5%8F%8Areact%E5%A6%82%E4%BD%95%E5%BA%94%E5%AF%B9
+ * 为了降低算法复杂度，React的diff会预设三个限制：
+ * 1、只对同级元素进行Diff。如果一个DOM节点在前后两次更新中跨越了层级，那么React不会尝试复用他。
+ * 2、两个不同类型的元素会产生出不同的树。如果元素由div变为p，React会销毁div及其子孙节点，并新建p及其子孙节点。
+ * 3、开发者可以通过 key prop来暗示哪些子元素在不同的渲染下能保持稳定。
  */
 export function reconcileChildren(
   current: Fiber | null,

@@ -809,6 +809,8 @@ function ChildReconciler(shouldTrackSideEffects) {
     let lastPlacedIndex = 0;
     let newIdx = 0;
     let nextOldFiber = null;
+
+    // ? 1. 第一次循环: 遍历最长公共序列(key相同), 公共序列的节点都视为可复用
     for (; oldFiber !== null && newIdx < newChildren.length; newIdx++) {
       if (oldFiber.index > newIdx) {
         nextOldFiber = oldFiber;
@@ -816,6 +818,8 @@ function ChildReconciler(shouldTrackSideEffects) {
       } else {
         nextOldFiber = oldFiber.sibling;
       }
+      // ? new 槽位和 old 槽位进行比较, 如果 key 不同, 返回null
+      // ? key 相同, 比较type是否一致. type 一致则执行 useFiber(update 逻辑), type 不一致则运行 createXXX(insert 逻辑)
       const newFiber = updateSlot(
         returnFiber,
         oldFiber,
@@ -827,19 +831,24 @@ function ChildReconciler(shouldTrackSideEffects) {
         // unfortunate because it triggers the slow path all the time. We need
         // a better way to communicate whether this was a miss or null,
         // boolean, undefined, etc.
+        // ? 如果返回 null, 表明 key 不同. 无法满足公共序列条件, 退出循环
         if (oldFiber === null) {
           oldFiber = nextOldFiber;
         }
         break;
       }
       if (shouldTrackSideEffects) {
+        // ? 若是新增节点, 则给老节点打上 Deletion 标记
         if (oldFiber && newFiber.alternate === null) {
           // We matched the slot, but we didn't reuse the existing fiber, so we
           // need to delete the existing child.
           deleteChild(returnFiber, oldFiber);
         }
       }
+      // ? lastPlacedIndex 记录被移动的节点索引
+      // ? 如果当前节点可复用, 则要判断位置是否移动.
       lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
+      // ? 更新 resultingFirstChild 结果序列
       if (previousNewFiber === null) {
         // todo: Move out of the loop. This only happens for the first run.
         resultingFirstChild = newFiber;
@@ -855,12 +864,14 @@ function ChildReconciler(shouldTrackSideEffects) {
     }
 
     if (newIdx === newChildren.length) {
+      // ? 如果 newChildren 序列被遍历完, 那么 oldFiber 序列中剩余节点都视为删除(打上 Deletion 标记)
       // We've reached the end of the new children. We can delete the rest.
       deleteRemainingChildren(returnFiber, oldFiber);
       return resultingFirstChild;
     }
 
     if (oldFiber === null) {
+      // ? 如果 oldFiber 序列被遍历完, 那么 newChildren 序列中剩余节点都视为新增(打上 Placement 标记)
       // If we don't have any more existing children we can choose a fast path
       // since the rest will all be insertions.
       for (; newIdx < newChildren.length; newIdx++) {
@@ -881,9 +892,11 @@ function ChildReconciler(shouldTrackSideEffects) {
     }
 
     // Add all children to a key map for quick lookups.
+    // ? 1. 将第一次循环后, oldFiber 剩余序列加入到一个 map 中. 目的是为了第二次循环能顺利的找到可复用节点
     const existingChildren = mapRemainingChildren(returnFiber, oldFiber);
 
     // Keep scanning and use the map to restore deleted items as moves.
+    // ? 2. 第二次循环: 遍历剩余非公共序列, 优先复用 oldFiber 序列中的节点
     for (; newIdx < newChildren.length; newIdx++) {
       const newFiber = updateFromMap(
         existingChildren,
@@ -899,12 +912,14 @@ function ChildReconciler(shouldTrackSideEffects) {
             // current, that means that we reused the fiber. We need to delete
             // it from the child list so that we don't add it to the deletion
             // list.
+            // ? 如果 newFiber 是通过复用创建的, 则清理 map 中对应的老节点
             existingChildren.delete(
               newFiber.key === null ? newIdx : newFiber.key,
             );
           }
         }
         lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
+        // 更新 resultingFirstChild 结果序列
         if (previousNewFiber === null) {
           resultingFirstChild = newFiber;
         } else {
@@ -913,8 +928,9 @@ function ChildReconciler(shouldTrackSideEffects) {
         previousNewFiber = newFiber;
       }
     }
-
+    // ? 3. 善后工作, 第二次循环完成之后, existingChildren 中剩余的 fiber 节点就是将要被删除的节点, 打上 Deletion 标记
     if (shouldTrackSideEffects) {
+      // ? newChildren 已经遍历完, 那么 oldFiber 序列中剩余节点都视为删除(打上 Deletion 标记)
       // Any existing children that weren't consumed above were deleted. We need
       // to add them to the deletion list.
       existingChildren.forEach(child => deleteChild(returnFiber, child));
@@ -1132,6 +1148,16 @@ function ChildReconciler(shouldTrackSideEffects) {
     return created;
   }
 
+  // TAGR 调和算法 —— 单节点比较
+  /**
+   * 如果是新增节点, 直接新建 fiber, 没有多余的逻辑
+   * 
+   * 如果是对比更新
+   *    如果key和type都相同(即: ReactElement.key === Fiber.key 且 Fiber.elementType === ReactElement.type), 则复用
+   *    否则新建
+   * 
+   * 注意: 复用过程是调用useFiber(child, element.props)创建新的fiber对象, 这个新fiber对象.stateNode = currentFirstChild.stateNode, 即stateNode属性得到了复用, 故 DOM 节点得到了复用.
+   */
   function reconcileSingleElement(
     returnFiber: Fiber,
     currentFirstChild: Fiber | null,
@@ -1141,9 +1167,12 @@ function ChildReconciler(shouldTrackSideEffects) {
     const key = element.key;
     let child = currentFirstChild;
     while (child !== null) {
+      // ! 更新阶段
+      // ? currentFirstChild !== null, 表明是对比更新阶段
       // todo: If key === null and child.key === null, then this only applies to
       // the first item in the list.
       if (child.key === key) {
+        // ? 1. key 相同, 进一步判断 child.elementType === element.type
         switch (child.tag) {
           case Fragment: {
             if (element.type === REACT_FRAGMENT_TYPE) {
@@ -1193,7 +1222,9 @@ function ChildReconciler(shouldTrackSideEffects) {
                 ? isCompatibleFamilyForHotReloading(child, element)
                 : false)
             ) {
+              // ? 1.1 已经匹配上了, 如果有兄弟节点, 需要给兄弟节点打上 Deletion 标记
               deleteRemainingChildren(returnFiber, child.sibling);
+              // ? 1.2 构造 fiber 节点, 新的 fiber 对象会复用 current.stateNode, 即可复用 DOM 对象
               const existing = useFiber(child, element.props);
               existing.ref = coerceRef(returnFiber, child, element);
               existing.return = returnFiber;
@@ -1207,9 +1238,11 @@ function ChildReconciler(shouldTrackSideEffects) {
           }
         }
         // Didn't match.
+        // ? 给当前节点点打上 Deletion 标记
         deleteRemainingChildren(returnFiber, child);
         break;
       } else {
+        // ? 2. key 不相同, 匹配失败, 给当前节点打上 Deletion 标记
         deleteChild(returnFiber, child);
       }
       child = child.sibling;
@@ -1225,6 +1258,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       created.return = returnFiber;
       return created;
     } else {
+      // ! 新建节点
       const created = createFiberFromElement(element, returnFiber.mode, lanes);
       created.ref = coerceRef(returnFiber, currentFirstChild, element);
       created.return = returnFiber;
@@ -1271,6 +1305,10 @@ function ChildReconciler(shouldTrackSideEffects) {
   // This API will tag the children with the side-effect of the reconciliation
   // itself. They will be added to the side-effect list as we pass through the
   // children and the parent.
+
+  // TAGR 调和算法 —— 入口函数
+
+  /** 调和算法 —— 既是入口函数又是可迭代节点比较 —— 数组及其他可迭代节点 */
   function reconcileChildFibers(
     returnFiber: Fiber,
     currentFirstChild: Fiber | null,
@@ -1293,8 +1331,9 @@ function ChildReconciler(shouldTrackSideEffects) {
     if (isUnkeyedTopLevelFragment) {
       newChild = newChild.props.children;
     }
+    // ! 根据 newChild 的类型, 调用不同的处理函数
 
-    // Handle object types
+    // ? 对象类型
     const isObject = typeof newChild === 'object' && newChild !== null;
 
     if (isObject) {
@@ -1332,6 +1371,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       }
     }
 
+    // ? 字符串/数字类型
     if (typeof newChild === 'string' || typeof newChild === 'number') {
       return placeSingleChild(
         reconcileSingleTextNode(
@@ -1343,6 +1383,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       );
     }
 
+    // ? 数组类型
     if (isArray(newChild)) {
       return reconcileChildrenArray(
         returnFiber,
@@ -1402,6 +1443,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       }
     }
 
+    // 以上都没有命中，删除节点
     // Remaining cases are all treated as empty.
     return deleteRemainingChildren(returnFiber, currentFirstChild);
   }
