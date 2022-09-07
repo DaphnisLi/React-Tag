@@ -50,8 +50,8 @@ export type LazyComponent<T, P> = {
 
 function lazyInitializer<T>(payload: Payload<T>): T {
   if (payload._status === Uninitialized) {
-    const ctor = payload._result;
-    const thenable = ctor();
+    const ctor = payload._result;  // () => import('path')
+    const thenable = ctor(); // import('path')    type: Promise<{ default: T }>
     // Transition to the next state.
     const pending: PendingPayload = (payload: any);
     pending._status = Pending;
