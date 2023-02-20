@@ -315,7 +315,7 @@ let workInProgressRootFatalError: mixed = null;
 /** 整个render期间所使用到的所有lanes */
 let workInProgressRootIncludedLanes: Lanes = NoLanes;
 // The work left over by components that were visited during this render. Only
-// includes unprocessed updates, not work in bailed out children. 
+// includes unprocessed updates, not work in bailed out children.
 /** 在render期间被跳过(由于优先级不够)的lanes: 只包括未处理的updates, 不包括被复用的fiber节点 */
 let workInProgressRootSkippedLanes: Lanes = NoLanes;
 // Lanes that were updated (in an interleaved event) during this render.
@@ -481,7 +481,7 @@ export function requestUpdateLane(fiber: Fiber): Lane {
 
   // todo: Remove this dependency on the Scheduler priority.
   // To do that, we're replacing it with an update lane priority.
-  // 正常情况, 获取调度优先级 
+  // 正常情况, 获取调度优先级
   const schedulerPriority = getCurrentPriorityLevel();
 
   // The old behavior was using the priority level of the Scheduler.
@@ -564,7 +564,7 @@ function requestRetryLane(fiber: Fiber) {
 // 在react自身上下文之外触发更新时, executionContext就为空。
 // 正常情况下的节点更新都是在合成事件的回调函数中，进行 setState。在执行这个回调之前，react 已经设置好了 executionContext。如果绕过 react 内部设置 executionContext 的时机，比如在 setTimeout 的回调，原生事件的回调，Promise.resolve 回调等中去执行 setState, 这个回调函数是 JavaScript 直接运行, 没有通过 react 内核来运行, 所以 react 没有机会设置 executionContext，此时就为空。
 
-/**  
+/**
  * Reconciler 包的入口函数
  */
 export function scheduleUpdateOnFiber(
@@ -614,7 +614,7 @@ export function scheduleUpdateOnFiber(
   // priority as an argument to that function and this one.
   const priorityLevel = getCurrentPriorityLevel();
 
-  // TAGR 首次渲染。构建 Fiber 或者进入调度
+  // TAGR 渲染, 构建 Fiber 或者进入调度
   if (lane === SyncLane) { // Legacy / Blocking 模式下 Updata 的 Lane === SyncLane
     // ? Legacy / Blocking 模式
     if (
@@ -754,9 +754,9 @@ function markUpdateLaneFromFiberToRoot(
 // exiting a task.
 
 // TAGS 是否注册调度任务
-/** 
+/**
  * 注册调度任务的核心函数，影响到是否会进行调度
- * 函数内部会判断是否需要注册调度任务，如果需要就去注册 
+ * 函数内部会判断是否需要注册调度任务，如果需要就去注册
 */
 function ensureRootIsScheduled(root: FiberRoot, currentTime: number) {
   // ? 前半部分: 判断是否需要注册新的调度
@@ -785,7 +785,7 @@ function ensureRootIsScheduled(root: FiberRoot, currentTime: number) {
   }
 
   // Check if there's an existing task. We may be able to reuse it.
-  // TAGS 注册调度任务前的节流防抖
+  // TAGS 注册调度任务前的节流（n 秒内只执行一次）防抖（每次都会重新计时）
   // 节流：(判断条件: existingCallbackPriority === newCallbackPriority, 新旧更新的优先级相同, 如连续多次执行 setState), 则无需注册新 task(继续沿用上一个优先级相同的task), 直接退出调用。
   // 防抖：(判断条件: existingCallbackPriority !== newCallbackPriority, 新旧更新的优先级不同), 则取消旧 task, 重新注册新 task。
   if (existingCallbackNode !== null) {
@@ -831,8 +831,8 @@ function ensureRootIsScheduled(root: FiberRoot, currentTime: number) {
 // goes through Scheduler.
 
 // TAGS Task 回调函数 —— Concurrent
-/** 
- * Concurrent 模式 Scheduler 回调函数，构建 Fiber 树 
+/**
+ * Concurrent 模式 Scheduler 回调函数，构建 Fiber 树
 */
 function performConcurrentWorkOnRoot(root) {
   // Since we know we're in a React event, we can clear the current
@@ -1071,7 +1071,7 @@ function markRootSuspended(root, suspendedLanes) {
 // through Scheduler
 
 // TAGS Task 回调函数 —— Legacy / Blocking
-/** 
+/**
  * 构建 Fiber 树
  * legacy 或 blocking 模式 Scheduler 回调函数
  * 在执行 fiber 树构造前(workLoopSync)会先刷新栈帧 prepareFreshStack(参考fiber 树构造(基础准备)).在这里创建了 HostRootFiber.alternate, 重置全局变量 workInProgress 和 workInProgressRoot 等。
@@ -1700,7 +1700,7 @@ function renderRootSync(root: FiberRoot, lanes: Lanes) {
 // TAGR 循环构造 Fiber 树 —— Legacy / Blocking
 
 // TAGQ 深度优先遍历
-// 当前节点处理完会一直向下遍历，如果子节点是文本或者没有就会停止向下遍历（这里并不会向下遍历了，是直接从左到右遍历兄弟节点，所以就不会回溯）。接着遍历兄弟节点，然后遍历兄弟节点的子节点。等最后一个兄弟节点遍历完了就会返回到父节点。然后遍历父节点的兄弟节点。
+// 当前节点处理完会一直向下遍历，如果子节点是文本或者没有就会停止向下遍历（这里不会向下遍历了，而是直接从左到右遍历兄弟节点，所以就不会回溯）。接着遍历兄弟节点，然后遍历兄弟节点的子节点。等最后一个兄弟节点遍历完了就会返回到父节点。然后遍历父节点的兄弟节点。
 // 记住：只有当子节点是文本或者没有的时候才会遍历兄弟节点。
 
 /**
@@ -1793,9 +1793,10 @@ function renderRootConcurrent(root: FiberRoot, lanes: Lanes) {
  */
 function workLoopConcurrent() {
   // Perform work until Scheduler asks us to yield
+  // TAGR 可中断渲染
   // TAGQ 可中断渲染 —— 每个 Fiber 节点构造前检查一次
-  // 单个任务执行时间过多
-  // 可中断渲染原理：在时间切片的基础之上, 如果单个 task.callback 执行时间就很长(假设 200ms)。就需要 task.callback 自己能够检测是否超时, 所以在 Fiber 树构造过程中, 每构造完成一个 Fiber, 都会检测一次超时(源码链接), 如遇超时就退出 Fiber 树构造循环, 并返回一个新的回调函数等待下一次回调继续未完成的 Fiber 树构造.
+  // 单个任务执行时间过长
+  // 可中断渲染原理：在时间切片的基础之上, 如果单个 task.callback 执行时间就很长(假设 200ms)。就需要 task.callback 自己能够检测是否超时, 所以在 Fiber 树构造过程中, 每构造完成一个 Fiber, 都会检测一次超时, 如遇超时就退出 Fiber 树构造循环, 并返回一个新的回调函数等待下一次回调继续未完成的 Fiber 树构造.
 
   // 深度优先遍历
   // ? 这里会比前两个模式多一个停顿机制, 这个机制实现了可中断渲染
@@ -1838,9 +1839,9 @@ function performUnitOfWork(unitOfWork: Fiber): void {
 
 // TAGR 回溯阶段
 
-/** 
+/**
  * 处理 beginWork 阶段已经创建出来的 fiber 节点
- * 
+ *
  * 1、调用 completeWork
  *      创建 DOM 实例：给 fiber 节点(tag=HostComponent, HostText)创建 DOM 实例, 设置 fiber.stateNode 局部状态(如tag = HostComponent, HostText 节点: fiber.stateNode 指向这个 DOM 实例)。
  *      设置 DOM 节点属性, 绑定事件。
@@ -1916,7 +1917,7 @@ function completeUnitOfWork(unitOfWork: Fiber): void {
         // reusing children we'll schedule this effect onto itself since we're
         // at the end.
 
-        // ? 2.2 如果当前 fiber 节点有副作用, 将其添加到子节点的副作用队列之后.
+        // ? 2.2 如果当前 fiber 节点有副作用, 将其添加到父节点的副作用队列之后.
         const flags = completedWork.flags;
 
         // Skip both NoWork and PerformedWork tags when creating the effect
@@ -2085,8 +2086,8 @@ function commitRoot(root) {
 /**
  * 1、处理副作用队列。(步骤 1、2、3 都会处理, 只是处理节点的标识 fiber.flags 不同)。
  * 2、调用渲染器，输出最终结果。(在步骤 2：commitMutationEffects 中执行)。
- * 
- * 其实就是处理是 "副作用队列" 和 "DOM 对象"。所以无论 Fiber 树结构有多么复杂, 到了 commitRoot 阶段, 实际起作用的只有 2 个节点:
+ *
+ * 其实就是处理 "副作用队列" 和 "DOM 对象"。所以无论 Fiber 树结构有多么复杂, 到了 commitRoot 阶段, 实际起作用的只有 2 个节点:
  *     副作用队列所在节点：根节点, 即 HostRootFiber 节点。
  *     DOM对象所在节点：从上至下首个 HostComponent 类型的 Fiber 节点，此节点 fiber.stateNode 实际上指向最新的 DOM 树。
  */
@@ -2498,9 +2499,9 @@ function commitRootImpl(root, renderPriorityLevel) {
  * DOM 变更之前
  * 处理以下副作用标记 Flags
  * Snapshot：HostRoot 和 ClassComponent。
- * Passive：只在使用了 Hook、useEffect会出现，所以此处是针对 Hook 对象的处理。
+ * Passive：只在使用了 Hook、useEffect 会出现，所以此处是针对 Hook 对象的处理。
  */
-function commitBeforeMutationEffects() {
+function ，commitBeforeMutationEffects() {
   while (nextEffect !== null) {
     const current = nextEffect.alternate;
 

@@ -233,11 +233,11 @@ if (__DEV__) {
 
 // TAGR 调和算法 —— 真正生成 Fiber 子节点的地方
 
-/** 
- * 根据 ReactElement 对象，生成 Fiber 子节点(只生成次级子节点) 
+/**
+ * 根据 ReactElement 对象，生成 Fiber 子节点(只生成次级子节点)
  * 首次渲染：直接生成 Fiber 子节点
  * 后续更新：Diff 算法
- * 
+ *
  * 1、新增、移动、删除节点设置 fiber.flags(新增、移动: Placement, 删除: Deletion)
  * 2、如果是需要删除的 fiber, 除了自身打上 Deletion 之外, 还要将其添加到父节点的 effects 链表中(正常副作用队列的处理是在completeWork 函数, 但是该节点(被删除)会脱离 fiber 树, 不会再进入 completeWork 阶段, 所以在 beginWork 阶段提前加入副作用队列). ———— 这里也会提前操作副作用队列
  */
@@ -247,7 +247,7 @@ if (__DEV__) {
  * 为了降低算法复杂度，React的diff会预设三个限制：
  * 1、只对同级元素进行Diff。如果一个DOM节点在前后两次更新中跨越了层级，那么React不会尝试复用他。
  * 2、两个不同类型的元素会产生出不同的树。如果元素由div变为p，React会销毁div及其子孙节点，并新建p及其子孙节点。
- * 3、开发者可以通过 key prop来暗示哪些子元素在不同的渲染下能保持稳定。
+ * 3、开发者可以通过 key prop 来暗示哪些子元素在不同的渲染下能保持稳定。
  */
 export function reconcileChildren(
   current: Fiber | null,
@@ -3184,7 +3184,7 @@ function remountFiber(
  * 1、根据 ReactElement 对象创建所有的 fiber 节点, 最终构造出 fiber 树形结构(设置 return 和 sibling 指针)
  * 2、设置 fiber.flags (二进制形式变量, 用来标记 fiber 节点 的增,删,改状态, 等待 completeWork 阶段处理)
  * 3、设置 fiber.stateNode 局部状态(如 Class 类型节点: fiber.stateNode = new Class())
- * 
+ *
  * 注意：如果是删除节点，那么在 beginWork 就会提前把副作用队列添加到父节点。并且被删除的节点不会进入 completeWork
  */
 function beginWork(
@@ -3442,7 +3442,7 @@ function beginWork(
   // 不同的 updateXXX 函数处理的 fiber 节点类型不同, 总的目的是为了向下生成子节点. 在这个过程中把一些需要持久化的数据挂载到 fiber 节点上(如 fiber.stateNode,fiber.memoizedState 等); 把 fiber 节点的特殊操作设置到 fiber.flags(如:节点 ref，class 组件的生命周期，function 组件的 hook，节点删除等)。
   // 后续更新会比首次渲染多两个逻辑
   /**
-   * 1、bailoutOnAlreadyFinishedWork：对比更新时如果遇到当前节点无需更新(如: class类型的节点且shouldComponentUpdate返回false), 会再次进入bailout逻辑.
+   * 1、bailoutOnAlreadyFinishedWork：对比更新时如果遇到当前节点无需更新(如: class类型的节点且shouldComponentUpdate返回false), 会再次进入l逻辑.
    * 2、reconcileChildren 调和函数：调和函数是updateXXX函数中的一项重要逻辑, 它的作用是向下生成子节点, 并设置fiber.flags。初次创建时fiber节点没有比较对象, 所以在向下生成子节点的时候没有任何多余的逻辑, 只管创建就行。对比更新时需要把ReactElement对象与旧fiber对象进行比较, 来判断是否需要复用旧fiber对象。
    */
   switch (workInProgress.tag) {

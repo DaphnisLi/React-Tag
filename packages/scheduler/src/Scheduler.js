@@ -67,7 +67,7 @@ var IDLE_PRIORITY_TIMEOUT = maxSigned31BitInt;
  */
 var taskQueue = [];
 
-/** 
+/**
  * 延时任务，应该是延时回调的任务
  */
 var timerQueue = [];
@@ -181,7 +181,7 @@ function workLoop(hasTimeRemaining, initialTime) {
   advanceTimers(currentTime);
   // 获取任务队列中的第一个任务，小顶堆
   currentTask = peek(taskQueue);
-
+  // TAGS 时间切片
   // TAGQ 时间切片 —— 每个调度任务检查一次
   /**
    * 任务太多，一个时间切片内只能执行一部分
