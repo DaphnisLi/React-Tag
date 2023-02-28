@@ -1,6 +1,104 @@
 {
-    "todo-tree.tree.showCountsInTree": true,
-    "todo-tree.tree.showBadges": false,
-    "todo-tree.tree.disableCompactFolders": true,
-    "javascript.validate.enable": false, // 关闭js动态验证 https://blog.csdn.net/weixin_45668912/article/details/120554704?utm_medium=distribute.pc_aggpage_search_result.none-task-blog-2~aggregatepage~first_rank_ecpm_v1~rank_v31_ecpm-2-120554704-null-null.pc_agg_new_rank&utm_term=react%E6%BA%90%E7%A0%81%E4%B8%AD%E7%9A%84flow&spm=1000.2123.3001.4430#:~:text=%E7%9A%84%E7%9B%B8%E5%85%B3%E6%96%87%E4%BB%B6%E3%80%82-,%E5%8F%A6%E5%A4%96,-%EF%BC%8Creact%E6%BA%90
+  "todo-tree.tree.showCountsInTree": true,
+  "todo-tree.tree.showBadges": false,
+  "todo-tree.tree.disableCompactFolders": true,
+  "javascript.validate.enable": false, // 关闭js动态验证 https://blog.csdn.net/weixin_45668912/article/details/120554704?utm_medium=distribute.pc_aggpage_search_result.none-task-blog-2~aggregatepage~first_rank_ecpm_v1~rank_v31_ecpm-2-120554704-null-null.pc_agg_new_rank&utm_term=react%E6%BA%90%E7%A0%81%E4%B8%AD%E7%9A%84flow&spm=1000.2123.3001.4430#:~:text=%E7%9A%84%E7%9B%B8%E5%85%B3%E6%96%87%E4%BB%B6%E3%80%82-,%E5%8F%A6%E5%A4%96,-%EF%BC%8Creact%E6%BA%90
+  "todo-tree.general.tags": [
+    "BUG",
+    "HACK",
+    "FIXME",
+    "TODO",
+    "TAG",
+    "TAGR",
+    "TAGS",
+    "TAGD",
+    "TAGT",
+    "TAGL",
+    "TAGQ",
+    "TAGH",
+    "PS",
+  ],
+  "todo-tree.highlights.backgroundColourScheme": [
+    "red",
+    "orange",
+    "yellow",
+    "green",
+    "green",
+    "green",
+    "yellow",
+    "orange",
+  ],
+  "todo-tree.highlights.foregroundColourScheme": [
+    "white",
+    "black",
+    "black",
+    "white",
+    "white",
+    "white",
+    "black",
+    "green"
+  ],
+  "todo-tree.highlights.customHighlight": {
+    "BUG": {
+      "icon": "bug"
+    },
+    "HACK": {
+      "icon": "tools"
+    },
+    "FIXME": {
+      "icon": "flame"
+    },
+    "XXX": {
+      "icon": "$(close)"
+    },
+    "TAG": {
+      "background": "#74eaf0",
+      "icon": "zap",
+      "iconColour": "#74eaf0",
+    },
+    "TAGS": {
+      "background": "#bfb607",
+      "icon": "check-circle-fill",
+      "iconColour": "#bfb607",
+    },
+    "TAGR": {
+      "background": "#07cbd2",
+      "icon": "zap",
+      "iconColour": "#07cbd2",
+    },
+    "TAGD": {
+      "background": "#e38e05",
+      "icon": "tag",
+      "iconColour": "#e38e05",
+    },
+    "TAGT": {
+      "background": "#f57b7b",
+      "icon": "flame",
+      "iconColour": "#f57b7b",
+    },
+    "TAGL": {
+      "background": "#c6a4e9",
+      "icon": "milestone",
+      "iconColour": "#c6a4e9",
+    },
+    "TAGQ": {
+      "background": "#c5f79f",
+      "icon": "hourglass",
+      "iconColour": "#c5f79f",
+    },
+    "TAGH": {
+      "background": "#43c2ad",
+      "icon": "heading",
+      "iconColour": "#43c2ad",
+    },
+    "PS": {
+      "background": "#e38e05",
+      "icon": "tag",
+      "iconColour": "#e38e05",
+    },
+  },
+  "todo-tree.filtering.excludeGlobs": [
+    "**/node_modules/*/**",
+    "README.md"
+  ],
 }

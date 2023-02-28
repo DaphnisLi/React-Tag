@@ -2,16 +2,15 @@
 
 
 # 标签
+
+安装插件后即可在左侧待办事项看多众多 TAG
 https://marketplace.visualstudio.com/items?itemName=Gruntfuggly.todo-tree
-"BUG",
-"HACK",
-"FIXME",
-"TODO",
-"TAG",
-"TAGR",
-"TAGS",
-"TAGD",
-"TAGT",
-"TAGL",
-"TAGQ",
-"TAGH"
+
+各 TAG 含义
+TAGR: react-reconciler 相关
+TAGS: scheduler 相关
+TAGD: react-dom 相关
+TAGT: Types
+TAGL: Lane
+TAGQ: 问题及需要特别注意的地方
+TAGH: Hooks
