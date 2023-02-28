@@ -3,7 +3,7 @@
 
 # 标签
 
-安装插件后即可在左侧待办事项看多众多 TAG
+安装插件后即可在左侧待办事项看到众多 TAG
 https://marketplace.visualstudio.com/items?itemName=Gruntfuggly.todo-tree
 
 各 TAG 含义
