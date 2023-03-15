@@ -1,7 +1,12 @@
-# React source code marking
+# React 源码读后感
+
+# 介绍
+此项目内涵众多源码注释（其实只有关键部位，SSR 等其他相关的不管）
 
 
-# 标签
+# 阅读建议
+
+强烈建议 clone 代码，然后安装 VSCode 插件
 
 安装插件后即可在左侧待办事项看到众多 TAG
 
